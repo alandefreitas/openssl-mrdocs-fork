@@ -1,0 +1,55 @@
+=== batch 13c ===
+  OK: mrdocs.yml :: lh_*_{comp,hash,doall}func exclude
+  OK: http.h :: OSSL_HTTP_REQ_CTX_nbio_d2i
+  OK: http.h :: OSSL_HTTP_proxy_connect
+  OK: kdf.h :: EVP_PKEY_CTX_set1_hkdf_key
+  OK: kdf.h :: EVP_PKEY_CTX_set_scrypt_r
+  OK: lhash.h :: OPENSSL_LH_NODE
+  OK: lhash.h.in :: OPENSSL_LH_NODE
+  OK: objects.h :: OBJ_sn2nid
+  OK: pkcs7.h :: pkcs7_signer_info_st.version
+  OK: pkcs7.h.in :: pkcs7_signer_info_st.version
+  OK: pkcs7.h :: pkcs7_signer_info_st.auth_attr
+  OK: pkcs7.h.in :: pkcs7_signer_info_st.auth_attr
+  OK: pkcs7.h :: i2d_PKCS7_bio
+  OK: pkcs7.h.in :: i2d_PKCS7_bio
+  OK: pkcs7.h :: PKCS7_add_certificate
+  OK: pkcs7.h.in :: PKCS7_add_certificate
+  OK: rsa.h :: EVP_PKEY_CTX_get_rsa_mgf1_md_name
+  OK: rsa.h :: EVP_PKEY_CTX_get_rsa_oaep_md
+  OK: rsa.h :: RSA_get0_multi_prime_factors
+  OK: rsa.h :: RSA_get0_dmp1
+  OK: rsa.h :: RSA_get0_iqmp
+  OK: rsa.h :: RSA_padding_check_none
+  OK: rsa.h :: RSAPrivateKey_dup
+  OK: rsa.h :: RSA_meth_set_finish
+  OK: sha.h :: SHA256_CTX fields
+  OK: srtp.h :: SSL_get_srtp_profiles
+  OK: ssl.h :: custom_ext_parse_cb
+  OK: ssl.h.in :: custom_ext_parse_cb
+  OK: ssl.h :: SSL_CTX_add_server_custom_ext
+  OK: ssl.h.in :: SSL_CTX_add_server_custom_ext
+  OK: ssl.h :: SSL_get_peer_finished
+  OK: ssl.h.in :: SSL_get_peer_finished
+  OK: ssl.h :: SSL_CTX_free
+  OK: ssl.h.in :: SSL_CTX_free
+  OK: ssl.h :: SSL_client_hello_cb_fn
+  OK: ssl.h.in :: SSL_client_hello_cb_fn
+  OK: ssl.h :: SSL_CTX_ctrl
+  OK: ssl.h.in :: SSL_CTX_ctrl
+  OK: ssl.h :: SSL_is_server
+  OK: ssl.h.in :: SSL_is_server
+  OK: ssl.h :: SSL_allow_early_data_cb_fn
+  OK: ssl.h.in :: SSL_allow_early_data_cb_fn
+  OK: types.h :: ASN1_OBJECT
+  OK: types.h :: X509_OBJECT
+  OK: types.h :: X509_LOOKUP
+  OK: types.h :: X509_POLICY_CACHE
+  OK: types.h :: NAME_CONSTRAINTS
+  OK: types.h :: OSSL_ENCODER_CTX
+  OK: ui.h :: UI_dup_input_string
+  OK: ui.h.in :: UI_dup_input_string
+  OK: ui.h :: UI_dup_error_string
+  OK: ui.h.in :: UI_dup_error_string
+
+OK=52 MISS=0

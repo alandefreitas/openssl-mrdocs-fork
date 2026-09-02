@@ -1,0 +1,539 @@
+===== asn1.h:2677 ASN1_item_d2i =====
+    2675|    long len, const ASN1_ITEM *it,
+    2676|    OSSL_LIB_CTX *libctx, const char *propq);
+>>> 2677|ASN1_VALUE *ASN1_item_d2i(ASN1_VALUE **val, const unsigned char **in,
+    2678|    long len, const ASN1_ITEM *it);
+    2679|/**
+    2680| * @brief Encode an ASN.1 value described by @p it to DER.
+    2681| * @param val Value to encode (typed according to @p it).
+    2682| * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+
+===== bio.h:1569 BIO_meth_get_destroy =====
+    1567|int (*BIO_meth_get_create(const BIO_METHOD *bion))(BIO *);
+    1568|int BIO_meth_set_create(BIO_METHOD *biom, int (*create)(BIO *));
+>>> 1569|int (*BIO_meth_get_destroy(const BIO_METHOD *biom))(BIO *);
+    1570|/**
+    1571| * @brief Install the destroy callback invoked when a BIO of this method is freed.
+    1572| * @param biom Method being configured.
+    1573| * @param destroy Callback that releases method-specific state for a BIO; may be NULL.
+    1574| * @return 1 on success, or 0 on failure.
+
+===== bio.h:1568 BIO_meth_set_create =====
+    1566| */
+    1567|int (*BIO_meth_get_create(const BIO_METHOD *bion))(BIO *);
+>>> 1568|int BIO_meth_set_create(BIO_METHOD *biom, int (*create)(BIO *));
+    1569|int (*BIO_meth_get_destroy(const BIO_METHOD *biom))(BIO *);
+    1570|/**
+    1571| * @brief Install the destroy callback invoked when a BIO of this method is freed.
+    1572| * @param biom Method being configured.
+    1573| * @param destroy Callback that releases method-specific state for a BIO; may be NULL.
+
+===== bio.h:1560 BIO_meth_set_ctrl =====
+    1558| */
+    1559|long (*BIO_meth_get_ctrl(const BIO_METHOD *biom))(BIO *, int, long, void *);
+>>> 1560|int BIO_meth_set_ctrl(BIO_METHOD *biom,
+    1561|    long (*ctrl)(BIO *, int, long, void *));
+    1562|/**
+    1563| * @brief Return the create callback installed on a BIO_METHOD.
+    1564| * @param bion Method to query.
+    1565| * @return Create callback invoked when a BIO of this method is allocated, or NULL if unset.
+
+===== bio.h:1552 BIO_meth_set_gets =====
+    1550|    int (*puts)(BIO *, const char *));
+    1551|int (*BIO_meth_get_gets(const BIO_METHOD *biom))(BIO *, char *, int);
+>>> 1552|int BIO_meth_set_gets(BIO_METHOD *biom,
+    1553|    int (*ossl_gets)(BIO *, char *, int));
+    1554|/**
+    1555| * @brief Return the ctrl function installed on a BIO_METHOD.
+    1556| * @param biom Method to query.
+    1557| * @return Ctrl callback pointer, or NULL if unset.
+
+===== bio.h:1551 BIO_meth_get_gets =====
+    1549|int BIO_meth_set_puts(BIO_METHOD *biom,
+    1550|    int (*puts)(BIO *, const char *));
+>>> 1551|int (*BIO_meth_get_gets(const BIO_METHOD *biom))(BIO *, char *, int);
+    1552|int BIO_meth_set_gets(BIO_METHOD *biom,
+    1553|    int (*ossl_gets)(BIO *, char *, int));
+    1554|/**
+    1555| * @brief Return the ctrl function installed on a BIO_METHOD.
+    1556| * @param biom Method to query.
+
+===== bio.h:1549 BIO_meth_set_puts =====
+    1547|    uint64_t, size_t *);
+    1548|int (*BIO_meth_get_puts(const BIO_METHOD *biom))(BIO *, const char *);
+>>> 1549|int BIO_meth_set_puts(BIO_METHOD *biom,
+    1550|    int (*puts)(BIO *, const char *));
+    1551|int (*BIO_meth_get_gets(const BIO_METHOD *biom))(BIO *, char *, int);
+    1552|int BIO_meth_set_gets(BIO_METHOD *biom,
+    1553|    int (*ossl_gets)(BIO *, char *, int));
+    1554|/**
+
+===== bio.h:1545 BIO_meth_get_recvmmsg =====
+    1543|    int (*f)(BIO *, BIO_MSG *, size_t, size_t,
+    1544|        uint64_t, size_t *));
+>>> 1545|int (*BIO_meth_get_recvmmsg(const BIO_METHOD *biom))(BIO *, BIO_MSG *,
+    1546|    size_t, size_t,
+    1547|    uint64_t, size_t *);
+    1548|int (*BIO_meth_get_puts(const BIO_METHOD *biom))(BIO *, const char *);
+    1549|int BIO_meth_set_puts(BIO_METHOD *biom,
+    1550|    int (*puts)(BIO *, const char *));
+
+===== bio.h:1534 BIO_meth_set_read_ex =====
+    1532|int BIO_meth_set_read(BIO_METHOD *biom,
+    1533|    int (*read)(BIO *, char *, int));
+>>> 1534|int BIO_meth_set_read_ex(BIO_METHOD *biom,
+    1535|    int (*bread)(BIO *, char *, size_t, size_t *));
+    1536|/**
+    1537| * @brief Install the multi-message receive callback on a BIO_METHOD.
+    1538| * @param biom Method table to update.
+    1539| * @param f Callback implementing recvmmsg-style reception into BIO_MSG entries.
+
+===== bio.h:1532 BIO_meth_set_read =====
+    1530|int (*BIO_meth_get_read(const BIO_METHOD *biom))(BIO *, char *, int);
+    1531|int (*BIO_meth_get_read_ex(const BIO_METHOD *biom))(BIO *, char *, size_t, size_t *);
+>>> 1532|int BIO_meth_set_read(BIO_METHOD *biom,
+    1533|    int (*read)(BIO *, char *, int));
+    1534|int BIO_meth_set_read_ex(BIO_METHOD *biom,
+    1535|    int (*bread)(BIO *, char *, size_t, size_t *));
+    1536|/**
+    1537| * @brief Install the multi-message receive callback on a BIO_METHOD.
+
+===== bio.h:1531 BIO_meth_get_read_ex =====
+    1529|    uint64_t, size_t *);
+    1530|int (*BIO_meth_get_read(const BIO_METHOD *biom))(BIO *, char *, int);
+>>> 1531|int (*BIO_meth_get_read_ex(const BIO_METHOD *biom))(BIO *, char *, size_t, size_t *);
+    1532|int BIO_meth_set_read(BIO_METHOD *biom,
+    1533|    int (*read)(BIO *, char *, int));
+    1534|int BIO_meth_set_read_ex(BIO_METHOD *biom,
+    1535|    int (*bread)(BIO *, char *, size_t, size_t *));
+    1536|/**
+
+===== bio.h:1530 BIO_meth_get_read =====
+    1528|    size_t, size_t,
+    1529|    uint64_t, size_t *);
+>>> 1530|int (*BIO_meth_get_read(const BIO_METHOD *biom))(BIO *, char *, int);
+    1531|int (*BIO_meth_get_read_ex(const BIO_METHOD *biom))(BIO *, char *, size_t, size_t *);
+    1532|int BIO_meth_set_read(BIO_METHOD *biom,
+    1533|    int (*read)(BIO *, char *, int));
+    1534|int BIO_meth_set_read_ex(BIO_METHOD *biom,
+    1535|    int (*bread)(BIO *, char *, size_t, size_t *));
+
+===== bio.h:1527 BIO_meth_get_sendmmsg =====
+    1525|    int (*f)(BIO *, BIO_MSG *, size_t, size_t,
+    1526|        uint64_t, size_t *));
+>>> 1527|int (*BIO_meth_get_sendmmsg(const BIO_METHOD *biom))(BIO *, BIO_MSG *,
+    1528|    size_t, size_t,
+    1529|    uint64_t, size_t *);
+    1530|int (*BIO_meth_get_read(const BIO_METHOD *biom))(BIO *, char *, int);
+    1531|int (*BIO_meth_get_read_ex(const BIO_METHOD *biom))(BIO *, char *, size_t, size_t *);
+    1532|int BIO_meth_set_read(BIO_METHOD *biom,
+
+===== bio.h:1520 BIO_meth_set_write =====
+    1518|int (*BIO_meth_get_write_ex(const BIO_METHOD *biom))(BIO *, const char *, size_t,
+    1519|    size_t *);
+>>> 1520|int BIO_meth_set_write(BIO_METHOD *biom,
+    1521|    int (*write)(BIO *, const char *, int));
+    1522|int BIO_meth_set_write_ex(BIO_METHOD *biom,
+    1523|    int (*bwrite)(BIO *, const char *, size_t, size_t *));
+    1524|int BIO_meth_set_sendmmsg(BIO_METHOD *biom,
+    1525|    int (*f)(BIO *, BIO_MSG *, size_t, size_t,
+
+===== bio.h:1512 BIO_meth_get_write =====
+    1510|BIO_METHOD *BIO_meth_new(int type, const char *name);
+    1511|void BIO_meth_free(BIO_METHOD *biom);
+>>> 1512|int (*BIO_meth_get_write(const BIO_METHOD *biom))(BIO *, const char *, int);
+    1513|/**
+    1514| * @brief Return the extended write function installed on a BIO_METHOD.
+    1515| * @param biom Method to query.
+    1516| * @return Write-ex callback, or NULL if unset.
+    1517| */
+
+===== bio.h:1510 BIO_meth_new =====
+    1508|#undef ossl_bio__printf__
+    1509|
+>>> 1510|BIO_METHOD *BIO_meth_new(int type, const char *name);
+    1511|void BIO_meth_free(BIO_METHOD *biom);
+    1512|int (*BIO_meth_get_write(const BIO_METHOD *biom))(BIO *, const char *, int);
+    1513|/**
+    1514| * @brief Return the extended write function installed on a BIO_METHOD.
+    1515| * @param biom Method to query.
+
+===== bio.h:1503 BIO_snprintf =====
+    1501|int BIO_vprintf(BIO *bio, const char *format, va_list args)
+    1502|    ossl_bio__attr__((__format__(ossl_bio__printf__, 2, 0)));
+>>> 1503|int BIO_snprintf(char *buf, size_t n, const char *format, ...)
+    1504|    ossl_bio__attr__((__format__(ossl_bio__printf__, 3, 4)));
+    1505|int BIO_vsnprintf(char *buf, size_t n, const char *format, va_list args)
+    1506|    ossl_bio__attr__((__format__(ossl_bio__printf__, 3, 0)));
+    1507|#undef ossl_bio__attr__
+    1508|#undef ossl_bio__printf__
+
+===== bio.h:1436 BIO_new_connect =====
+    1434| */
+    1435|BIO *BIO_new_socket(int sock, int close_flag);
+>>> 1436|BIO *BIO_new_connect(const char *host_port);
+    1437|BIO *BIO_new_accept(const char *host_port);
+    1438|#endif /* OPENSSL_NO_SOCK*/
+    1439|
+    1440|/**
+    1441| * @brief Create a file-descriptor BIO wrapping an existing OS descriptor.
+
+===== bio.h:1427 BIO_closesocket =====
+    1425|int BIO_listen(int sock, const BIO_ADDR *addr, int options);
+    1426|int BIO_accept_ex(int accept_sock, BIO_ADDR *addr, int options);
+>>> 1427|int BIO_closesocket(int sock);
+    1428|
+    1429|/**
+    1430| * @brief Wrap an existing socket descriptor in a BIO_s_socket() BIO.
+    1431| * @param sock Socket file descriptor.
+    1432| * @param close_flag BIO_CLOSE to close @p sock when the BIO is freed, or BIO_NOCLOSE.
+
+===== bio.h:1424 BIO_bind =====
+    1422|int BIO_socket(int domain, int socktype, int protocol, int options);
+    1423|int BIO_connect(int sock, const BIO_ADDR *addr, int options);
+>>> 1424|int BIO_bind(int sock, const BIO_ADDR *addr, int options);
+    1425|int BIO_listen(int sock, const BIO_ADDR *addr, int options);
+    1426|int BIO_accept_ex(int accept_sock, BIO_ADDR *addr, int options);
+    1427|int BIO_closesocket(int sock);
+    1428|
+    1429|/**
+
+===== bio.h:1423 BIO_connect =====
+    1421|
+    1422|int BIO_socket(int domain, int socktype, int protocol, int options);
+>>> 1423|int BIO_connect(int sock, const BIO_ADDR *addr, int options);
+    1424|int BIO_bind(int sock, const BIO_ADDR *addr, int options);
+    1425|int BIO_listen(int sock, const BIO_ADDR *addr, int options);
+    1426|int BIO_accept_ex(int accept_sock, BIO_ADDR *addr, int options);
+    1427|int BIO_closesocket(int sock);
+    1428|
+
+===== bio.h:1400 addr =====
+    1398|
+    1399|union BIO_sock_info_u {
+>>> 1400|    BIO_ADDR *addr;
+    1401|};
+    1402|enum BIO_sock_info_type {
+    1403|    BIO_SOCK_INFO_ADDRESS
+    1404|};
+    1405|/**
+
+===== bio.h:1322 BIO_lookup =====
+    1320|    BIO_LOOKUP_SERVER
+    1321|};
+>>> 1322|int BIO_lookup(const char *host, const char *service,
+    1323|    enum BIO_lookup_type lookup_type,
+    1324|    int family, int socktype, BIO_ADDRINFO **res);
+    1325|/**
+    1326| * @brief Resolve @p host / @p service into a BIO_ADDRINFO list with protocol selection.
+    1327| * @param host Hostname or address string to look up, or NULL for wildcard.
+
+===== bio.h:1309 BIO_PARSE_PRIO_SERV =====
+    1307|enum BIO_hostserv_priorities {
+    1308|    BIO_PARSE_PRIO_HOST,
+>>> 1309|    BIO_PARSE_PRIO_SERV
+    1310|};
+    1311|int BIO_parse_hostserv(const char *hostserv, char **host, char **service,
+    1312|    enum BIO_hostserv_priorities hostserv_prio);
+    1313|/**
+    1314| * @brief Whether BIO_lookup resolves addresses for a client connect or server bind.
+
+===== bio.h:1307 BIO_hostserv_priorities =====
+    1305|void BIO_ADDRINFO_free(BIO_ADDRINFO *bai);
+    1306|
+>>> 1307|enum BIO_hostserv_priorities {
+    1308|    BIO_PARSE_PRIO_HOST,
+    1309|    BIO_PARSE_PRIO_SERV
+    1310|};
+    1311|int BIO_parse_hostserv(const char *hostserv, char **host, char **service,
+    1312|    enum BIO_hostserv_priorities hostserv_prio);
+
+===== bio.h:1305 BIO_ADDRINFO_free =====
+    1303|int BIO_ADDRINFO_protocol(const BIO_ADDRINFO *bai);
+    1304|const BIO_ADDR *BIO_ADDRINFO_address(const BIO_ADDRINFO *bai);
+>>> 1305|void BIO_ADDRINFO_free(BIO_ADDRINFO *bai);
+    1306|
+    1307|enum BIO_hostserv_priorities {
+    1308|    BIO_PARSE_PRIO_HOST,
+    1309|    BIO_PARSE_PRIO_SERV
+    1310|};
+
+===== bio.h:1304 BIO_ADDRINFO_address =====
+    1302| */
+    1303|int BIO_ADDRINFO_protocol(const BIO_ADDRINFO *bai);
+>>> 1304|const BIO_ADDR *BIO_ADDRINFO_address(const BIO_ADDRINFO *bai);
+    1305|void BIO_ADDRINFO_free(BIO_ADDRINFO *bai);
+    1306|
+    1307|enum BIO_hostserv_priorities {
+    1308|    BIO_PARSE_PRIO_HOST,
+    1309|    BIO_PARSE_PRIO_SERV
+
+===== bio.h:1285 BIO_ADDRINFO_next =====
+    1283|char *BIO_ADDR_path_string(const BIO_ADDR *ap);
+    1284|
+>>> 1285|const BIO_ADDRINFO *BIO_ADDRINFO_next(const BIO_ADDRINFO *bai);
+    1286|/**
+    1287| * @brief Return the address family of a BIO_ADDRINFO node (for example AF_INET).
+    1288| * @param bai Address-info node to query.
+    1289| * @return Address family constant suitable for socket().
+    1290| */
+
+===== bio.h:1283 BIO_ADDR_path_string =====
+    1281|char *BIO_ADDR_hostname_string(const BIO_ADDR *ap, int numeric);
+    1282|char *BIO_ADDR_service_string(const BIO_ADDR *ap, int numeric);
+>>> 1283|char *BIO_ADDR_path_string(const BIO_ADDR *ap);
+    1284|
+    1285|const BIO_ADDRINFO *BIO_ADDRINFO_next(const BIO_ADDRINFO *bai);
+    1286|/**
+    1287| * @brief Return the address family of a BIO_ADDRINFO node (for example AF_INET).
+    1288| * @param bai Address-info node to query.
+
+===== bio.h:1280 BIO_ADDR_rawport =====
+    1278|int BIO_ADDR_family(const BIO_ADDR *ap);
+    1279|int BIO_ADDR_rawaddress(const BIO_ADDR *ap, void *p, size_t *l);
+>>> 1280|unsigned short BIO_ADDR_rawport(const BIO_ADDR *ap);
+    1281|char *BIO_ADDR_hostname_string(const BIO_ADDR *ap, int numeric);
+    1282|char *BIO_ADDR_service_string(const BIO_ADDR *ap, int numeric);
+    1283|char *BIO_ADDR_path_string(const BIO_ADDR *ap);
+    1284|
+    1285|const BIO_ADDRINFO *BIO_ADDRINFO_next(const BIO_ADDRINFO *bai);
+
+===== bio.h:1279 BIO_ADDR_rawaddress =====
+    1277|void BIO_ADDR_clear(BIO_ADDR *ap);
+    1278|int BIO_ADDR_family(const BIO_ADDR *ap);
+>>> 1279|int BIO_ADDR_rawaddress(const BIO_ADDR *ap, void *p, size_t *l);
+    1280|unsigned short BIO_ADDR_rawport(const BIO_ADDR *ap);
+    1281|char *BIO_ADDR_hostname_string(const BIO_ADDR *ap, int numeric);
+    1282|char *BIO_ADDR_service_string(const BIO_ADDR *ap, int numeric);
+    1283|char *BIO_ADDR_path_string(const BIO_ADDR *ap);
+    1284|
+
+===== bio.h:1278 BIO_ADDR_family =====
+    1276| */
+    1277|void BIO_ADDR_clear(BIO_ADDR *ap);
+>>> 1278|int BIO_ADDR_family(const BIO_ADDR *ap);
+    1279|int BIO_ADDR_rawaddress(const BIO_ADDR *ap, void *p, size_t *l);
+    1280|unsigned short BIO_ADDR_rawport(const BIO_ADDR *ap);
+    1281|char *BIO_ADDR_hostname_string(const BIO_ADDR *ap, int numeric);
+    1282|char *BIO_ADDR_service_string(const BIO_ADDR *ap, int numeric);
+    1283|char *BIO_ADDR_path_string(const BIO_ADDR *ap);
+
+===== bio.h:1264 BIO_ADDR_copy =====
+    1262|#ifndef OPENSSL_NO_SOCK
+    1263|BIO_ADDR *BIO_ADDR_new(void);
+>>> 1264|int BIO_ADDR_copy(BIO_ADDR *dst, const BIO_ADDR *src);
+    1265|BIO_ADDR *BIO_ADDR_dup(const BIO_ADDR *ap);
+    1266|int BIO_ADDR_rawmake(BIO_ADDR *ap, int family,
+    1267|    const void *where, size_t wherelen, unsigned short port);
+    1268|/**
+    1269| * @brief Free a BIO_ADDR allocated with BIO_ADDR_new() or BIO_ADDR_dup().
+
+===== bio.h:1259 BIO_hex_string =====
+    1257|int BIO_dump_indent_fp(FILE *fp, const void *s, int len, int indent);
+    1258|#endif
+>>> 1259|int BIO_hex_string(BIO *out, int indent, int width, const void *data,
+    1260|    int datalen);
+    1261|
+    1262|#ifndef OPENSSL_NO_SOCK
+    1263|BIO_ADDR *BIO_ADDR_new(void);
+    1264|int BIO_ADDR_copy(BIO_ADDR *dst, const BIO_ADDR *src);
+
+===== bio.h:1257 BIO_dump_indent_fp =====
+    1255| */
+    1256|int BIO_dump_fp(FILE *fp, const void *s, int len);
+>>> 1257|int BIO_dump_indent_fp(FILE *fp, const void *s, int len, int indent);
+    1258|#endif
+    1259|int BIO_hex_string(BIO *out, int indent, int width, const void *data,
+    1260|    int datalen);
+    1261|
+    1262|#ifndef OPENSSL_NO_SOCK
+
+===== bio.h:1247 BIO_dump_indent =====
+    1245|    void *u, const void *s, int len, int indent);
+    1246|int BIO_dump(BIO *b, const void *bytes, int len);
+>>> 1247|int BIO_dump_indent(BIO *b, const void *bytes, int len, int indent);
+    1248|#ifndef OPENSSL_NO_STDIO
+    1249|/**
+    1250| * @brief Hex-dump @p len bytes at @p s to a stdio FILE.
+    1251| * @param fp Output FILE.
+    1252| * @param s Bytes to dump.
+
+===== bio.h:1244 BIO_dump_indent_cb =====
+    1242|int BIO_dump_cb(int (*cb)(const void *data, size_t len, void *u),
+    1243|    void *u, const void *s, int len);
+>>> 1244|int BIO_dump_indent_cb(int (*cb)(const void *data, size_t len, void *u),
+    1245|    void *u, const void *s, int len, int indent);
+    1246|int BIO_dump(BIO *b, const void *bytes, int len);
+    1247|int BIO_dump_indent(BIO *b, const void *bytes, int len, int indent);
+    1248|#ifndef OPENSSL_NO_STDIO
+    1249|/**
+
+===== bio.h:1242 BIO_dump_cb =====
+    1240|int BIO_fd_should_retry(int i);
+    1241|int BIO_fd_non_fatal_error(int error);
+>>> 1242|int BIO_dump_cb(int (*cb)(const void *data, size_t len, void *u),
+    1243|    void *u, const void *s, int len);
+    1244|int BIO_dump_indent_cb(int (*cb)(const void *data, size_t len, void *u),
+    1245|    void *u, const void *s, int len, int indent);
+    1246|int BIO_dump(BIO *b, const void *bytes, int len);
+    1247|int BIO_dump_indent(BIO *b, const void *bytes, int len, int indent);
+
+===== bio.h:1241 BIO_fd_non_fatal_error =====
+    1239| */
+    1240|int BIO_fd_should_retry(int i);
+>>> 1241|int BIO_fd_non_fatal_error(int error);
+    1242|int BIO_dump_cb(int (*cb)(const void *data, size_t len, void *u),
+    1243|    void *u, const void *s, int len);
+    1244|int BIO_dump_indent_cb(int (*cb)(const void *data, size_t len, void *u),
+    1245|    void *u, const void *s, int len, int indent);
+    1246|int BIO_dump(BIO *b, const void *bytes, int len);
+
+===== bio.h:1187 BIO_s_dgram_pair =====
+    1185|const BIO_METHOD *BIO_s_core(void);
+    1186|#ifndef OPENSSL_NO_DGRAM
+>>> 1187|const BIO_METHOD *BIO_s_dgram_pair(void);
+    1188|const BIO_METHOD *BIO_s_datagram(void);
+    1189|int BIO_dgram_non_fatal_error(int error);
+    1190|/**
+    1191| * @brief Create a datagram (UDP-style) BIO wrapping an existing socket descriptor.
+    1192| * @param fd Socket file descriptor to wrap.
+
+===== bio.h:1184 BIO_f_prefix =====
+    1182|const BIO_METHOD *BIO_f_linebuffer(void);
+    1183|const BIO_METHOD *BIO_f_nbio_test(void);
+>>> 1184|const BIO_METHOD *BIO_f_prefix(void);
+    1185|const BIO_METHOD *BIO_s_core(void);
+    1186|#ifndef OPENSSL_NO_DGRAM
+    1187|const BIO_METHOD *BIO_s_dgram_pair(void);
+    1188|const BIO_METHOD *BIO_s_datagram(void);
+    1189|int BIO_dgram_non_fatal_error(int error);
+
+===== bio.h:1183 BIO_f_nbio_test =====
+    1181| */
+    1182|const BIO_METHOD *BIO_f_linebuffer(void);
+>>> 1183|const BIO_METHOD *BIO_f_nbio_test(void);
+    1184|const BIO_METHOD *BIO_f_prefix(void);
+    1185|const BIO_METHOD *BIO_s_core(void);
+    1186|#ifndef OPENSSL_NO_DGRAM
+    1187|const BIO_METHOD *BIO_s_dgram_pair(void);
+    1188|const BIO_METHOD *BIO_s_datagram(void);
+
+===== bio.h:1172 BIO_f_buffer =====
+    1170|const BIO_METHOD *BIO_s_null(void);
+    1171|const BIO_METHOD *BIO_f_null(void);
+>>> 1172|const BIO_METHOD *BIO_f_buffer(void);
+    1173|/**
+    1174| * @brief Return the BIO filter method that read-ahead buffers data from the next BIO.
+    1175| * @return Pointer to the read-buffer filter method used with BIO_new().
+    1176| */
+    1177|const BIO_METHOD *BIO_f_readbuffer(void);
+
+===== bio.h:1170 BIO_s_null =====
+    1168|const BIO_METHOD *BIO_s_log(void);
+    1169|const BIO_METHOD *BIO_s_bio(void);
+>>> 1170|const BIO_METHOD *BIO_s_null(void);
+    1171|const BIO_METHOD *BIO_f_null(void);
+    1172|const BIO_METHOD *BIO_f_buffer(void);
+    1173|/**
+    1174| * @brief Return the BIO filter method that read-ahead buffers data from the next BIO.
+    1175| * @return Pointer to the read-buffer filter method used with BIO_new().
+
+===== bio.h:1169 BIO_s_bio =====
+    1167|const BIO_METHOD *BIO_s_fd(void);
+    1168|const BIO_METHOD *BIO_s_log(void);
+>>> 1169|const BIO_METHOD *BIO_s_bio(void);
+    1170|const BIO_METHOD *BIO_s_null(void);
+    1171|const BIO_METHOD *BIO_f_null(void);
+    1172|const BIO_METHOD *BIO_f_buffer(void);
+    1173|/**
+    1174| * @brief Return the BIO filter method that read-ahead buffers data from the next BIO.
+
+===== bio.h:1168 BIO_s_log =====
+    1166|#endif
+    1167|const BIO_METHOD *BIO_s_fd(void);
+>>> 1168|const BIO_METHOD *BIO_s_log(void);
+    1169|const BIO_METHOD *BIO_s_bio(void);
+    1170|const BIO_METHOD *BIO_s_null(void);
+    1171|const BIO_METHOD *BIO_f_null(void);
+    1172|const BIO_METHOD *BIO_f_buffer(void);
+    1173|/**
+
+===== bio.h:1167 BIO_s_fd =====
+    1165|const BIO_METHOD *BIO_s_accept(void);
+    1166|#endif
+>>> 1167|const BIO_METHOD *BIO_s_fd(void);
+    1168|const BIO_METHOD *BIO_s_log(void);
+    1169|const BIO_METHOD *BIO_s_bio(void);
+    1170|const BIO_METHOD *BIO_s_null(void);
+    1171|const BIO_METHOD *BIO_f_null(void);
+    1172|const BIO_METHOD *BIO_f_buffer(void);
+
+===== bio.h:1159 BIO_s_socket =====
+    1157|BIO *BIO_new_mem_buf(const void *buf, int len);
+    1158|#ifndef OPENSSL_NO_SOCK
+>>> 1159|const BIO_METHOD *BIO_s_socket(void);
+    1160|/**
+    1161| * @brief Return the BIO_METHOD for a TCP connect (client) socket BIO.
+    1162| * @return Pointer to the static connect BIO method for use with BIO_new().
+    1163| */
+    1164|const BIO_METHOD *BIO_s_connect(void);
+
+===== bio.h:1140 BIO_s_mem =====
+    1138|int BIO_nwrite(BIO *bio, char **buf, int num);
+    1139|
+>>> 1140|const BIO_METHOD *BIO_s_mem(void);
+    1141|#ifndef OPENSSL_NO_DGRAM
+    1142|const BIO_METHOD *BIO_s_dgram_mem(void);
+    1143|#endif
+    1144|/**
+    1145| * @brief Return the BIO_METHOD for a secure-heap memory BIO.
+
+===== bio.h:1130 BIO_nwrite0 =====
+    1128| */
+    1129|int BIO_nread(BIO *bio, char **buf, int num);
+>>> 1130|int BIO_nwrite0(BIO *bio, char **buf);
+    1131|/**
+    1132| * @brief Obtain a writable buffer from a memory BIO and advance its write pointer.
+    1133| * @param bio Memory BIO to write into.
+    1134| * @param buf Receives a pointer into the BIO's internal buffer.
+    1135| * @param num Maximum number of bytes to reserve.
+
+===== bio.h:1118 BIO_set_retry_reason =====
+    1116| */
+    1117|int BIO_get_retry_reason(BIO *bio);
+>>> 1118|void BIO_set_retry_reason(BIO *bio, int reason);
+    1119|BIO *BIO_dup_chain(BIO *in);
+    1120|
+    1121|int BIO_nread0(BIO *bio, char **buf);
+    1122|/**
+    1123| * @brief Consume up to @p num bytes from a memory BIO, returning an internal pointer.
+
+===== bio.h:1030 BIO_sendmmsg =====
+    1028| */
+    1029|int BIO_write_ex(BIO *b, const void *data, size_t dlen, size_t *written);
+>>> 1030|__owur int BIO_sendmmsg(BIO *b, BIO_MSG *msg,
+    1031|    size_t stride, size_t num_msg, uint64_t flags,
+    1032|    size_t *msgs_processed);
+    1033|/**
+    1034| * @brief Fill @p desc with the pollable read-side target for a BIO (if any).
+    1035| * @param b BIO to query.
+
+===== bio.h:965 BIO_get_shutdown =====
+     963| */
+     964|void BIO_set_shutdown(BIO *a, int shut);
+>>>  965|int BIO_get_shutdown(BIO *a);
+     966|/**
+     967| * @brief Free a BIO and every BIO linked after it in the chain.
+     968| * @param a First BIO in the chain to free; NULL is ignored.
+     969| */
+     970|void BIO_vfree(BIO *a);
+
+===== bio.h:934 BIO_free =====
+     932|BIO *BIO_new_ex(OSSL_LIB_CTX *libctx, const BIO_METHOD *method);
+     933|BIO *BIO_new(const BIO_METHOD *type);
+>>>  934|int BIO_free(BIO *a);
+     935|/**
+     936| * @brief Store an implementation-specific pointer on a BIO (used by custom BIO methods).
+     937| * @param a BIO whose app-data pointer is set.
+     938| * @param ptr Opaque pointer for the BIO method implementation.
+     939| */

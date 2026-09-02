@@ -1,0 +1,30 @@
+=== batch 17d: params/evp/http/kdf/lhash/objects ===
+  OK: params.h :: OSSL_PARAM_locate
+  OK: params.h :: OSSL_PARAM_construct_int
+  OK: params.h :: OSSL_PARAM_construct_long
+  OK: params.h :: OSSL_PARAM_construct_uint32+int64
+  OK: params.h :: OSSL_PARAM_construct_octet_ptr
+  OK: params.h :: OSSL_PARAM_allocate_from_text
+  OK: params.h :: OSSL_PARAM_get_ulong+int32+uint32+int64
+  OK: params.h :: OSSL_PARAM_get_time_t+set_int
+  OK: params.h :: OSSL_PARAM_set_uint32+int64+uint64
+  OK: params.h :: OSSL_PARAM_set_time_t
+  OK: params.h :: OSSL_PARAM_get_BN
+  OK: params.h :: OSSL_PARAM_get_utf8_string
+  OK: params.h :: OSSL_PARAM_get_octet_ptr
+  OK: params.h :: OSSL_PARAM_get_*_ptr+modified+dup
+  OK: evp.h :: EVP_sha512_224
+  OK: evp.h :: EVP_rc4_hmac_md5
+  OK: evp.h :: EVP_PKEY_asn1_get0_info
+  OK: evp.h :: EVP_PKEY_CTX_set_mac_key
+  OK: evp.h :: EVP_PKEY_new_raw_public_key
+  OK: evp.h :: EVP_PKEY_derive_set_peer
+  OK: http.h :: OSSL_HTTP_get
+  OK: http.h :: OSSL_HTTP_REQ_CTX_set_max_response_hdr_lines
+  OK: kdf.h :: EVP_KDF_CTX_gettable_params
+  OK: kdf.h :: EVP_PKEY_CTX_set_tls1_prf_md
+  OK: lhash.h :: OPENSSL_LH_node_stats_bio
+  OK: lhash.h.in :: OPENSSL_LH_node_stats_bio
+  OK: objects.h :: OBJ_length
+
+OK: 27  MISS: 0

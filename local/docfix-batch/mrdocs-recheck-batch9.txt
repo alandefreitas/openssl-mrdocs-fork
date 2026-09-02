@@ -1,0 +1,2419 @@
+[0;37m/opt/homebrew/opt/llvm/bin/clang -v -E -x c++ -
+[0m[0;37mExtracting declarations
+[0m[0;37mmax-errors=200: found enough documentation problems; translation units not yet started will be skipped
+[0m[0;37mFinalizing corpus
+[0m/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/async.h:103:1:
+    1) ASYNC_WAIT_CTX_get_all_fds: function is undocumented
+  103 | int ASYNC_WAIT_CTX_get_all_fds(ASYNC_WAIT_CTX *ctx, OSSL_ASYNC_FD *fd,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dh.h:576:1:
+    1) DH_meth_set_init: function is undocumented
+  576 | OSSL_DEPRECATEDIN_3_0 int DH_meth_set_init(DH_METHOD *dhm, int (*init)(DH *));
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dh.h:536:1:
+    1) DH_meth_get0_app_data: function is undocumented
+  536 | OSSL_DEPRECATEDIN_3_0 void *DH_meth_get0_app_data(const DH_METHOD *dhm);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dh.h:496:1:
+    1) DH_clear_flags: function is undocumented
+  496 | OSSL_DEPRECATEDIN_3_0 void DH_clear_flags(DH *dh, int flags);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dh.h:354:1:
+    1) DH_check_pub_key: function is undocumented
+  354 | OSSL_DEPRECATEDIN_3_0 int DH_check_pub_key(const DH *dh, const BIGNUM *pub_key,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dh.h:345:1:
+    1) DH_check_pub_key_ex: function is undocumented
+  345 | OSSL_DEPRECATEDIN_3_0 int DH_check_pub_key_ex(const DH *dh, const BIGNUM *pub_key);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dh.h:55:1:
+    1) EVP_PKEY_CTX_set_dh_paramgen_prime_len: function is undocumented
+  55 | int EVP_PKEY_CTX_set_dh_paramgen_prime_len(EVP_PKEY_CTX *ctx, int pbits);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:496:1:
+    1) DSA_meth_get_paramgen: function is undocumented
+  496 | OSSL_DEPRECATEDIN_3_0 int (*DSA_meth_get_paramgen(const DSA_METHOD *dsam))(DSA *, int, const unsigned char *, int, int *, unsigned long *,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:494:1:
+    1) DSA_meth_set_finish: function is undocumented
+  494 | OSSL_DEPRECATEDIN_3_0 int DSA_meth_set_finish(DSA_METHOD *dsam,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:493:1:
+    1) DSA_meth_get_finish: function is undocumented
+  493 | OSSL_DEPRECATEDIN_3_0 int (*DSA_meth_get_finish(const DSA_METHOD *dsam))(DSA *);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:464:1:
+    1) DSA_meth_set_mod_exp: function is undocumented
+  464 | OSSL_DEPRECATEDIN_3_0 int DSA_meth_set_mod_exp(DSA_METHOD *dsam,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:441:1:
+    1) DSA_meth_set_sign_setup: function is undocumented
+  441 | OSSL_DEPRECATEDIN_3_0 int DSA_meth_set_sign_setup(DSA_METHOD *dsam,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:418:1:
+    1) DSA_meth_get0_app_data: function is undocumented
+  418 | OSSL_DEPRECATEDIN_3_0 void *DSA_meth_get0_app_data(const DSA_METHOD *dsam);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:402:1:
+    1) DSA_meth_get0_name: function is undocumented
+  402 | OSSL_DEPRECATEDIN_3_0 const char *DSA_meth_get0_name(const DSA_METHOD *dsam);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:400:1:
+    1) DSA_meth_free: function is undocumented
+  400 | OSSL_DEPRECATEDIN_3_0 void DSA_meth_free(DSA_METHOD *dsam);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:389:1:
+    1) DSA_set_flags: function is undocumented
+  389 | OSSL_DEPRECATEDIN_3_0 void DSA_set_flags(DSA *d, int flags);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:387:1:
+    1) DSA_clear_flags: function is undocumented
+  387 | OSSL_DEPRECATEDIN_3_0 void DSA_clear_flags(DSA *d, int flags);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:379:1:
+    1) DSA_get0_g: function is undocumented
+  379 | OSSL_DEPRECATEDIN_3_0 const BIGNUM *DSA_get0_g(const DSA *d);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:373:1:
+    1) DSA_get0_key: function is undocumented
+  373 | OSSL_DEPRECATEDIN_3_0 void DSA_get0_key(const DSA *d, const BIGNUM **pub_key,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:358:1:
+    1) DSA_dup_DH: function is undocumented
+  358 | OSSL_DEPRECATEDIN_3_0 DH *DSA_dup_DH(const DSA *r);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:331:1:
+    1) DSA_print: function is undocumented
+  331 | OSSL_DEPRECATEDIN_3_0 int DSA_print(BIO *bp, const DSA *x, int off);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:270:1:
+    1) d2i_DSAPublicKey: function is undocumented
+  270 | DECLARE_ASN1_ENCODE_FUNCTIONS_only_attr(OSSL_DEPRECATEDIN_3_0,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:267:1:
+    1) DSA_set_ex_data: function is undocumented
+  267 | OSSL_DEPRECATEDIN_3_0 int DSA_set_ex_data(DSA *d, int idx, void *arg);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:223:1:
+    1) DSA_free: function is undocumented
+  223 | OSSL_DEPRECATEDIN_3_0 void DSA_free(DSA *r);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:181:1:
+    1) DSA_do_sign: function is undocumented
+  181 | OSSL_DEPRECATEDIN_3_0 DSA_SIG *DSA_do_sign(const unsigned char *dgst, int dlen,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ec.h:41:1:
+    1) EVP_PKEY_CTX_set_ecdh_cofactor_mode: function is undocumented
+  41 | int EVP_PKEY_CTX_set_ecdh_cofactor_mode(EVP_PKEY_CTX *ctx, int cofactor_mode);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/engine.h:1456:1:
+    1) ENGINE_get_static_state: function is undocumented
+  1456 | void *ENGINE_get_static_state(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/engine.h:581:1:
+    1) ENGINE_register_all_pkey_asn1_meths: function is undocumented
+  581 | OSSL_DEPRECATEDIN_3_0 void ENGINE_register_all_pkey_asn1_meths(void);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/engine.h:494:1:
+    1) ENGINE_register_DSA: function is undocumented
+  494 | OSSL_DEPRECATEDIN_3_0 int ENGINE_register_DSA(ENGINE *e);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:4609:1:
+    1) EVP_PKEY_CTX_get0_propq: function is undocumented
+  4609 | const char *EVP_PKEY_CTX_get0_propq(const EVP_PKEY_CTX *ctx);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:4491:1:
+    1) EVP_PKEY_meth_get_ctrl: function is undocumented
+  4491 | OSSL_DEPRECATEDIN_3_0 void EVP_PKEY_meth_get_ctrl(const EVP_PKEY_METHOD *pmeth,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:4398:1:
+    1) EVP_PKEY_meth_set_digestverify: function is undocumented
+  4398 | OSSL_DEPRECATEDIN_3_0 void EVP_PKEY_meth_set_digestverify(EVP_PKEY_METHOD *pmeth,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:4123:1:
+    1) EVP_PKEY_fromdata_settable: function is undocumented
+  4123 | const OSSL_PARAM *EVP_PKEY_fromdata_settable(EVP_PKEY_CTX *ctx, int selection);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:4095:1:
+    1) EVP_PKEY_auth_decapsulate_init: function is undocumented
+  4095 | int EVP_PKEY_auth_decapsulate_init(EVP_PKEY_CTX *ctx, EVP_PKEY *authpub,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:4071:1:
+    1) EVP_PKEY_derive: function is undocumented
+  4071 | int EVP_PKEY_derive(EVP_PKEY_CTX *ctx, unsigned char *key, size_t *keylen);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:3916:1:
+    1) EVP_ASYM_CIPHER_gettable_ctx_params: function is undocumented
+  3916 | const OSSL_PARAM *EVP_ASYM_CIPHER_gettable_ctx_params(const EVP_ASYM_CIPHER *ciph);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:3902:1:
+    1) EVP_ASYM_CIPHER_do_all_provided: function is undocumented
+  3902 | void EVP_ASYM_CIPHER_do_all_provided(OSSL_LIB_CTX *libctx,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:3895:1:
+    1) EVP_ASYM_CIPHER_get0_name: function is undocumented
+  3895 | const char *EVP_ASYM_CIPHER_get0_name(const EVP_ASYM_CIPHER *cipher);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:3883:1:
+    1) EVP_ASYM_CIPHER_free: function is undocumented
+  3883 | void EVP_ASYM_CIPHER_free(EVP_ASYM_CIPHER *cipher);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:3831:1:
+    1) EVP_PKEY_CTX_set_app_data: function is undocumented
+  3831 | void EVP_PKEY_CTX_set_app_data(EVP_PKEY_CTX *ctx, void *data);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:3762:1:
+    1) EVP_PKEY_CTX_set0_keygen_info: function is undocumented
+  3762 | void EVP_PKEY_CTX_set0_keygen_info(EVP_PKEY_CTX *ctx, int *dat, int datlen);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:3695:1:
+    1) EVP_PKEY_CTX_new_from_name: function is undocumented
+  3695 | EVP_PKEY_CTX *EVP_PKEY_CTX_new_from_name(OSSL_LIB_CTX *libctx,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:3687:1:
+    1) EVP_PKEY_CTX_new: function is undocumented
+  3687 | EVP_PKEY_CTX *EVP_PKEY_CTX_new(EVP_PKEY *pkey, ENGINE *e);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:3610:1:
+    1) EVP_PKEY_meth_find: function is undocumented
+  3610 | OSSL_DEPRECATEDIN_3_0 const EVP_PKEY_METHOD *EVP_PKEY_meth_find(int type);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:3285:1:
+    1) EVP_PBE_find: function is undocumented
+  3285 | int EVP_PBE_find(int type, int pbe_nid, int *pcnid, int *pmnid,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:3146:1:
+    1) PKCS5_v2_PBE_keyivgen: function is undocumented
+  3146 | int PKCS5_v2_PBE_keyivgen(EVP_CIPHER_CTX *ctx, const char *pass, int passlen,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:3064:1:
+    1) EVP_PKEY_get_default_digest_nid: function is undocumented
+  3064 | int EVP_PKEY_get_default_digest_nid(EVP_PKEY *pkey, int *pnid);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:3004:1:
+    1) EVP_PKEY_eq: function is undocumented
+  3004 | int EVP_PKEY_eq(const EVP_PKEY *a, const EVP_PKEY *b);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2996:1:
+    1) EVP_PKEY_save_parameters: function is undocumented
+  2996 | int EVP_PKEY_save_parameters(EVP_PKEY *pkey, int mode);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2730:1:
+    1) EVP_PKEY_type_names_do_all: function is undocumented
+  2730 | int EVP_PKEY_type_names_do_all(const EVP_PKEY *pkey,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2538:1:
+    1) EVP_MAC_CTX_gettable_params: function is undocumented
+  2538 | const OSSL_PARAM *EVP_MAC_CTX_gettable_params(EVP_MAC_CTX *ctx);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2536:1:
+    1) EVP_MAC_gettable_ctx_params: function is undocumented
+  2536 | const OSSL_PARAM *EVP_MAC_gettable_ctx_params(const EVP_MAC *mac);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2534:1:
+    1) EVP_MAC_finalXOF: function is undocumented
+  2534 | int EVP_MAC_finalXOF(EVP_MAC_CTX *ctx, unsigned char *out, size_t outsize);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2500:1:
+    1) EVP_MAC_CTX_get_block_size: function is undocumented
+  2500 | size_t EVP_MAC_CTX_get_block_size(EVP_MAC_CTX *ctx);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2496:1:
+    1) EVP_MAC_CTX_get_params: function is undocumented
+  2496 | int EVP_MAC_CTX_get_params(EVP_MAC_CTX *ctx, OSSL_PARAM params[]);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2495:1:
+    1) EVP_MAC_CTX_get0_mac: function is undocumented
+  2495 | EVP_MAC *EVP_MAC_CTX_get0_mac(EVP_MAC_CTX *ctx);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2488:1:
+    1) EVP_MAC_CTX_free: function is undocumented
+  2488 | void EVP_MAC_CTX_free(EVP_MAC_CTX *ctx);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2465:1:
+    1) EVP_MAC_get0_description: function is undocumented
+  2465 | const char *EVP_MAC_get0_description(const EVP_MAC *mac);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2458:1:
+    1) EVP_MAC_free: function is undocumented
+  2458 | void EVP_MAC_free(EVP_MAC *mac);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2455:1:
+    1) EVP_MAC_fetch: function is undocumented
+  2455 | EVP_MAC *EVP_MAC_fetch(OSSL_LIB_CTX *libctx, const char *algorithm,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2419:1:
+    1) EVP_CIPHER_do_all_sorted: function is undocumented
+  2419 | void EVP_CIPHER_do_all_sorted(void (*fn)(const EVP_CIPHER *ciph, const char *from,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2416:1:
+    1) EVP_CIPHER_do_all: function is undocumented
+  2416 | void EVP_CIPHER_do_all(void (*fn)(const EVP_CIPHER *ciph,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2401:1:
+    1) EVP_add_digest: function is undocumented
+  2401 | int EVP_add_digest(const EVP_MD *digest);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2400:1:
+    1) EVP_add_cipher: function is undocumented
+  2400 | int EVP_add_cipher(const EVP_CIPHER *cipher);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2370:1:
+    1) EVP_sm4_ctr: function is undocumented
+  2370 | const EVP_CIPHER *EVP_sm4_ctr(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2367:1:
+    1) EVP_sm4_cfb128: function is undocumented
+  2367 | const EVP_CIPHER *EVP_sm4_cfb128(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2366:1:
+    1) EVP_sm4_cbc: function is undocumented
+  2366 | const EVP_CIPHER *EVP_sm4_cbc(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2355:1:
+    1) EVP_seed_cfb128: function is undocumented
+  2355 | const EVP_CIPHER *EVP_seed_cfb128(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2335:1:
+    1) EVP_camellia_256_ctr: function is undocumented
+  2335 | const EVP_CIPHER *EVP_camellia_256_ctr(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2307:1:
+    1) EVP_camellia_192_ctr: function is undocumented
+  2307 | const EVP_CIPHER *EVP_camellia_192_ctr(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2295:1:
+    1) EVP_camellia_192_cfb8: function is undocumented
+  2295 | const EVP_CIPHER *EVP_camellia_192_cfb8(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2284:1:
+    1) EVP_camellia_192_ecb: function is undocumented
+  2284 | const EVP_CIPHER *EVP_camellia_192_ecb(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2248:1:
+    1) EVP_aria_256_gcm: function is undocumented
+  2248 | const EVP_CIPHER *EVP_aria_256_gcm(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2247:1:
+    1) EVP_aria_256_ofb: function is undocumented
+  2247 | const EVP_CIPHER *EVP_aria_256_ofb(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2240:1:
+    1) EVP_aria_256_cfb128: function is undocumented
+  2240 | const EVP_CIPHER *EVP_aria_256_cfb128(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2233:1:
+    1) EVP_aria_256_cbc: function is undocumented
+  2233 | const EVP_CIPHER *EVP_aria_256_cbc(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2227:1:
+    1) EVP_aria_192_ccm: function is undocumented
+  2227 | const EVP_CIPHER *EVP_aria_192_ccm(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2221:1:
+    1) EVP_aria_192_ofb: function is undocumented
+  2221 | const EVP_CIPHER *EVP_aria_192_ofb(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2198:1:
+    1) EVP_aria_192_ecb: function is undocumented
+  2198 | const EVP_CIPHER *EVP_aria_192_ecb(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2197:1:
+    1) EVP_aria_128_ccm: function is undocumented
+  2197 | const EVP_CIPHER *EVP_aria_128_ccm(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2186:1:
+    1) EVP_aria_128_ctr: function is undocumented
+  2186 | const EVP_CIPHER *EVP_aria_128_ctr(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2162:1:
+    1) EVP_aes_256_cbc_hmac_sha256: function is undocumented
+  2162 | const EVP_CIPHER *EVP_aes_256_cbc_hmac_sha256(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2161:1:
+    1) EVP_aes_128_cbc_hmac_sha256: function is undocumented
+  2161 | const EVP_CIPHER *EVP_aes_128_cbc_hmac_sha256(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2155:1:
+    1) EVP_aes_256_wrap_pad: function is undocumented
+  2155 | const EVP_CIPHER *EVP_aes_256_wrap_pad(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2154:1:
+    1) EVP_aes_256_wrap: function is undocumented
+  2154 | const EVP_CIPHER *EVP_aes_256_wrap(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2152:1:
+    1) EVP_aes_256_gcm: function is undocumented
+  2152 | const EVP_CIPHER *EVP_aes_256_gcm(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2145:1:
+    1) EVP_aes_256_ofb: function is undocumented
+  2145 | const EVP_CIPHER *EVP_aes_256_ofb(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2132:1:
+    1) EVP_aes_256_cbc: function is undocumented
+  2132 | const EVP_CIPHER *EVP_aes_256_cbc(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2108:1:
+    1) EVP_aes_192_ccm: function is undocumented
+  2108 | const EVP_CIPHER *EVP_aes_192_ccm(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2102:1:
+    1) EVP_aes_192_ofb: function is undocumented
+  2102 | const EVP_CIPHER *EVP_aes_192_ofb(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2066:1:
+    1) EVP_aes_128_xts: function is undocumented
+  2066 | const EVP_CIPHER *EVP_aes_128_xts(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2050:1:
+    1) EVP_aes_128_ofb: function is undocumented
+  2050 | const EVP_CIPHER *EVP_aes_128_ofb(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2048:1:
+    1) EVP_aes_128_cfb128: function is undocumented
+  2048 | const EVP_CIPHER *EVP_aes_128_cfb128(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2042:1:
+    1) EVP_aes_128_cfb1: function is undocumented
+  2042 | const EVP_CIPHER *EVP_aes_128_cfb1(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2002:1:
+    1) EVP_bf_cfb64: function is undocumented
+  2002 | const EVP_CIPHER *EVP_bf_cfb64(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1959:1:
+    1) EVP_idea_ofb: function is undocumented
+  1959 | const EVP_CIPHER *EVP_idea_ofb(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1920:1:
+    1) EVP_des_ede3_ofb: function is undocumented
+  1920 | const EVP_CIPHER *EVP_des_ede3_ofb(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1909:1:
+    1) EVP_des_ede3_cfb8: function is undocumented
+  1909 | const EVP_CIPHER *EVP_des_ede3_cfb8(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1908:1:
+    1) EVP_des_ede3_cfb1: function is undocumented
+  1908 | const EVP_CIPHER *EVP_des_ede3_cfb1(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1887:1:
+    1) EVP_des_ede3_ecb: function is undocumented
+  1887 | const EVP_CIPHER *EVP_des_ede3_ecb(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1886:1:
+    1) EVP_des_ede_ecb: function is undocumented
+  1886 | const EVP_CIPHER *EVP_des_ede_ecb(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1884:1:
+    1) EVP_des_ede: function is undocumented
+  1884 | const EVP_CIPHER *EVP_des_ede(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1881:1:
+    1) EVP_enc_null: function is undocumented
+  1881 | const EVP_CIPHER *EVP_enc_null(void); /* does nothing :-) */
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1879:1:
+    1) EVP_sm3: function is undocumented
+  1879 | const EVP_MD *EVP_sm3(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1869:1:
+    1) EVP_ripemd160: function is undocumented
+  1869 | const EVP_MD *EVP_ripemd160(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1866:1:
+    1) EVP_mdc2: function is undocumented
+  1866 | const EVP_MD *EVP_mdc2(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1834:1:
+    1) EVP_sha384: function is undocumented
+  1834 | const EVP_MD *EVP_sha384(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1812:1:
+    1) EVP_blake2b512: function is undocumented
+  1812 | const EVP_MD *EVP_blake2b512(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1809:1:
+    1) EVP_md5_sha1: function is undocumented
+  1809 | const EVP_MD *EVP_md5_sha1(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1775:1:
+    1) BIO_f_reliable: function is undocumented
+  1775 | const BIO_METHOD *BIO_f_reliable(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1754:1:
+    1) EVP_CIPHER_gettable_params: function is undocumented
+  1754 | const OSSL_PARAM *EVP_CIPHER_gettable_params(const EVP_CIPHER *cipher);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1738:1:
+    1) EVP_CIPHER_CTX_rand_key: function is undocumented
+  1738 | int EVP_CIPHER_CTX_rand_key(EVP_CIPHER_CTX *ctx, unsigned char *key);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1676:1:
+    1) EVP_EncodeFinal: function is undocumented
+  1676 | void EVP_EncodeFinal(EVP_ENCODE_CTX *ctx, unsigned char *out, int *outl);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1674:1:
+    1) EVP_EncodeUpdate: function is undocumented
+  1674 | int EVP_EncodeUpdate(EVP_ENCODE_CTX *ctx, unsigned char *out, int *outl,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1672:1:
+    1) EVP_ENCODE_CTX_num: function is undocumented
+  1672 | int EVP_ENCODE_CTX_num(EVP_ENCODE_CTX *ctx);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1671:1:
+    1) EVP_ENCODE_CTX_copy: function is undocumented
+  1671 | int EVP_ENCODE_CTX_copy(EVP_ENCODE_CTX *dctx, const EVP_ENCODE_CTX *sctx);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1649:8:
+    1) EVP_SealInit: function is undocumented
+  1649 | __owur int EVP_SealInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *type,
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1647:8:
+    1) EVP_OpenFinal: function is undocumented
+  1647 | __owur int EVP_OpenFinal(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl);
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1631:8:
+    1) EVP_DigestVerifyFinal: function is undocumented
+  1631 | __owur int EVP_DigestVerifyFinal(EVP_MD_CTX *ctx, const unsigned char *sig,
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1539:8:
+    1) EVP_DigestSign: function is undocumented
+  1539 | __owur int EVP_DigestSign(EVP_MD_CTX *ctx, unsigned char *sigret,
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1535:8:
+    1) EVP_SignFinal_ex: function is undocumented
+  1535 | __owur int EVP_SignFinal_ex(EVP_MD_CTX *ctx, unsigned char *md, unsigned int *s,
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1533:8:
+    1) EVP_SignFinal: function is undocumented
+  1533 | __owur int EVP_SignFinal(EVP_MD_CTX *ctx, unsigned char *md, unsigned int *s,
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1530:8:
+    1) EVP_CipherFinal_ex: function is undocumented
+  1530 | __owur int EVP_CipherFinal_ex(EVP_CIPHER_CTX *ctx, unsigned char *outm,
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1528:8:
+    1) EVP_CipherFinal: function is undocumented
+  1528 | __owur int EVP_CipherFinal(EVP_CIPHER_CTX *ctx, unsigned char *outm,
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1497:8:
+    1) EVP_CipherInit: function is undocumented
+  1497 | __owur int EVP_CipherInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1450:8:
+    1) EVP_DecryptInit_ex: function is undocumented
+  1450 | __owur int EVP_DecryptInit_ex(EVP_CIPHER_CTX *ctx,
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1433:8:
+    1) EVP_EncryptFinal_ex: function is undocumented
+  1433 | __owur int EVP_EncryptFinal_ex(EVP_CIPHER_CTX *ctx, unsigned char *out,
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1405:8:
+    1) EVP_EncryptInit_ex: function is undocumented
+  1405 | __owur int EVP_EncryptInit_ex(EVP_CIPHER_CTX *ctx,
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1380:1:
+    1) EVP_CIPHER_CTX_set_flags: function is undocumented
+  1380 | void EVP_CIPHER_CTX_set_flags(EVP_CIPHER_CTX *ctx, int flags);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:1189:1:
+    1) EVP_MD_gettable_ctx_params: function is undocumented
+  1189 | const OSSL_PARAM *EVP_MD_gettable_ctx_params(const EVP_MD *md);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:357:1:
+    1) EVP_CIPHER_meth_set_iv_length: function is undocumented
+  357 | OSSL_DEPRECATEDIN_3_0
+      | ^~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/objects.h:147:1:
+    1) OBJ_obj2txt: function is undocumented
+  147 | int OBJ_obj2txt(char *buf, int buf_len, const ASN1_OBJECT *a, int no_name);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs7.h:727:1:
+    1) PKCS7_sign_add_signer: function is undocumented
+  727 | PKCS7_SIGNER_INFO *PKCS7_sign_add_signer(PKCS7 *p7,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs7.h:640:1:
+    1) PKCS7_cert_from_signer_info: function is undocumented
+  640 | X509 *PKCS7_cert_from_signer_info(PKCS7 *p7, PKCS7_SIGNER_INFO *si);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs7.h:601:1:
+    1) PKCS7_set_content: function is undocumented
+  601 | int PKCS7_set_content(PKCS7 *p7, PKCS7 *p7_data);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs7.h:449:1:
+    1) i2d_PKCS7_ENC_CONTENT: function is undocumented
+  449 | DECLARE_ASN1_FUNCTIONS(PKCS7_ENC_CONTENT)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs7.h:417:1:
+    1) PKCS7_SIGNER_INFO_it: function is undocumented
+  417 | DECLARE_ASN1_FUNCTIONS(PKCS7_SIGNER_INFO)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs7.h:264:5:
+    1) ctx: variable is undocumented
+  264 |     PKCS7_CTX ctx;
+      |     ^~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs7.h:252:9:
+    1) enveloped: variable is undocumented
+  252 |         PKCS7_ENVELOPE *enveloped;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs7.h:233:5:
+    1) state: variable is undocumented
+  233 |     int state; /* used during processing */
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs7.h:199:5:
+    1) signer_info: variable is undocumented
+  199 |     STACK_OF(PKCS7_SIGNER_INFO) *signer_info;
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs7.h:65:5:
+    1) issuer_and_serial: variable is undocumented
+  65 |     PKCS7_ISSUER_AND_SERIAL *issuer_and_serial;
+     |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rsa.h:1148:1:
+    1) RSA_meth_set_sign: function is undocumented
+  1148 | OSSL_DEPRECATEDIN_3_0
+       | ^~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rsa.h:739:1:
+    1) RSA_verify_ASN1_OCTET_STRING: function is undocumented
+  739 | OSSL_DEPRECATEDIN_3_0
+      | ^~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rsa.h:655:5:
+    1) pSourceFunc: variable is undocumented
+  655 |     X509_ALGOR *pSourceFunc;
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rsa.h:549:1:
+    1) RSA_set_method: function is undocumented
+  549 | OSSL_DEPRECATEDIN_3_0 int RSA_set_method(RSA *rsa, const RSA_METHOD *meth);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rsa.h:199:1:
+    1) EVP_PKEY_CTX_set_rsa_pss_keygen_mgf1_md_name: function is undocumented
+  199 | int EVP_PKEY_CTX_set_rsa_pss_keygen_mgf1_md_name(EVP_PKEY_CTX *ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rsa.h:143:1:
+    1) EVP_PKEY_CTX_set_rsa_pss_keygen_saltlen: function is undocumented
+  143 | int EVP_PKEY_CTX_set_rsa_pss_keygen_saltlen(EVP_PKEY_CTX *ctx, int saltlen);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ssl.h:4684:8:
+    1) SSL_get_stream_type: function is undocumented
+  4684 | __owur int SSL_get_stream_type(SSL *s);
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ssl.h:4238:8:
+    1) SSL_get1_session: function is undocumented
+  4238 | __owur SSL_SESSION *SSL_get1_session(SSL *ssl); /* obtain a reference count */
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ssl.h:2988:1:
+    1) d2i_SSL_SESSION: function is undocumented
+  2988 | SSL_SESSION *d2i_SSL_SESSION(SSL_SESSION **a, const unsigned char **pp,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ssl.h:2695:1:
+    1) SSL_add_dir_cert_subjects_to_stack: function is undocumented
+  2695 | int SSL_add_dir_cert_subjects_to_stack(STACK_OF(X509_NAME) *stackCAs,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ssl.h:2678:8:
+    1) SSL_use_certificate_chain_file: function is undocumented
+  2678 | __owur int SSL_use_certificate_chain_file(SSL *ssl, const char *file);
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ssl.h:2273:8:
+    1) SSL_CTX_get_timeout: function is undocumented
+  2273 | __owur long SSL_CTX_get_timeout(const SSL_CTX *ctx);
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ssl.h:1192:1:
+    1) SSL_CTX_set_psk_client_callback: function is undocumented
+  1192 | void SSL_CTX_set_psk_client_callback(SSL_CTX *ctx, SSL_psk_client_cb_func cb);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ssl.h:1034:1:
+    1) SSL_CTX_set_stateless_cookie_verify_cb: function is undocumented
+  1034 | void SSL_CTX_set_stateless_cookie_verify_cb(
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:2782:1:
+    1) X509_PUBKEY_get0_param: function is undocumented
+  2782 | int X509_PUBKEY_get0_param(ASN1_OBJECT **ppkalg,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:2641:1:
+    1) PKCS5_pbe_set_ex: function is undocumented
+  2641 | X509_ALGOR *PKCS5_pbe_set_ex(int alg, int iter,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:2639:1:
+    1) PKCS5_pbe_set: function is undocumented
+  2639 | X509_ALGOR *PKCS5_pbe_set(int alg, int iter,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:2453:1:
+    1) X509_ATTRIBUTE_get0_data: function is undocumented
+  2453 | void *X509_ATTRIBUTE_get0_data(X509_ATTRIBUTE *attr, int idx, int atrtype,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:2285:1:
+    1) X509v3_get_ext_by_OBJ: function is undocumented
+  2285 | int X509v3_get_ext_by_OBJ(const STACK_OF(X509_EXTENSION) *x,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:2267:1:
+    1) X509_NAME_get0_der: function is undocumented
+  2267 | int X509_NAME_get0_der(const X509_NAME *nm, const unsigned char **pder,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:2221:1:
+    1) X509_NAME_ENTRY_create_by_NID: function is undocumented
+  2221 | X509_NAME_ENTRY *X509_NAME_ENTRY_create_by_NID(X509_NAME_ENTRY **ne, int nid,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:2217:1:
+    1) X509_NAME_ENTRY_create_by_txt: function is undocumented
+  2217 | X509_NAME_ENTRY *X509_NAME_ENTRY_create_by_txt(X509_NAME_ENTRY **ne,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:2136:1:
+    1) X509_print_ex_fp: function is undocumented
+  2136 | int X509_print_ex_fp(FILE *bp, X509 *x, unsigned long nmflag,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:1821:1:
+    1) X509_getm_notAfter: function is undocumented
+  1821 | ASN1_TIME *X509_getm_notAfter(const X509 *x);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:1738:1:
+    1) ASN1_item_verify: function is undocumented
+  1738 | int ASN1_item_verify(const ASN1_ITEM *it, const X509_ALGOR *alg,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:1302:1:
+    1) X509_EXTENSION_new: function is undocumented
+  1302 | DECLARE_ASN1_FUNCTIONS(X509_EXTENSION)
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:1151:1:
+    1) d2i_PUBKEY_ex: function is undocumented
+  1151 | EVP_PKEY *d2i_PUBKEY_ex(EVP_PKEY **a, const unsigned char **pp, long length,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:919:1:
+    1) d2i_PrivateKey_ex_bio: function is undocumented
+  919 | EVP_PKEY *d2i_PrivateKey_ex_bio(BIO *bp, EVP_PKEY **a, OSSL_LIB_CTX *libctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:785:1:
+    1) d2i_PrivateKey_fp: function is undocumented
+  785 | EVP_PKEY *d2i_PrivateKey_fp(FILE *fp, EVP_PKEY **a);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:726:1:
+    1) i2d_RSA_PUBKEY_fp: function is undocumented
+  726 | OSSL_DEPRECATEDIN_3_0 int i2d_RSA_PUBKEY_fp(FILE *fp, const RSA *rsa);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:697:1:
+    1) i2d_X509_fp: function is undocumented
+  697 | int i2d_X509_fp(FILE *fp, const X509 *x509);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:603:1:
+    1) NETSCAPE_SPKI_get_pubkey: function is undocumented
+  603 | EVP_PKEY *NETSCAPE_SPKI_get_pubkey(NETSCAPE_SPKI *x);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:463:5:
+    1) sig_algor: variable is undocumented
+  463 |     X509_ALGOR sig_algor;
+      |     ^~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:460:1:
+    1) NETSCAPE_SPKI: typedef is undocumented
+  460 | typedef struct Netscape_spki_st {
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:454:9:
+    1) Netscape_spkac_st: record is undocumented
+  454 | typedef struct Netscape_spkac_st {
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:418:5:
+    1) enc_data: variable is undocumented
+  418 |     char *enc_data;
+      |     ^~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:413:5:
+    1) crl: variable is undocumented
+  413 |     X509_CRL *crl;
+      |     ^~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:411:1:
+    1) X509_INFO: typedef is undocumented
+  411 | typedef struct X509_info_st {
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:408:5:
+    1) cipher: variable is undocumented
+  408 |     EVP_CIPHER_INFO cipher;
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:406:5:
+    1) key_free: variable is undocumented
+  406 |     int key_free; /* true if we should auto free key_data */
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:395:5:
+    1) version: variable is undocumented
+  395 |     int version;
+      |     ^~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:319:9:
+    1) x509_cinf_st: record is undocumented
+  319 | typedef struct x509_cinf_st X509_CINF;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:314:9:
+    1) X509_req_st: record is undocumented
+  314 | typedef struct X509_req_st X509_REQ;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:314:1:
+    1) X509_REQ: typedef is undocumented
+  314 | typedef struct X509_req_st X509_REQ;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:313:9:
+    1) X509_req_info_st: record is undocumented
+  313 | typedef struct X509_req_info_st X509_REQ_INFO;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:283:9:
+    1) x509_attributes_st: record is undocumented
+  283 | typedef struct x509_attributes_st X509_ATTRIBUTE;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:283:1:
+    1) X509_ATTRIBUTE: typedef is undocumented
+  283 | typedef struct x509_attributes_st X509_ATTRIBUTE;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:205:1:
+    1) X509_VAL: typedef is undocumented
+  205 | typedef struct X509_val_st {
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509_vfy.h:1138:1:
+    1) X509_STORE_CTX_set0_rpk: function is undocumented
+  1138 | void X509_STORE_CTX_set0_rpk(X509_STORE_CTX *ctx, EVP_PKEY *target);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509_vfy.h:1137:1:
+    1) X509_STORE_CTX_set_cert: function is undocumented
+  1137 | void X509_STORE_CTX_set_cert(X509_STORE_CTX *ctx, X509 *target);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509_vfy.h:1113:1:
+    1) X509_STORE_CTX_get_current_cert: function is undocumented
+  1113 | X509 *X509_STORE_CTX_get_current_cert(const X509_STORE_CTX *ctx);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509_vfy.h:1013:1:
+    1) X509_load_cert_file_ex: function is undocumented
+  1013 | int X509_load_cert_file_ex(X509_LOOKUP *ctx, const char *file, int type,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509_vfy.h:933:1:
+    1) X509_LOOKUP_meth_set_free: function is undocumented
+  933 | int X509_LOOKUP_meth_set_free(X509_LOOKUP_METHOD *method,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509_vfy.h:772:1:
+    1) X509_STORE_CTX_init: function is undocumented
+  772 | int X509_STORE_CTX_init(X509_STORE_CTX *ctx, X509_STORE *trust_store,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509_vfy.h:642:1:
+    1) X509_STORE_CTX_get1_certs: function is undocumented
+  642 | STACK_OF(X509) *X509_STORE_CTX_get1_certs(X509_STORE_CTX *xs,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509_vfy.h:170:5:
+    1) name: variable is undocumented
+  170 |     char *name;
+      |     ^~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509v3.h:2309:1:
+    1) X509V3_EXT_add_list: function is undocumented
+  2309 | int X509V3_EXT_add_list(X509V3_EXT_METHOD *extlist);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509v3.h:1121:1:
+    1) d2i_BASIC_CONSTRAINTS: function is undocumented
+  1121 | BASIC_CONSTRAINTS *d2i_BASIC_CONSTRAINTS(BASIC_CONSTRAINTS **a, const unsigned char **in, long len);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1658
+
+error limit reached (max-errors=200); further diagnostics suppressed. Rerun with --max-errors=0 for the full report.
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: ee8f24c615e47494a27f3c1ee8bf104a97c54606)
+    Reported From: `src/mrdocs/Metadata/Finalizers/DocCommentFinalizer.cpp` at line 1665
+
+[0;37mExtracted 6164 declarations in 730ms
+[0m[0;37m  - regular symbols: 6133
+[0m[0;37m  - dependency symbols: 31
+[0m[0;37mGenerating docs
+[0m[0;37mGenerated noop documentation in 0ms
+[0m

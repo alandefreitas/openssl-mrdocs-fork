@@ -1,0 +1,1261 @@
+[0;37m/opt/homebrew/opt/llvm/bin/clang -v -E -x c++ -
+[0m[0;37mExtracting declarations
+[0m[0;37mmax-errors=250: found enough documentation problems; translation units not yet started will be skipped
+[0m[0;37mFinalizing corpus
+[0m/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/asn1.h:2719:1:
+    1) ASN1_generate_nconf: function is undocumented
+  2719 | ASN1_TYPE *ASN1_generate_nconf(const char *str, CONF *nconf);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/asn1.h:2089:1:
+    1) ASN1_ENUMERATED_get_int64: function is undocumented
+  2089 | int ASN1_ENUMERATED_get_int64(int64_t *pr, const ASN1_ENUMERATED *a);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/asn1.h:954:1:
+    1) ASN1_STRING_data: function is undocumented
+  954 | OSSL_DEPRECATEDIN_1_1_0 unsigned char *ASN1_STRING_data(ASN1_STRING *x);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1847:1:
+    1) BIO_meth_set_sendmmsg: function is undocumented
+  1847 | int BIO_meth_set_sendmmsg(BIO_METHOD *biom,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1801:1:
+    1) BIO_vsnprintf: function is undocumented
+  1801 | int BIO_vsnprintf(char *buf, size_t n, const char *format, va_list args)
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1751:1:
+    1) BIO_copy_next_retry: function is undocumented
+  1751 | void BIO_copy_next_retry(BIO *b);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1741:1:
+    1) BIO_new_bio_dgram_pair: function is undocumented
+  1741 | int BIO_new_bio_dgram_pair(BIO **bio1, size_t writebuf1,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1719:1:
+    1) BIO_new_accept: function is undocumented
+  1719 | BIO *BIO_new_accept(const char *host_port);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1698:1:
+    1) BIO_accept_ex: function is undocumented
+  1698 | int BIO_accept_ex(int accept_sock, BIO_ADDR *addr, int options);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1697:1:
+    1) BIO_listen: function is undocumented
+  1697 | int BIO_listen(int sock, const BIO_ADDR *addr, int options);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1638:1:
+    1) BIO_accept: function is undocumented
+  1638 | OSSL_DEPRECATEDIN_1_1_0 int BIO_accept(int sock, char **ip_port);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1479:1:
+    1) BIO_ADDR_service_string: function is undocumented
+  1479 | char *BIO_ADDR_service_string(const BIO_ADDR *ap, int numeric);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1478:1:
+    1) BIO_ADDR_hostname_string: function is undocumented
+  1478 | char *BIO_ADDR_hostname_string(const BIO_ADDR *ap, int numeric);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1436:1:
+    1) BIO_ADDR_dup: function is undocumented
+  1436 | BIO_ADDR *BIO_ADDR_dup(const BIO_ADDR *ap);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1428:1:
+    1) BIO_ADDR_new: function is undocumented
+  1428 | BIO_ADDR *BIO_ADDR_new(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1386:1:
+    1) BIO_dump: function is undocumented
+  1386 | int BIO_dump(BIO *b, const void *bytes, int len);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1351:1:
+    1) BIO_do_connect_retry: function is undocumented
+  1351 | int BIO_do_connect_retry(BIO *bio, int timeout, int nap_milliseconds);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1302:1:
+    1) BIO_dgram_non_fatal_error: function is undocumented
+  1302 | int BIO_dgram_non_fatal_error(int error);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1301:1:
+    1) BIO_s_datagram: function is undocumented
+  1301 | const BIO_METHOD *BIO_s_datagram(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1264:1:
+    1) BIO_f_null: function is undocumented
+  1264 | const BIO_METHOD *BIO_f_null(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1215:1:
+    1) BIO_s_dgram_mem: function is undocumented
+  1215 | const BIO_METHOD *BIO_s_dgram_mem(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1174:1:
+    1) BIO_dup_chain: function is undocumented
+  1174 | BIO *BIO_dup_chain(BIO *in);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1142:1:
+    1) BIO_find_type: function is undocumented
+  1142 | BIO *BIO_find_type(BIO *b, int bio_type);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1098:1:
+    1) BIO_ctrl: function is undocumented
+  1098 | long BIO_ctrl(BIO *bp, int cmd, long larg, void *parg);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1097:1:
+    1) BIO_indent: function is undocumented
+  1097 | int BIO_indent(BIO *b, int indent, int max);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:1027:8:
+    1) BIO_recvmmsg: function is undocumented
+  1027 | __owur int BIO_recvmmsg(BIO *b, BIO_MSG *msg,
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:918:1:
+    1) BIO_s_file: function is undocumented
+  918 | const BIO_METHOD *BIO_s_file(void);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:915:1:
+    1) BIO_asn1_get_suffix: function is undocumented
+  915 | int BIO_asn1_get_suffix(BIO *b, asn1_ps_func **psuffix,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:904:1:
+    1) BIO_asn1_get_prefix: function is undocumented
+  904 | int BIO_asn1_get_prefix(BIO *b, asn1_ps_func **pprefix,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:472:1:
+    1) asn1_ps_func: typedef is undocumented
+  472 | typedef int asn1_ps_func(BIO *b, unsigned char **pbuf, int *plen,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:401:1:
+    1) BIO_get_callback_arg: function is undocumented
+  401 | char *BIO_get_callback_arg(const BIO *b);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:379:1:
+    1) BIO_get_callback_ex: function is undocumented
+  379 | BIO_callback_fn_ex BIO_get_callback_ex(const BIO *b);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:348:1:
+    1) BIO_set_callback: function is undocumented
+  348 | OSSL_DEPRECATEDIN_3_0 void BIO_set_callback(BIO *b, BIO_callback_fn callback);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:347:1:
+    1) BIO_get_callback: function is undocumented
+  347 | OSSL_DEPRECATEDIN_3_0 BIO_callback_fn BIO_get_callback(const BIO *b);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/blowfish.h:98:1:
+    1) BF_options: function is undocumented
+  98 | OSSL_DEPRECATEDIN_3_0 const char *BF_options(void);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/blowfish.h:55:1:
+    1) BF_set_key: function is undocumented
+  55 | OSSL_DEPRECATEDIN_3_0 void BF_set_key(BF_KEY *key, int len,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:1557:1:
+    1) BN_get0_nist_prime_384: function is undocumented
+  1557 | const BIGNUM *BN_get0_nist_prime_384(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:1540:1:
+    1) BN_nist_mod_521: function is undocumented
+  1540 | int BN_nist_mod_521(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:1414:1:
+    1) BN_GF2m_mod_arr: function is undocumented
+  1414 | int BN_GF2m_mod_arr(BIGNUM *r, const BIGNUM *a, const int p[]);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:1202:1:
+    1) BN_BLINDING_is_current_thread: function is undocumented
+  1202 | int BN_BLINDING_is_current_thread(BN_BLINDING *b);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:1079:1:
+    1) BN_MONT_CTX_new: function is undocumented
+  1079 | BN_MONT_CTX *BN_MONT_CTX_new(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:994:1:
+    1) BN_is_prime_ex: function is undocumented
+  994 | OSSL_DEPRECATEDIN_3_0
+      | ^~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:973:1:
+    1) BN_is_prime: function is undocumented
+  973 | OSSL_DEPRECATEDIN_0_9_8
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:953:1:
+    1) BN_consttime_swap: function is undocumented
+  953 | void BN_consttime_swap(BN_ULONG swap, BIGNUM *a, BIGNUM *b, int nwords);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:913:1:
+    1) BN_gcd: function is undocumented
+  913 | int BN_gcd(BIGNUM *r, const BIGNUM *a, const BIGNUM *b, BN_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:829:1:
+    1) BN_reciprocal: function is undocumented
+  829 | int BN_reciprocal(BIGNUM *r, const BIGNUM *m, int len, BN_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:828:1:
+    1) BN_print: function is undocumented
+  828 | int BN_print(BIO *bio, const BIGNUM *a);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:826:1:
+    1) BN_print_fp: function is undocumented
+  826 | int BN_print_fp(FILE *fp, const BIGNUM *a);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:783:1:
+    1) BN_mod_exp2_mont: function is undocumented
+  783 | int BN_mod_exp2_mont(BIGNUM *r, const BIGNUM *a1, const BIGNUM *p1,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:715:1:
+    1) BN_is_bit_set: function is undocumented
+  715 | int BN_is_bit_set(const BIGNUM *a, int n);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:709:1:
+    1) BN_cmp: function is undocumented
+  709 | int BN_cmp(const BIGNUM *a, const BIGNUM *b);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:694:1:
+    1) BN_sub_word: function is undocumented
+  694 | int BN_sub_word(BIGNUM *a, BN_ULONG w);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:686:1:
+    1) BN_mul_word: function is undocumented
+  686 | int BN_mul_word(BIGNUM *a, BN_ULONG w);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:678:1:
+    1) BN_mod_word: function is undocumented
+  678 | BN_ULONG BN_mod_word(const BIGNUM *a, BN_ULONG w);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:676:1:
+    1) BN_mod_lshift_quick: function is undocumented
+  676 | int BN_mod_lshift_quick(BIGNUM *r, const BIGNUM *a, int n, const BIGNUM *m);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:604:1:
+    1) BN_mod_add: function is undocumented
+  604 | int BN_mod_add(BIGNUM *r, const BIGNUM *a, const BIGNUM *b, const BIGNUM *m,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:603:1:
+    1) BN_nnmod: function is undocumented
+  603 | int BN_nnmod(BIGNUM *r, const BIGNUM *m, const BIGNUM *d, BN_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:489:1:
+    1) BN_bn2lebinpad: function is undocumented
+  489 | int BN_bn2lebinpad(const BIGNUM *a, unsigned char *to, int tolen);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:432:1:
+    1) BN_copy: function is undocumented
+  432 | BIGNUM *BN_copy(BIGNUM *a, const BIGNUM *b);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:301:1:
+    1) BN_CTX_end: function is undocumented
+  301 | void BN_CTX_end(BN_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:234:1:
+    1) BN_is_odd: function is undocumented
+  234 | int BN_is_odd(const BIGNUM *a);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:233:1:
+    1) BN_is_word: function is undocumented
+  233 | int BN_is_word(const BIGNUM *a, const BN_ULONG w);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:226:1:
+    1) BN_is_zero: function is undocumented
+  226 | int BN_is_zero(const BIGNUM *a);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:136:1:
+    1) BN_GENCB_set: function is undocumented
+  136 | void BN_GENCB_set(BN_GENCB *gencb, int (*callback)(int, int, BN_GENCB *),
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:82:1:
+    1) BN_get_flags: function is undocumented
+  82 | int BN_get_flags(const BIGNUM *b, int n);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/conf.h:330:1:
+    1) NCONF_get_section: function is undocumented
+  330 | STACK_OF(CONF_VALUE) *NCONF_get_section(const CONF *conf,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/conftypes.h:25:5:
+    1) name: variable is undocumented
+  25 |     const char *name;
+     |     ^~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/core.h:249:1:
+    1) OSSL_PASSPHRASE_CALLBACK: typedef is undocumented
+  249 | typedef int(OSSL_PASSPHRASE_CALLBACK)(char *pass, size_t pass_size,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/core.h:241:1:
+    1) OSSL_INOUT_CALLBACK: typedef is undocumented
+  241 | typedef int(OSSL_INOUT_CALLBACK)(const OSSL_PARAM in_params[],
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/core.h:240:1:
+    1) OSSL_CALLBACK: typedef is undocumented
+  240 | typedef int(OSSL_CALLBACK)(const OSSL_PARAM params[], void *arg);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/core.h:208:1:
+    1) OSSL_provider_init_fn: typedef is undocumented
+  208 | typedef int(OSSL_provider_init_fn)(const OSSL_CORE_HANDLE *handle,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/core.h:106:5:
+    1) return_size: variable is undocumented
+  106 |     size_t return_size; /* returned content size */
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/core.h:105:5:
+    1) data_size: variable is undocumented
+  105 |     size_t data_size; /* data size */
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/core.h:104:5:
+    1) data: variable is undocumented
+  104 |     void *data; /* value being passed in or out */
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/core.h:90:5:
+    1) algorithm_description: variable is undocumented
+  90 |     const char *algorithm_description;
+     |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/core.h:75:5:
+    1) ptr: variable is undocumented
+  75 |     void *ptr;
+     |     ^~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:1077:1:
+    1) OSSL_sleep: function is undocumented
+  1077 | void OSSL_sleep(uint64_t millis);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:812:1:
+    1) OPENSSL_gmtime_diff: function is undocumented
+  812 | int OPENSSL_gmtime_diff(int *pday, int *psec,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:658:1:
+    1) CRYPTO_secure_malloc: function is undocumented
+  658 | OSSL_CRYPTO_ALLOC void *CRYPTO_secure_malloc(size_t num, const char *file, int line);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:575:1:
+    1) CRYPTO_malloc: function is undocumented
+  575 | OSSL_CRYPTO_ALLOC void *CRYPTO_malloc(size_t num, const char *file, int line);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:423:1:
+    1) CRYPTO_free_ex_index: function is undocumented
+  423 | int CRYPTO_free_ex_index(int class_index, int idx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:394:1:
+    1) CRYPTO_EX_free: typedef is undocumented
+  394 | typedef void CRYPTO_EX_free(void *parent, void *ptr, CRYPTO_EX_DATA *ad,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:317:1:
+    1) OPENSSL_issetugid: function is undocumented
+  317 | int OPENSSL_issetugid(void);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:254:1:
+    1) OPENSSL_version_major: function is undocumented
+  254 | unsigned int OPENSSL_version_major(void);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:224:1:
+    1) OPENSSL_hexstr2buf: function is undocumented
+  224 | unsigned char *OPENSSL_hexstr2buf(const char *str, long *buflen);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:203:1:
+    1) OPENSSL_buf2hexstr_ex: function is undocumented
+  203 | int OPENSSL_buf2hexstr_ex(char *str, size_t str_n, size_t *strlength,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:195:1:
+    1) OPENSSL_strlcat: function is undocumented
+  195 | size_t OPENSSL_strlcat(char *dst, const char *src, size_t siz);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cryptoerr_legacy.h:105:1:
+    1) ERR_load_PKCS12_strings: function is undocumented
+  105 | OSSL_DEPRECATEDIN_3_0 int ERR_load_PKCS12_strings(void);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cryptoerr_legacy.h:51:1:
+    1) ERR_load_CT_strings: function is undocumented
+  51 | OSSL_DEPRECATEDIN_3_0 int ERR_load_CT_strings(void);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cryptoerr_legacy.h:48:1:
+    1) ERR_load_CONF_strings: function is undocumented
+  48 | OSSL_DEPRECATEDIN_3_0 int ERR_load_CONF_strings(void);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cryptoerr_legacy.h:31:1:
+    1) ERR_load_BIO_strings: function is undocumented
+  31 | OSSL_DEPRECATEDIN_3_0 int ERR_load_BIO_strings(void);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cryptoerr_legacy.h:30:1:
+    1) ERR_load_ASYNC_strings: function is undocumented
+  30 | OSSL_DEPRECATEDIN_3_0 int ERR_load_ASYNC_strings(void);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dh.h:697:1:
+    1) DH_get_length: function is undocumented
+  697 | OSSL_DEPRECATEDIN_3_0 long DH_get_length(const DH *dh);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dsa.h:550:1:
+    1) DSA_get0_p: function is undocumented
+  550 | OSSL_DEPRECATEDIN_3_0 const BIGNUM *DSA_get0_p(const DSA *d);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/err.h:291:1:
+    1) ERR_FATAL_ERROR: function is undocumented
+  291 | static ossl_unused ossl_inline int ERR_FATAL_ERROR(unsigned long errcode)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:6268:1:
+    1) EVP_PKEY_meth_set_param_check: function is undocumented
+  6268 | OSSL_DEPRECATEDIN_3_0 void EVP_PKEY_meth_set_param_check(EVP_PKEY_METHOD *pmeth, int (*check)(EVP_PKEY *pkey));
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:5533:1:
+    1) EVP_KEM_get0_provider: function is undocumented
+  5533 | OSSL_PROVIDER *EVP_KEM_get0_provider(const EVP_KEM *wrap);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:4966:1:
+    1) EVP_PKEY_meth_copy: function is undocumented
+  4966 | OSSL_DEPRECATEDIN_3_0 void EVP_PKEY_meth_copy(EVP_PKEY_METHOD *dst,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:4281:1:
+    1) PKCS5_PBE_keyivgen: function is undocumented
+  4281 | int PKCS5_PBE_keyivgen(EVP_CIPHER_CTX *ctx, const char *pass, int passlen,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:3684:1:
+    1) EVP_PKEY_is_a: function is undocumented
+  3684 | int EVP_PKEY_is_a(const EVP_PKEY *pkey, const char *name);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:2111:1:
+    1) EVP_CIPHER_CTX_ctrl: function is undocumented
+  2111 | int EVP_CIPHER_CTX_ctrl(EVP_CIPHER_CTX *ctx, int type, int arg, void *ptr);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/evp.h:220:1:
+    1) EVP_MD_meth_set_ctrl: function is undocumented
+  220 | OSSL_DEPRECATEDIN_3_0
+      | ^~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/kdf.h:209:1:
+    1) EVP_PKEY_CTX_add1_hkdf_info: function is undocumented
+  209 | int EVP_PKEY_CTX_add1_hkdf_info(EVP_PKEY_CTX *ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/kdf.h:196:1:
+    1) EVP_PKEY_CTX_set1_hkdf_salt: function is undocumented
+  196 | int EVP_PKEY_CTX_set1_hkdf_salt(EVP_PKEY_CTX *ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/kdf.h:108:1:
+    1) EVP_KDF_CTX_settable_params: function is undocumented
+  108 | const OSSL_PARAM *EVP_KDF_CTX_settable_params(EVP_KDF_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/kdf.h:101:1:
+    1) EVP_KDF_settable_ctx_params: function is undocumented
+  101 | const OSSL_PARAM *EVP_KDF_settable_ctx_params(const EVP_KDF *kdf);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/kdf.h:94:1:
+    1) EVP_KDF_gettable_params: function is undocumented
+  94 | const OSSL_PARAM *EVP_KDF_gettable_params(const EVP_KDF *kdf);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/kdf.h:86:1:
+    1) EVP_KDF_CTX_get_params: function is undocumented
+  86 | int EVP_KDF_CTX_get_params(EVP_KDF_CTX *ctx, OSSL_PARAM params[]);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/kdf.h:77:1:
+    1) EVP_KDF_derive: function is undocumented
+  77 | int EVP_KDF_derive(EVP_KDF_CTX *ctx, unsigned char *key, size_t keylen,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/kdf.h:64:1:
+    1) EVP_KDF_CTX_kdf: function is undocumented
+  64 | const EVP_KDF *EVP_KDF_CTX_kdf(EVP_KDF_CTX *ctx);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/kdf.h:63:1:
+    1) EVP_KDF_get0_provider: function is undocumented
+  63 | const OSSL_PROVIDER *EVP_KDF_get0_provider(const EVP_KDF *kdf);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/kdf.h:56:1:
+    1) EVP_KDF_is_a: function is undocumented
+  56 | int EVP_KDF_is_a(const EVP_KDF *kdf, const char *name);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/kdf.h:38:1:
+    1) EVP_KDF_CTX_new: function is undocumented
+  38 | EVP_KDF_CTX *EVP_KDF_CTX_new(EVP_KDF *kdf);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/kdf.h:35:1:
+    1) EVP_KDF_fetch: function is undocumented
+  35 | EVP_KDF *EVP_KDF_fetch(OSSL_LIB_CTX *libctx, const char *algorithm,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/kdf.h:34:1:
+    1) EVP_KDF_free: function is undocumented
+  34 | void EVP_KDF_free(EVP_KDF *kdf);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:57:1:
+    1) OSSL_PARAM_BLD_push_octet_ptr: function is undocumented
+  57 | int OSSL_PARAM_BLD_push_octet_ptr(OSSL_PARAM_BLD *bld, const char *key,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:55:1:
+    1) OSSL_PARAM_BLD_push_octet_string: function is undocumented
+  55 | int OSSL_PARAM_BLD_push_octet_string(OSSL_PARAM_BLD *bld, const char *key,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:53:1:
+    1) OSSL_PARAM_BLD_push_utf8_ptr: function is undocumented
+  53 | int OSSL_PARAM_BLD_push_utf8_ptr(OSSL_PARAM_BLD *bld, const char *key,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:51:1:
+    1) OSSL_PARAM_BLD_push_utf8_string: function is undocumented
+  51 | int OSSL_PARAM_BLD_push_utf8_string(OSSL_PARAM_BLD *bld, const char *key,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:49:1:
+    1) OSSL_PARAM_BLD_push_BN_pad: function is undocumented
+  49 | int OSSL_PARAM_BLD_push_BN_pad(OSSL_PARAM_BLD *bld, const char *key,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:45:1:
+    1) OSSL_PARAM_BLD_push_double: function is undocumented
+  45 | int OSSL_PARAM_BLD_push_double(OSSL_PARAM_BLD *bld, const char *key,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:43:1:
+    1) OSSL_PARAM_BLD_push_time_t: function is undocumented
+  43 | int OSSL_PARAM_BLD_push_time_t(OSSL_PARAM_BLD *bld, const char *key,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:41:1:
+    1) OSSL_PARAM_BLD_push_size_t: function is undocumented
+  41 | int OSSL_PARAM_BLD_push_size_t(OSSL_PARAM_BLD *bld, const char *key,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:37:1:
+    1) OSSL_PARAM_BLD_push_int64: function is undocumented
+  37 | int OSSL_PARAM_BLD_push_int64(OSSL_PARAM_BLD *bld, const char *key,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:35:1:
+    1) OSSL_PARAM_BLD_push_uint32: function is undocumented
+  35 | int OSSL_PARAM_BLD_push_uint32(OSSL_PARAM_BLD *bld, const char *key,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:31:1:
+    1) OSSL_PARAM_BLD_push_ulong: function is undocumented
+  31 | int OSSL_PARAM_BLD_push_ulong(OSSL_PARAM_BLD *bld, const char *key,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:29:1:
+    1) OSSL_PARAM_BLD_push_long: function is undocumented
+  29 | int OSSL_PARAM_BLD_push_long(OSSL_PARAM_BLD *bld, const char *key,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:27:1:
+    1) OSSL_PARAM_BLD_push_uint: function is undocumented
+  27 | int OSSL_PARAM_BLD_push_uint(OSSL_PARAM_BLD *bld, const char *key,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:24:1:
+    1) OSSL_PARAM_BLD_free: function is undocumented
+  24 | void OSSL_PARAM_BLD_free(OSSL_PARAM_BLD *bld);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:23:1:
+    1) OSSL_PARAM_BLD_to_param: function is undocumented
+  23 | OSSL_PARAM *OSSL_PARAM_BLD_to_param(OSSL_PARAM_BLD *bld);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:22:1:
+    1) OSSL_PARAM_BLD_new: function is undocumented
+  22 | OSSL_PARAM_BLD *OSSL_PARAM_BLD_new(void);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/params.h:499:1:
+    1) OSSL_PARAM_merge: function is undocumented
+  499 | OSSL_PARAM *OSSL_PARAM_merge(const OSSL_PARAM *p1, const OSSL_PARAM *p2);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/params.h:77:1:
+    1) OSSL_PARAM_locate_const: function is undocumented
+  77 | const OSSL_PARAM *OSSL_PARAM_locate_const(const OSSL_PARAM *p, const char *key);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rc2.h:56:1:
+    1) RC2_ofb64_encrypt: function is undocumented
+  56 | OSSL_DEPRECATEDIN_3_0 void RC2_ofb64_encrypt(const unsigned char *in,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rc2.h:51:1:
+    1) RC2_cfb64_encrypt: function is undocumented
+  51 | OSSL_DEPRECATEDIN_3_0 void RC2_cfb64_encrypt(const unsigned char *in,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rc2.h:47:1:
+    1) RC2_cbc_encrypt: function is undocumented
+  47 | OSSL_DEPRECATEDIN_3_0 void RC2_cbc_encrypt(const unsigned char *in,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rc2.h:46:1:
+    1) RC2_decrypt: function is undocumented
+  46 | OSSL_DEPRECATEDIN_3_0 void RC2_decrypt(unsigned long *data, RC2_KEY *key);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rc2.h:45:1:
+    1) RC2_encrypt: function is undocumented
+  45 | OSSL_DEPRECATEDIN_3_0 void RC2_encrypt(unsigned long *data, RC2_KEY *key);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rc2.h:42:1:
+    1) RC2_ecb_encrypt: function is undocumented
+  42 | OSSL_DEPRECATEDIN_3_0 void RC2_ecb_encrypt(const unsigned char *in,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rc2.h:40:1:
+    1) RC2_set_key: function is undocumented
+  40 | OSSL_DEPRECATEDIN_3_0 void RC2_set_key(RC2_KEY *key, int len,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rc2.h:36:5:
+    1) data: variable is undocumented
+  36 |     RC2_INT data[64];
+     |     ^~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rc2.h:35:9:
+    1) rc2_key_st: record is undocumented
+  35 | typedef struct rc2_key_st {
+     |         ^~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rc2.h:35:1:
+    1) RC2_KEY: typedef is undocumented
+  35 | typedef struct rc2_key_st {
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/rsa.h:258:1:
+    1) EVP_PKEY_CTX_set_rsa_pss_keygen_md_name: function is undocumented
+  258 | int EVP_PKEY_CTX_set_rsa_pss_keygen_md_name(EVP_PKEY_CTX *ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/safestack.h:268:1:
+    1) OPENSSL_BLOCK: typedef is undocumented
+  268 | typedef void *OPENSSL_BLOCK;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/safestack.h:197:1:
+    1) OPENSSL_STRING: typedef is undocumented
+  197 | typedef char *OPENSSL_STRING;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ssl.h:5082:8:
+    1) SSL_set_session_ticket_ext_cb: function is undocumented
+  5082 | __owur int SSL_set_session_ticket_ext_cb(SSL *s,
+       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ssl.h:4779:1:
+    1) SSL_get_info_callback: function is undocumented
+  4779 | void (*SSL_get_info_callback(const SSL *ssl))(const SSL *ssl, int type,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ssl.h:4269:1:
+    1) TLSv1_2_client_method: function is undocumented
+  4269 | OSSL_DEPRECATEDIN_1_1_0 __owur const SSL_METHOD *TLSv1_2_client_method(void);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ssl.h:3334:1:
+    1) SSL_CTX_set_cert_cb: function is undocumented
+  3334 | void SSL_CTX_set_cert_cb(SSL_CTX *c, int (*cb)(SSL *ssl, void *arg),
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:110:1:
+    1) OPENSSL_sk_is_sorted: function is undocumented
+  110 | int OPENSSL_sk_is_sorted(const OPENSSL_STACK *st);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:90:1:
+    1) OPENSSL_sk_zero: function is undocumented
+  90 | void OPENSSL_sk_zero(OPENSSL_STACK *st);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:89:1:
+    1) OPENSSL_sk_pop: function is undocumented
+  89 | void *OPENSSL_sk_pop(OPENSSL_STACK *st);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:88:1:
+    1) OPENSSL_sk_shift: function is undocumented
+  88 | void *OPENSSL_sk_shift(OPENSSL_STACK *st);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:87:1:
+    1) OPENSSL_sk_unshift: function is undocumented
+  87 | int OPENSSL_sk_unshift(OPENSSL_STACK *st, const void *data);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:78:1:
+    1) OPENSSL_sk_find_ex: function is undocumented
+  78 | int OPENSSL_sk_find_ex(OPENSSL_STACK *st, const void *data);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:70:1:
+    1) OPENSSL_sk_delete_ptr: function is undocumented
+  70 | void *OPENSSL_sk_delete_ptr(OPENSSL_STACK *st, const void *p);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:68:1:
+    1) OPENSSL_sk_insert: function is undocumented
+  68 | int OPENSSL_sk_insert(OPENSSL_STACK *sk, const void *data, int where);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:65:1:
+    1) OPENSSL_sk_deep_copy: function is undocumented
+  65 | OPENSSL_STACK *OPENSSL_sk_deep_copy(const OPENSSL_STACK *,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:64:1:
+    1) OPENSSL_sk_pop_free: function is undocumented
+  64 | void OPENSSL_sk_pop_free(OPENSSL_STACK *st, void (*func)(void *));
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:63:1:
+    1) OPENSSL_sk_free: function is undocumented
+  63 | void OPENSSL_sk_free(OPENSSL_STACK *);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:62:1:
+    1) OPENSSL_sk_reserve: function is undocumented
+  62 | int OPENSSL_sk_reserve(OPENSSL_STACK *st, int n);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:54:1:
+    1) OPENSSL_sk_new_null: function is undocumented
+  54 | OPENSSL_STACK *OPENSSL_sk_new_null(void);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:53:1:
+    1) OPENSSL_sk_new: function is undocumented
+  53 | OPENSSL_STACK *OPENSSL_sk_new(OPENSSL_sk_compfunc cmp);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:42:1:
+    1) OPENSSL_sk_value: function is undocumented
+  42 | void *OPENSSL_sk_value(const OPENSSL_STACK *, int);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:41:1:
+    1) OPENSSL_sk_num: function is undocumented
+  41 | int OPENSSL_sk_num(const OPENSSL_STACK *);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/stack.h:39:1:
+    1) OPENSSL_sk_copyfunc: typedef is undocumented
+  39 | typedef void *(*OPENSSL_sk_copyfunc)(const void *);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:534:1:
+    1) OSSL_DECODER_CTX: typedef is undocumented
+  534 | typedef struct ossl_decoder_ctx_st OSSL_DECODER_CTX;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:498:1:
+    1) OSSL_PARAM: typedef is undocumented
+  498 | typedef struct ossl_param_st OSSL_PARAM;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:485:9:
+    1) ossl_dispatch_st: record is undocumented
+  485 | typedef struct ossl_dispatch_st OSSL_DISPATCH;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:485:1:
+    1) OSSL_DISPATCH: typedef is undocumented
+  485 | typedef struct ossl_dispatch_st OSSL_DISPATCH;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:465:9:
+    1) ctlog_store_st: record is undocumented
+  465 | typedef struct ctlog_store_st CTLOG_STORE;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:465:1:
+    1) CTLOG_STORE: typedef is undocumented
+  465 | typedef struct ctlog_store_st CTLOG_STORE;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:456:9:
+    1) sct_ctx_st: record is undocumented
+  456 | typedef struct sct_ctx_st SCT_CTX;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:433:1:
+    1) CRYPTO_EX_DATA: typedef is undocumented
+  433 | typedef struct crypto_ex_data_st CRYPTO_EX_DATA;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:423:1:
+    1) DIST_POINT: typedef is undocumented
+  423 | typedef struct DIST_POINT_st DIST_POINT;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:413:9:
+    1) X509_POLICY_TREE_st: record is undocumented
+  413 | typedef struct X509_POLICY_TREE_st X509_POLICY_TREE;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:413:1:
+    1) X509_POLICY_TREE: typedef is undocumented
+  413 | typedef struct X509_POLICY_TREE_st X509_POLICY_TREE;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:412:9:
+    1) X509_POLICY_LEVEL_st: record is undocumented
+  412 | typedef struct X509_POLICY_LEVEL_st X509_POLICY_LEVEL;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:411:9:
+    1) X509_POLICY_NODE_st: record is undocumented
+  411 | typedef struct X509_POLICY_NODE_st X509_POLICY_NODE;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:411:1:
+    1) X509_POLICY_NODE: typedef is undocumented
+  411 | typedef struct X509_POLICY_NODE_st X509_POLICY_NODE;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:405:9:
+    1) comp_ctx_st: record is undocumented
+  405 | typedef struct comp_ctx_st COMP_CTX;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:395:9:
+    1) engine_st: record is undocumented
+  395 | typedef struct engine_st ENGINE;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:393:9:
+    1) ui_method_st: record is undocumented
+  393 | typedef struct ui_method_st UI_METHOD;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:385:9:
+    1) v3_ext_ctx: record is undocumented
+  385 | typedef struct v3_ext_ctx X509V3_CTX;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:385:1:
+    1) X509V3_CTX: typedef is undocumented
+  385 | typedef struct v3_ext_ctx X509V3_CTX;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:372:1:
+    1) X509_VERIFY_PARAM: typedef is undocumented
+  372 | typedef struct X509_VERIFY_PARAM_st X509_VERIFY_PARAM;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:361:9:
+    1) x509_store_ctx_st: record is undocumented
+  361 | typedef struct x509_store_ctx_st X509_STORE_CTX;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:361:1:
+    1) X509_STORE_CTX: typedef is undocumented
+  361 | typedef struct x509_store_ctx_st X509_STORE_CTX;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:352:9:
+    1) X509_pubkey_st: record is undocumented
+  352 | typedef struct X509_pubkey_st X509_PUBKEY;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:352:1:
+    1) X509_PUBKEY: typedef is undocumented
+  352 | typedef struct X509_pubkey_st X509_PUBKEY;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:351:9:
+    1) X509_name_st: record is undocumented
+  351 | typedef struct X509_name_st X509_NAME;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:351:1:
+    1) X509_NAME: typedef is undocumented
+  351 | typedef struct X509_name_st X509_NAME;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:330:9:
+    1) X509_algor_st: record is undocumented
+  330 | typedef struct X509_algor_st X509_ALGOR;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:330:1:
+    1) X509_ALGOR: typedef is undocumented
+  330 | typedef struct X509_algor_st X509_ALGOR;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:329:9:
+    1) x509_st: record is undocumented
+  329 | typedef struct x509_st X509;
+      |         ^~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:274:9:
+    1) dsa_method: record is undocumented
+  274 | typedef struct dsa_method DSA_METHOD;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:274:1:
+    1) DSA_METHOD: typedef is undocumented
+  274 | typedef struct dsa_method DSA_METHOD;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:273:1:
+    1) DSA: typedef is undocumented
+  273 | typedef struct dsa_st DSA;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:262:1:
+    1) DH: typedef is undocumented
+  262 | typedef struct dh_st DH;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:241:9:
+    1) evp_asym_cipher_st: record is undocumented
+  241 | typedef struct evp_asym_cipher_st EVP_ASYM_CIPHER;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:239:9:
+    1) evp_signature_st: record is undocumented
+  239 | typedef struct evp_signature_st EVP_SIGNATURE;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:239:1:
+    1) EVP_SIGNATURE: typedef is undocumented
+  239 | typedef struct evp_signature_st EVP_SIGNATURE;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:237:9:
+    1) evp_keyexch_st: record is undocumented
+  237 | typedef struct evp_keyexch_st EVP_KEYEXCH;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:237:1:
+    1) EVP_KEYEXCH: typedef is undocumented
+  237 | typedef struct evp_keyexch_st EVP_KEYEXCH;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:235:1:
+    1) EVP_RAND_CTX: typedef is undocumented
+  235 | typedef struct evp_rand_ctx_st EVP_RAND_CTX;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:221:9:
+    1) evp_kdf_st: record is undocumented
+  221 | typedef struct evp_kdf_st EVP_KDF;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:210:9:
+    1) evp_pkey_ctx_st: record is undocumented
+  210 | typedef struct evp_pkey_ctx_st EVP_PKEY_CTX;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:210:1:
+    1) EVP_PKEY_CTX: typedef is undocumented
+  210 | typedef struct evp_pkey_ctx_st EVP_PKEY_CTX;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:209:9:
+    1) evp_pkey_method_st: record is undocumented
+  209 | typedef struct evp_pkey_method_st EVP_PKEY_METHOD;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:209:1:
+    1) EVP_PKEY_METHOD: typedef is undocumented
+  209 | typedef struct evp_pkey_method_st EVP_PKEY_METHOD;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:194:9:
+    1) evp_mac_ctx_st: record is undocumented
+  194 | typedef struct evp_mac_ctx_st EVP_MAC_CTX;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:194:1:
+    1) EVP_MAC_CTX: typedef is undocumented
+  194 | typedef struct evp_mac_ctx_st EVP_MAC_CTX;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:177:9:
+    1) evp_md_st: record is undocumented
+  177 | typedef struct evp_md_st EVP_MD;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:177:1:
+    1) EVP_MD: typedef is undocumented
+  177 | typedef struct evp_md_st EVP_MD;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:176:9:
+    1) evp_cipher_ctx_st: record is undocumented
+  176 | typedef struct evp_cipher_ctx_st EVP_CIPHER_CTX;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:176:1:
+    1) EVP_CIPHER_CTX: typedef is undocumented
+  176 | typedef struct evp_cipher_ctx_st EVP_CIPHER_CTX;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:165:1:
+    1) stack_st_BIGNUM_const: record is undocumented
+  165 | STACK_OF(BIGNUM_const);
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:164:1:
+    1) stack_st_BIGNUM: record is undocumented
+  164 | STACK_OF(BIGNUM);
+      | ^~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:162:9:
+    1) buf_mem_st: record is undocumented
+  162 | typedef struct buf_mem_st BUF_MEM;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:162:1:
+    1) BUF_MEM: typedef is undocumented
+  162 | typedef struct buf_mem_st BUF_MEM;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:160:9:
+    1) bn_gencb_st: record is undocumented
+  160 | typedef struct bn_gencb_st BN_GENCB;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:160:1:
+    1) BN_GENCB: typedef is undocumented
+  160 | typedef struct bn_gencb_st BN_GENCB;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:155:9:
+    1) bn_mont_ctx_st: record is undocumented
+  155 | typedef struct bn_mont_ctx_st BN_MONT_CTX;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:138:9:
+    1) bio_st: record is undocumented
+  138 | typedef struct bio_st BIO;
+      |         ^~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:138:1:
+    1) BIO: typedef is undocumented
+  138 | typedef struct bio_st BIO;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:101:1:
+    1) ASN1_NULL: typedef is undocumented
+  101 | typedef int ASN1_NULL;
+      | ^~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:100:1:
+    1) ASN1_BOOLEAN: typedef is undocumented
+  100 | typedef int ASN1_BOOLEAN;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:95:1:
+    1) ASN1_UTF8STRING: typedef is undocumented
+  95 | typedef struct asn1_string_st ASN1_UTF8STRING;
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:90:1:
+    1) ASN1_GENERALIZEDTIME: typedef is undocumented
+  90 | typedef struct asn1_string_st ASN1_GENERALIZEDTIME;
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:89:1:
+    1) ASN1_TIME: typedef is undocumented
+  89 | typedef struct asn1_string_st ASN1_TIME;
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:88:1:
+    1) ASN1_UTCTIME: typedef is undocumented
+  88 | typedef struct asn1_string_st ASN1_UTCTIME;
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:86:1:
+    1) ASN1_UNIVERSALSTRING: typedef is undocumented
+  86 | typedef struct asn1_string_st ASN1_UNIVERSALSTRING;
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:77:1:
+    1) ASN1_T61STRING: typedef is undocumented
+  77 | typedef struct asn1_string_st ASN1_T61STRING;
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:76:1:
+    1) ASN1_PRINTABLESTRING: typedef is undocumented
+  76 | typedef struct asn1_string_st ASN1_PRINTABLESTRING;
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:4333:1:
+    1) EVP_PKEY_get_attr_by_NID: function is undocumented
+  4333 | int EVP_PKEY_get_attr_by_NID(const EVP_PKEY *key, int nid, int lastpos);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:3820:1:
+    1) X509v3_get_ext_by_critical: function is undocumented
+  3820 | int X509v3_get_ext_by_critical(const STACK_OF(X509_EXTENSION) *x,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:3778:1:
+    1) X509_NAME_ENTRY_get_data: function is undocumented
+  3778 | ASN1_STRING *X509_NAME_ENTRY_get_data(const X509_NAME_ENTRY *ne);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:3777:1:
+    1) X509_NAME_ENTRY_get_object: function is undocumented
+  3777 | ASN1_OBJECT *X509_NAME_ENTRY_get_object(const X509_NAME_ENTRY *ne);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:3605:1:
+    1) X509_REQ_print: function is undocumented
+  3605 | int X509_REQ_print(BIO *bp, X509_REQ *req);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:3579:1:
+    1) X509_ocspid_print: function is undocumented
+  3579 | int X509_ocspid_print(BIO *bp, X509 *x);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:3217:1:
+    1) X509_CRL_get_nextUpdate: function is undocumented
+  3217 | OSSL_DEPRECATEDIN_1_1_0 ASN1_TIME *X509_CRL_get_nextUpdate(X509_CRL *crl);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:3159:1:
+    1) X509_CRL_set_issuer_name: function is undocumented
+  3159 | int X509_CRL_set_issuer_name(X509_CRL *x, const X509_NAME *name);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:1320:1:
+    1) i2d_PKCS8_bio: function is undocumented
+  1320 | int i2d_PKCS8_bio(BIO *bp, const X509_SIG *p8);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:1038:1:
+    1) i2d_EC_PUBKEY_fp: function is undocumented
+  1038 | OSSL_DEPRECATEDIN_3_0 int i2d_EC_PUBKEY_fp(FILE *fp, const EC_KEY *eckey);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:753:1:
+    1) X509_signature_dump: function is undocumented
+  753 | int X509_signature_dump(BIO *bp, const ASN1_STRING *sig, int indent);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:456:5:
+    1) enc_cipher: variable is undocumented
+  456 |     EVP_CIPHER_INFO enc_cipher;
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509_vfy.h:2200:1:
+    1) X509_VERIFY_PARAM_get0_peername: function is undocumented
+  2200 | char *X509_VERIFY_PARAM_get0_peername(const X509_VERIFY_PARAM *param);
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509_vfy.h:763:1:
+    1) X509_OBJECT_get_type: function is undocumented
+  763 | X509_LOOKUP_TYPE X509_OBJECT_get_type(const X509_OBJECT *a);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509v3.h:899:1:
+    1) PROXY_POLICY_free: function is undocumented
+  899 | void PROXY_POLICY_free(PROXY_POLICY *a);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+error limit reached (max-errors=250); the report is incomplete. Rerun with --max-errors=0 for the full report.
+[0;37mExtracted 6184 declarations in 1s 919ms
+[0m[0;37m  - regular symbols: 6151
+[0m[0;37m  - dependency symbols: 33
+[0m[0;37mGenerating docs
+[0m[0;37mGenerated noop documentation in 0ms
+[0m

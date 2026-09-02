@@ -1,0 +1,256 @@
+[0;37m/opt/homebrew/opt/llvm/bin/clang -v -E -x c++ -
+[0m[0;37mExtracting declarations
+[0mIn file included from In file included from In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/kdf.h/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cms.h/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ossl_typ.h:::In file included from In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/core.h/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h::1528:
+:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h::197197::7979::  error: error: expected unqualified-idexpected unqualified-id
+
+  19716:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:  79197: |   error: *expected unqualified-id 
+@brief O  p197a | q u*e  @sbyrmimeeft rOipca-qcuiep hseyrm moepterriact-icoinp hceorn toepxetr a(tEiVoPn co | n t*e x@tb r(iEeVf PO_p_EnEanqcurey psty*m/mEeVtPri_cD-ecc29rr:
+yyIn file included from pptt/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h**://28EE:
+VV/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.hPP:__197DC:ei79p:h eerror: rexpected unqualified-id*
+)cr  y197pct*/iEpVhP_Ciph. | 
+e      r|                                                                                ^e
+r*).
+      |                                                                               ^
+ * @brief Opaque symmetric-cipher operatioonp ecroanttieoxt (EVP_Encrypt*/nE VcPo_nDecrypt*/EVP_Cipher*).text (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      
+|                                                                               ^      21|                                                                               ^:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:25:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brieIn file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/engine.h:24:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h:25:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+f  197  |  * O@brpiaeqfu e symmeOpaque symmetric-cipher opetric-ciprhaetr operationi conotne xcto n(tEVP_Encrypt*/EVeP_xDte c(rEyVpPt_*E/nEcVrPy_pCti*p/hEeVr*).
+      |                                                                               ^
+P_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+1 error generated.
+1 error generated.
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/params.h:15:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/core.h:15:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+1 error generated.
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/err.h:30:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/conf_api.h:19:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/lhash.h:28:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:32:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:38:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  *In file included from  /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pem.h@:b20ri:
+eIn file included from f/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h :O32p:
+aIn file included from q/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.hu:e38 :
+s/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.hy:m197:m79e:t rerror: iexpected unqualified-idc
+-cipher   o197p | e r*a t@iborni ecfo nOtpeaxqt u(eEV Ps_yEmnmcerypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+tric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ssl3.h:20:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/comp.h:22:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:38:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/http.h:17:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:32:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:38:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ui.h:29:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:38:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dh.h:20:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/asn1.h:32:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:32:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:38:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:32:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:38:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+1 error generated.
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509v3.h:26:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:32:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:38:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h:15:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/params.h:15:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/core.h:15:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+1 error generated.
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/conf.h:26:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:32:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:38:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+1 error generated.
+1 error generated.
+1 error generated.
+1 error generated.
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/decoder.h:22:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/conftypes.h:15:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/conf.h:26:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:32:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:38:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509_vfy.h:30:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h:28:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/txt_db.h:20:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:32:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:38:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+1 error generated.
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:25:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:30:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509v3.h:26:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:32:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:38:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+1 error generated.
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/self_test.h:14:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/core.h:15:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+1 error generated.
+1 error generated.
+1 error generated.
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ecdsa.h:10:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ec.h:21:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+1 error generated.
+1 error generated.
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs12.h:26:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:32:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:38:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/objects.h:20:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:32:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:38:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+[0;37mmax-errors=200: found enough documentation problems; translation units not yet started will be skipped
+[0mIn file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:38:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+1 error generated.
+1 error generated.
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:30:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509v3.h:26:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h:32:
+In file included from /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h:38:
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:197:79: error: expected unqualified-id
+  197 |  * @brief Opaque symmetric-cipher operation context (EVP_Encrypt*/EVP_Decrypt*/EVP_Cipher*).
+      |                                                                               ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+1 error generated.
+1 error generated.
+1 error generated.
+2 errors generated.
+2 errors generated.
+2 errors generated.
+2 errors generated.
+2 errors generated.
+2 errors generated.
+2 errors generated.
+2 errors generated.
+2 errors generated.
+2 errors generated.
+2 errors generated.
+Generating reference failed: 32 errors occurred:
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs12.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ssl3.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cms.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509_vfy.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/engine.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ui.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pem.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/conftypes.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crypto.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/self_test.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/http.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/decoder.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/txt_db.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/conf.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/x509v3.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ecdsa.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/asn1.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/dh.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/kdf.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/core.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bio.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/conf_api.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/bn.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/err.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/objects.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/param_build.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/params.h (src/mrdocs/Corpus.cpp:466)
+    Failed to run action on /Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ossl_typ.h (src/mrdocs/Corpus.cpp:466)
+
+
+An issue occurred during execution.
+If you believe this is a bug, please report it at https://github.com/cppalliance/mrdocs/issues
+with the following details:
+    MrDocs Version: 0.8.0 (Build: 4d7e534b3434bc5ce65c15de525f82a128d163ba)
+    Error Location: `src/mrdocs/Corpus.cpp` at line 520
+    Reported From: `tools/mrdocs/src/Main.cpp` at line 426
+

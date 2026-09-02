@@ -1,0 +1,66 @@
+=== batch 11d: ssl.h + x509.h ===
+  OK: ssl.h :: custom_ext_add_cb
+  OK: ssl.h.in :: custom_ext_add_cb
+  OK: ssl.h :: SSL_CTX_SRP_CTX_free
+  OK: ssl.h.in :: SSL_CTX_SRP_CTX_free
+  OK: ssl.h :: SSL_get0_group_name
+  OK: ssl.h.in :: SSL_get0_group_name
+  OK: ssl.h :: SSL_set_bio
+  OK: ssl.h.in :: SSL_set_bio
+  MISS: ssl.h :: SSL_CTX_use_certificate_chain_file
+  MISS: ssl.h.in :: SSL_CTX_use_certificate_chain_file
+  OK: ssl.h :: SSL_CTX_set_verify
+  OK: ssl.h.in :: SSL_CTX_set_verify
+  OK: ssl.h :: SSL_CTX_use_PrivateKey_ASN1
+  OK: ssl.h.in :: SSL_CTX_use_PrivateKey_ASN1
+  OK: ssl.h :: SSL_get_async_status
+  OK: ssl.h.in :: SSL_get_async_status
+  OK: ssl.h :: SSL_renegotiate
+  OK: ssl.h.in :: SSL_renegotiate
+  OK: ssl.h :: SSL_CTX_set_client_CA_list
+  OK: ssl.h.in :: SSL_CTX_set_client_CA_list
+  OK: ssl.h :: SSL_CTX_set_not_resumable_session_callback
+  OK: ssl.h.in :: SSL_CTX_set_not_resumable_session_callback
+  OK: ssl.h :: SSL_CTX_set_record_padding_callback_arg
+  OK: ssl.h.in :: SSL_CTX_set_record_padding_callback_arg
+  OK: x509.h :: X509_EXTENSION
+  OK: x509.h.in :: X509_EXTENSION
+  OK: x509.h :: X509_self_signed
+  OK: x509.h.in :: X509_self_signed
+  OK: x509.h :: NETSCAPE_SPKI_print
+  OK: x509.h.in :: NETSCAPE_SPKI_print
+  OK: x509.h :: i2d_DSAPrivateKey_fp
+  OK: x509.h.in :: i2d_DSAPrivateKey_fp
+  OK: x509.h :: d2i_EC_PUBKEY_bio
+  OK: x509.h.in :: d2i_EC_PUBKEY_bio
+  OK: x509.h :: X509_REQ_to_X509
+  OK: x509.h.in :: X509_REQ_to_X509
+  OK: x509.h :: X509_alias_get0
+  OK: x509.h.in :: X509_alias_get0
+  OK: x509.h :: ASN1_sign
+  OK: x509.h.in :: ASN1_sign
+  OK: x509.h :: ASN1_item_digest
+  OK: x509.h.in :: ASN1_item_digest
+  OK: x509.h :: X509_get_version
+  OK: x509.h.in :: X509_get_version
+  OK: x509.h :: i2d_re_X509_REQ_tbs
+  OK: x509.h.in :: i2d_re_X509_REQ_tbs
+  OK: x509.h :: X509_REQ_get_pubkey
+  OK: x509.h.in :: X509_REQ_get_pubkey
+  OK: x509.h :: X509_REQ_set_extension_nids
+  OK: x509.h.in :: X509_REQ_set_extension_nids
+  OK: x509.h :: X509_certificate_type
+  OK: x509.h.in :: X509_certificate_type
+  OK: x509.h :: X509_get_ext_count
+  OK: x509.h.in :: X509_get_ext_count
+  OK: x509.h :: X509at_add1_attr
+  OK: x509.h.in :: X509at_add1_attr
+  OK: x509.h :: EVP_PKEY_get_attr_by_OBJ
+  OK: x509.h.in :: EVP_PKEY_get_attr_by_OBJ
+  OK: x509.h :: X509_PUBKEY_eq
+  OK: x509.h.in :: X509_PUBKEY_eq
+
+OK=58 MISS=2
+Missing:
+  ssl.h:SSL_CTX_use_certificate_chain_file
+  ssl.h.in:SSL_CTX_use_certificate_chain_file

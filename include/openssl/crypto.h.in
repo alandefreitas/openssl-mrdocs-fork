@@ -1,0 +1,1132 @@
+/*
+ * {- join("\n * ", @autowarntext) -}
+ *
+ * Copyright 1995-2025 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright (c) 2002, Oracle and/or its affiliates. All rights reserved
+ *
+ * Licensed under the Apache License 2.0 (the "License").  You may not use
+ * this file except in compliance with the License.  You can obtain a copy
+ * in the file LICENSE in the source distribution or at
+ * https://www.openssl.org/source/license.html
+ */
+
+/* clang-format off */
+{-
+use OpenSSL::stackhash qw(generate_stack_macros);
+-}
+/* clang-format on */
+
+#ifndef OPENSSL_CRYPTO_H
+#define OPENSSL_CRYPTO_H
+#pragma once
+
+#include <openssl/macros.h>
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#define HEADER_CRYPTO_H
+#endif
+
+#include <stdlib.h>
+#include <time.h>
+
+#include <openssl/e_os2.h>
+
+#ifndef OPENSSL_NO_STDIO
+#include <stdio.h>
+#endif
+
+#include <openssl/safestack.h>
+#include <openssl/opensslv.h>
+#include <openssl/types.h>
+#include <openssl/opensslconf.h>
+#include <openssl/cryptoerr.h>
+#include <openssl/core.h>
+
+#ifdef CHARSET_EBCDIC
+#include <openssl/ebcdic.h>
+#endif
+
+/*
+ * Resolve problems on some operating systems with symbol names that clash
+ * one way or another
+ */
+#include <openssl/symhacks.h>
+
+#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+#include <openssl/opensslv.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+#define SSLeay OpenSSL_version_num
+#define SSLeay_version OpenSSL_version
+#define SSLEAY_VERSION_NUMBER OPENSSL_VERSION_NUMBER
+#define SSLEAY_VERSION OPENSSL_VERSION
+#define SSLEAY_CFLAGS OPENSSL_CFLAGS
+#define SSLEAY_BUILT_ON OPENSSL_BUILT_ON
+#define SSLEAY_PLATFORM OPENSSL_PLATFORM
+#define SSLEAY_DIR OPENSSL_DIR
+
+/**
+ * @brief Legacy placeholder type once used for dynamic lock callbacks (deprecated).
+ *
+ * No longer used; prefer CRYPTO_THREAD_* / CRYPTO_RWLOCK instead.
+ */
+typedef struct {
+    /** Unused padding member retained for ABI compatibility of the empty struct. */
+    int dummy;
+} CRYPTO_dynlock;
+
+#endif /* OPENSSL_NO_DEPRECATED_1_1_0 */
+
+/**
+ * @brief Opaque read/write lock used by CRYPTO_THREAD_* and CRYPTO_atomic_* helpers.
+ */
+typedef void CRYPTO_RWLOCK;
+
+/**
+ * @brief Allocate a new read/write lock for CRYPTO_THREAD_* locking helpers.
+ * @return New CRYPTO_RWLOCK, or NULL on allocation failure.
+ */
+CRYPTO_RWLOCK *CRYPTO_THREAD_lock_new(void);
+/**
+ * @brief Acquire a shared (read) lock on a CRYPTO_RWLOCK.
+ * @param lock Lock allocated by CRYPTO_THREAD_lock_new().
+ * @return 1 on success, or 0 on failure.
+ */
+__owur int CRYPTO_THREAD_read_lock(CRYPTO_RWLOCK *lock);
+/**
+ * @brief Acquire a CRYPTO_RWLOCK for exclusive (write) access.
+ * @param lock Lock to acquire.
+ * @return 1 on success, or 0 on error.
+ */
+__owur int CRYPTO_THREAD_write_lock(CRYPTO_RWLOCK *lock);
+/**
+ * @brief Release a previously acquired read or write lock on a CRYPTO_RWLOCK.
+ * @param lock Lock to unlock.
+ * @return 1 on success, or 0 on error.
+ */
+int CRYPTO_THREAD_unlock(CRYPTO_RWLOCK *lock);
+/**
+ * @brief Free a CRYPTO_RWLOCK allocated by CRYPTO_THREAD_lock_new().
+ * @param lock Lock to free, or NULL (no-op).
+ */
+void CRYPTO_THREAD_lock_free(CRYPTO_RWLOCK *lock);
+
+/**
+ * @brief Atomically add @p amount to *@p val, optionally under @p lock.
+ * @param val Integer to modify in place.
+ * @param amount Value added to *@p val.
+ * @param ret Receives the post-add value of *@p val; must not be NULL.
+ * @param lock Optional CRYPTO_RWLOCK used when hardware atomics are unavailable, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int CRYPTO_atomic_add(int *val, int amount, int *ret, CRYPTO_RWLOCK *lock);
+/**
+ * @brief Atomically bitwise-OR @p op into *@p val, optionally under @p lock.
+ * @param val 64-bit integer to modify in place.
+ * @param op Bits ORed into *@p val.
+ * @param ret Receives the post-OR value of *@p val; must not be NULL.
+ * @param lock Optional CRYPTO_RWLOCK used when hardware atomics are unavailable, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int CRYPTO_atomic_or(uint64_t *val, uint64_t op, uint64_t *ret,
+    CRYPTO_RWLOCK *lock);
+/**
+ * @brief Atomically load a 64-bit value, optionally under @p lock.
+ * @param val Address of the value to read.
+ * @param ret Receives a snapshot of *@p val; must not be NULL.
+ * @param lock Optional CRYPTO_RWLOCK used when hardware atomics are unavailable, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int CRYPTO_atomic_load(uint64_t *val, uint64_t *ret, CRYPTO_RWLOCK *lock);
+/**
+ * @brief Atomically load an int value, optionally under @p lock.
+ * @param val Address of the integer to read.
+ * @param ret Receives a snapshot of *@p val; must not be NULL.
+ * @param lock Optional CRYPTO_RWLOCK used when hardware atomics are unavailable, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int CRYPTO_atomic_load_int(int *val, int *ret, CRYPTO_RWLOCK *lock);
+
+/* No longer needed, so this is a no-op */
+#define OPENSSL_malloc_init() \
+    while (0)                 \
+    continue
+
+#define OPENSSL_malloc(num) \
+    CRYPTO_malloc(num, OPENSSL_FILE, OPENSSL_LINE)
+#define OPENSSL_zalloc(num) \
+    CRYPTO_zalloc(num, OPENSSL_FILE, OPENSSL_LINE)
+#define OPENSSL_realloc(addr, num) \
+    CRYPTO_realloc(addr, num, OPENSSL_FILE, OPENSSL_LINE)
+#define OPENSSL_clear_realloc(addr, old_num, num) \
+    CRYPTO_clear_realloc(addr, old_num, num, OPENSSL_FILE, OPENSSL_LINE)
+#define OPENSSL_clear_free(addr, num) \
+    CRYPTO_clear_free(addr, num, OPENSSL_FILE, OPENSSL_LINE)
+#define OPENSSL_free(addr) \
+    CRYPTO_free(addr, OPENSSL_FILE, OPENSSL_LINE)
+#define OPENSSL_memdup(str, s) \
+    CRYPTO_memdup((str), s, OPENSSL_FILE, OPENSSL_LINE)
+#define OPENSSL_strdup(str) \
+    CRYPTO_strdup(str, OPENSSL_FILE, OPENSSL_LINE)
+#define OPENSSL_strndup(str, n) \
+    CRYPTO_strndup(str, n, OPENSSL_FILE, OPENSSL_LINE)
+#define OPENSSL_secure_malloc(num) \
+    CRYPTO_secure_malloc(num, OPENSSL_FILE, OPENSSL_LINE)
+#define OPENSSL_secure_zalloc(num) \
+    CRYPTO_secure_zalloc(num, OPENSSL_FILE, OPENSSL_LINE)
+#define OPENSSL_secure_free(addr) \
+    CRYPTO_secure_free(addr, OPENSSL_FILE, OPENSSL_LINE)
+#define OPENSSL_secure_clear_free(addr, num) \
+    CRYPTO_secure_clear_free(addr, num, OPENSSL_FILE, OPENSSL_LINE)
+#define OPENSSL_secure_actual_size(ptr) \
+    CRYPTO_secure_actual_size(ptr)
+
+/**
+ * @brief Copy @p src into @p dst with BSD strlcpy semantics.
+ * @param dst Destination buffer of @p siz bytes.
+ * @param src NUL-terminated source string.
+ * @param siz Capacity of @p dst including space for the NUL terminator.
+ * @return Length of @p src (as if there were no truncation).
+ */
+size_t OPENSSL_strlcpy(char *dst, const char *src, size_t siz);
+/**
+ * @brief Append @p src onto @p dst with OpenSSL's bounded strlcat semantics.
+ * @param dst Destination buffer already containing a NUL-terminated prefix.
+ * @param src NUL-terminated string to append.
+ * @param siz Total capacity of @p dst in bytes.
+ * @return Length of the string OPENSSL_strlcat tried to create (strlen(initial dst)+strlen(src)).
+ */
+size_t OPENSSL_strlcat(char *dst, const char *src, size_t siz);
+/**
+ * @brief Return the length of @p str, limited to at most @p maxlen bytes.
+ * @param str Possibly non-NUL-terminated buffer to measure.
+ * @param maxlen Maximum number of bytes to examine.
+ * @return Number of non-NUL bytes before the first NUL, or @p maxlen if none is found.
+ */
+size_t OPENSSL_strnlen(const char *str, size_t maxlen);
+int OPENSSL_buf2hexstr_ex(char *str, size_t str_n, size_t *strlength,
+    const unsigned char *buf, size_t buflen,
+    const char sep);
+/**
+ * @brief Convert a byte buffer to a newly allocated colon-separated hex string.
+ * @param buf Bytes to convert.
+ * @param buflen Number of bytes at @p buf; negative treats the buffer as unsigned.
+ * @return Newly allocated string such as "AB:CD", or NULL on error; free with OPENSSL_free.
+ */
+char *OPENSSL_buf2hexstr(const unsigned char *buf, long buflen);
+/**
+ * @brief Decode a hex string into @p buf, optionally ignoring separator @p sep.
+ * @param buf Destination byte buffer, or NULL to only compute the required length.
+ * @param buf_n Capacity of @p buf in bytes (ignored when @p buf is NULL).
+ * @param buflen Receives the number of decoded bytes, or may be NULL.
+ * @param str NUL-terminated hex text (may contain @p sep between octets).
+ * @param sep Optional separator character to skip (for example ':'), or '\0' for none.
+ * @return 1 on success, or 0 on failure (invalid input or insufficient @p buf_n).
+ */
+int OPENSSL_hexstr2buf_ex(unsigned char *buf, size_t buf_n, size_t *buflen,
+    const char *str, const char sep);
+/**
+ * @brief Decode a hexadecimal string into a newly allocated byte buffer.
+ * @param str NUL-terminated hex text (optional ':' separators between octets).
+ * @param buflen Receives the number of decoded bytes, or may be NULL.
+ * @return Allocated buffer with decoded bytes, or NULL on error; free with OPENSSL_free().
+ */
+unsigned char *OPENSSL_hexstr2buf(const char *str, long *buflen);
+/**
+ * @brief Convert a single hexadecimal digit character to its 0–15 value.
+ * @param c ASCII hex digit ('0'–'9', 'a'–'f', or 'A'–'F').
+ * @return Nibble value 0–15, or -1 if @p c is not a hex digit.
+ */
+int OPENSSL_hexchar2int(unsigned char c);
+/**
+ * @brief Case-insensitive comparison of two NUL-terminated C strings.
+ * @param s1 First string.
+ * @param s2 Second string.
+ * @return Less than, equal to, or greater than zero as with strcasecmp(3).
+ */
+int OPENSSL_strcasecmp(const char *s1, const char *s2);
+/**
+ * @brief Case-insensitive comparison of at most @p n characters of two C strings.
+ * @param s1 First string.
+ * @param s2 Second string.
+ * @param n Maximum number of characters to compare.
+ * @return Negative, zero, or positive like strncasecmp().
+ */
+int OPENSSL_strncasecmp(const char *s1, const char *s2, size_t n);
+
+#define OPENSSL_MALLOC_MAX_NELEMS(type) (((1U << (sizeof(int) * 8 - 1)) - 1) / sizeof(type))
+
+/**
+ * @brief Return the OpenSSL library major version (OPENSSL_VERSION_MAJOR).
+ * @return Major version number from the build-time OPENSSL_VERSION_* macros.
+ */
+unsigned int OPENSSL_version_major(void);
+/**
+ * @brief Return the OpenSSL library minor version (OPENSSL_VERSION_MINOR).
+ * @return Minor version number from the build-time OPENSSL_VERSION_* macros.
+ */
+unsigned int OPENSSL_version_minor(void);
+/**
+ * @brief Return the OpenSSL library patch level (OPENSSL_VERSION_PATCH).
+ * @return Patch version number from the build-time OPENSSL_VERSION_* macros.
+ */
+unsigned int OPENSSL_version_patch(void);
+/**
+ * @brief Return the OpenSSL pre-release label (OPENSSL_VERSION_PRE_RELEASE).
+ * @return Constant string such as "-dev" or "" when this is not a pre-release; do not free.
+ */
+const char *OPENSSL_version_pre_release(void);
+/**
+ * @brief Return OpenSSL build metadata (OPENSSL_VERSION_BUILD_METADATA).
+ * @return Constant metadata string (may be empty); do not free.
+ */
+const char *OPENSSL_version_build_metadata(void);
+
+/**
+ * @brief Return the packed OpenSSL version number (OPENSSL_VERSION_NUMBER).
+ * @return Library version encoded as 0xMNN00PP0L (major/minor/patch nibbles).
+ */
+unsigned long OpenSSL_version_num(void);
+/**
+ * @brief Return a descriptive string about the running OpenSSL build.
+ * @param type Selector such as OPENSSL_VERSION, OPENSSL_VERSION_STRING, OPENSSL_BUILT_ON, OPENSSL_PLATFORM, OPENSSL_DIR, OPENSSL_MODULES_DIR, or OPENSSL_CPU_INFO.
+ * @return Constant string describing the requested aspect, or "not available" for unknown @p type values.
+ */
+const char *OpenSSL_version(int type);
+#define OPENSSL_VERSION 0
+#define OPENSSL_CFLAGS 1
+#define OPENSSL_BUILT_ON 2
+#define OPENSSL_PLATFORM 3
+#define OPENSSL_DIR 4
+#define OPENSSL_ENGINES_DIR 5
+#define OPENSSL_VERSION_STRING 6
+#define OPENSSL_FULL_VERSION_STRING 7
+#define OPENSSL_MODULES_DIR 8
+#define OPENSSL_CPU_INFO 9
+
+/**
+ * @brief Return a static string describing a build or runtime configuration property.
+ * @param type OPENSSL_INFO_* selector (for example OPENSSL_INFO_CONFIG_DIR).
+ * @return Internal NUL-terminated string for @p type, or NULL if unknown.
+ */
+const char *OPENSSL_info(int type);
+/*
+ * The series starts at 1001 to avoid confusion with the OpenSSL_version
+ * types.
+ */
+#define OPENSSL_INFO_CONFIG_DIR 1001
+#define OPENSSL_INFO_ENGINES_DIR 1002
+#define OPENSSL_INFO_MODULES_DIR 1003
+#define OPENSSL_INFO_DSO_EXTENSION 1004
+#define OPENSSL_INFO_DIR_FILENAME_SEPARATOR 1005
+#define OPENSSL_INFO_LIST_SEPARATOR 1006
+#define OPENSSL_INFO_SEED_SOURCE 1007
+#define OPENSSL_INFO_CPU_SETTINGS 1008
+
+/**
+ * @brief Report whether the process is running setuid/setgid (or otherwise "tainted").
+ * @return Non-zero if privileged credentials differ from real ones (or platform equivalent), else 0.
+ */
+int OPENSSL_issetugid(void);
+
+/**
+ * @brief Per-object extensible data bag keyed by CRYPTO_EX_INDEX_* class.
+ */
+struct crypto_ex_data_st {
+    /** Library context associated with this ex_data instance. */
+    OSSL_LIB_CTX *ctx;
+    /** Stack of class-specific ex_data pointers indexed by ex_data index. */
+    STACK_OF(void) *sk;
+};
+
+/* clang-format off */
+{-
+    generate_stack_macros("void");
+-}
+/* clang-format on */
+
+/*
+ * Per class, we have a STACK of function pointers.
+ */
+#define CRYPTO_EX_INDEX_SSL 0
+#define CRYPTO_EX_INDEX_SSL_CTX 1
+#define CRYPTO_EX_INDEX_SSL_SESSION 2
+#define CRYPTO_EX_INDEX_X509 3
+#define CRYPTO_EX_INDEX_X509_STORE 4
+#define CRYPTO_EX_INDEX_X509_STORE_CTX 5
+#define CRYPTO_EX_INDEX_DH 6
+#define CRYPTO_EX_INDEX_DSA 7
+#define CRYPTO_EX_INDEX_EC_KEY 8
+#define CRYPTO_EX_INDEX_RSA 9
+#define CRYPTO_EX_INDEX_ENGINE 10
+#define CRYPTO_EX_INDEX_UI 11
+#define CRYPTO_EX_INDEX_BIO 12
+#define CRYPTO_EX_INDEX_APP 13
+#define CRYPTO_EX_INDEX_UI_METHOD 14
+#define CRYPTO_EX_INDEX_RAND_DRBG 15
+#define CRYPTO_EX_INDEX_DRBG CRYPTO_EX_INDEX_RAND_DRBG
+#define CRYPTO_EX_INDEX_OSSL_LIB_CTX 16
+#define CRYPTO_EX_INDEX_EVP_PKEY 17
+#define CRYPTO_EX_INDEX__COUNT 18
+
+/**
+ * @brief Callback invoked when a new ex_data slot is first associated with an object.
+ * @param parent Object that owns the CRYPTO_EX_DATA.
+ * @param ptr Pointer value being stored (often NULL on allocation).
+ * @param ad Ex-data bag for @p parent.
+ * @param idx Ex-data index being initialized.
+ * @param argl Long argument registered with CRYPTO_get_ex_new_index().
+ * @param argp Pointer argument registered with CRYPTO_get_ex_new_index().
+ */
+typedef void CRYPTO_EX_new(void *parent, void *ptr, CRYPTO_EX_DATA *ad,
+    int idx, long argl, void *argp);
+/**
+ * @brief Callback invoked when an ex_data slot is freed or the owning object is destroyed.
+ * @param parent Object that owns the CRYPTO_EX_DATA.
+ * @param ptr Pointer value previously stored in the slot.
+ * @param ad Ex-data bag for @p parent.
+ * @param idx Ex-data index being cleared.
+ * @param argl Long argument registered with CRYPTO_get_ex_new_index().
+ * @param argp Pointer argument registered with CRYPTO_get_ex_new_index().
+ */
+typedef void CRYPTO_EX_free(void *parent, void *ptr, CRYPTO_EX_DATA *ad,
+    int idx, long argl, void *argp);
+/**
+ * @brief Callback that duplicates one ex_data slot when an object is copied.
+ * @param to Destination ex-data bag.
+ * @param from Source ex-data bag.
+ * @param from_d Address of the source slot pointer; may be updated to the duplicated value.
+ * @param idx Ex-data index being duplicated.
+ * @param argl Long argument registered with CRYPTO_get_ex_new_index().
+ * @param argp Pointer argument registered with CRYPTO_get_ex_new_index().
+ * @return 1 on success, or 0 on failure.
+ */
+typedef int CRYPTO_EX_dup(CRYPTO_EX_DATA *to, const CRYPTO_EX_DATA *from,
+    void **from_d, int idx, long argl, void *argp);
+/**
+ * @brief Allocate a new application-specific ex_data index for a CRYPTO_EX_INDEX_* class.
+ * @param class_index CRYPTO_EX_INDEX_* identifying the object class.
+ * @param argl Opaque long passed to the new/dup/free callbacks.
+ * @param argp Opaque pointer passed to the new/dup/free callbacks.
+ * @param new_func Optional constructor callback, or NULL.
+ * @param dup_func Optional duplication callback, or NULL.
+ * @param free_func Optional destructor callback, or NULL.
+ * @return Non-negative index on success, or -1 on failure.
+ */
+__owur int CRYPTO_get_ex_new_index(int class_index, long argl, void *argp,
+    CRYPTO_EX_new *new_func,
+    CRYPTO_EX_dup *dup_func,
+    CRYPTO_EX_free *free_func);
+/**
+ * @brief Release an application ex_data index previously allocated for a class (historically a no-op cleanup).
+ * @param class_index CRYPTO_EX_INDEX_* identifying the object class.
+ * @param idx Index returned by CRYPTO_get_ex_new_index().
+ * @return 1 on success, or 0 on failure.
+ */
+int CRYPTO_free_ex_index(int class_index, int idx);
+
+/*
+ * Initialise/duplicate/free CRYPTO_EX_DATA variables corresponding to a
+ * given class (invokes whatever per-class callbacks are applicable)
+ */
+/**
+ * @brief Initialise @p ad for object @p obj of CRYPTO_EX_INDEX class @p class_index.
+ * @param class_index CRYPTO_EX_INDEX_* identifying the owning object type.
+ * @param obj Owning object pointer passed to new-index callbacks.
+ * @param ad Ex-data structure embedded in (or associated with) @p obj.
+ * @return 1 on success, or 0 on error.
+ */
+int CRYPTO_new_ex_data(int class_index, void *obj, CRYPTO_EX_DATA *ad);
+/**
+ * @brief Duplicate CRYPTO_EX_DATA entries from @p from into @p to for a class.
+ * @param class_index CRYPTO_EX_INDEX_* identifying the object class.
+ * @param to Destination ex_data container (typically freshly initialized).
+ * @param from Source ex_data to copy.
+ * @return 1 on success, or 0 on failure.
+ */
+int CRYPTO_dup_ex_data(int class_index, CRYPTO_EX_DATA *to,
+    const CRYPTO_EX_DATA *from);
+
+/**
+ * @brief Free all ex_data attached to @p ad for the given class, invoking free callbacks.
+ * @param class_index CRYPTO_EX_INDEX_* identifying the object class.
+ * @param obj Object that owns @p ad (passed to free callbacks).
+ * @param ad Ex-data table to clear.
+ */
+void CRYPTO_free_ex_data(int class_index, void *obj, CRYPTO_EX_DATA *ad);
+
+/* Allocate a single item in the CRYPTO_EX_DATA variable */
+int CRYPTO_alloc_ex_data(int class_index, void *obj, CRYPTO_EX_DATA *ad,
+    int idx);
+
+/*
+ * Get/set data in a CRYPTO_EX_DATA variable corresponding to a particular
+ * index (relative to the class type involved)
+ */
+int CRYPTO_set_ex_data(CRYPTO_EX_DATA *ad, int idx, void *val);
+/**
+ * @brief Retrieve the pointer stored at ex_data index @p idx.
+ * @param ad Ex-data bag to query.
+ * @param idx Index from CRYPTO_get_ex_new_index() (or a class helper).
+ * @return Stored pointer, or NULL if unset / out of range.
+ */
+void *CRYPTO_get_ex_data(const CRYPTO_EX_DATA *ad, int idx);
+
+#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+/*
+ * This function cleans up all "ex_data" state. It mustn't be called under
+ * potential race-conditions.
+ */
+#define CRYPTO_cleanup_all_ex_data() \
+    while (0)                        \
+    continue
+
+/*
+ * The old locking functions have been removed completely without compatibility
+ * macros. This is because the old functions either could not properly report
+ * errors, or the returned error values were not clearly documented.
+ * Replacing the locking functions with no-ops would cause race condition
+ * issues in the affected applications. It is far better for them to fail at
+ * compile time.
+ * On the other hand, the locking callbacks are no longer used.  Consequently,
+ * the callback management functions can be safely replaced with no-op macros.
+ */
+#define CRYPTO_num_locks() (1)
+#define CRYPTO_set_locking_callback(func)
+#define CRYPTO_get_locking_callback() (NULL)
+#define CRYPTO_set_add_lock_callback(func)
+#define CRYPTO_get_add_lock_callback() (NULL)
+
+/*
+ * These defines where used in combination with the old locking callbacks,
+ * they are not called anymore, but old code that's not called might still
+ * use them.
+ */
+#define CRYPTO_LOCK 1
+#define CRYPTO_UNLOCK 2
+#define CRYPTO_READ 4
+#define CRYPTO_WRITE 8
+
+/* This structure is no longer used */
+/**
+ * @brief Legacy thread-id placeholder retained for API compatibility (no longer used).
+ */
+typedef struct crypto_threadid_st {
+    int dummy;
+} CRYPTO_THREADID;
+/* Only use CRYPTO_THREADID_set_[numeric|pointer]() within callbacks */
+#define CRYPTO_THREADID_set_numeric(id, val)
+#define CRYPTO_THREADID_set_pointer(id, ptr)
+#define CRYPTO_THREADID_set_callback(threadid_func) (0)
+#define CRYPTO_THREADID_get_callback() (NULL)
+#define CRYPTO_THREADID_current(id)
+#define CRYPTO_THREADID_cmp(a, b) (-1)
+#define CRYPTO_THREADID_cpy(dest, src)
+#define CRYPTO_THREADID_hash(id) (0UL)
+
+#ifndef OPENSSL_NO_DEPRECATED_1_0_0
+#define CRYPTO_set_id_callback(func)
+#define CRYPTO_get_id_callback() (NULL)
+#define CRYPTO_thread_id() (0UL)
+#endif /* OPENSSL_NO_DEPRECATED_1_0_0 */
+
+#define CRYPTO_set_dynlock_create_callback(dyn_create_function)
+#define CRYPTO_set_dynlock_lock_callback(dyn_lock_function)
+#define CRYPTO_set_dynlock_destroy_callback(dyn_destroy_function)
+#define CRYPTO_get_dynlock_create_callback() (NULL)
+#define CRYPTO_get_dynlock_lock_callback() (NULL)
+#define CRYPTO_get_dynlock_destroy_callback() (NULL)
+#endif /* OPENSSL_NO_DEPRECATED_1_1_0 */
+
+/**
+ * @brief Allocator callback type used by CRYPTO_set_mem_functions().
+ * @param num Number of bytes to allocate.
+ * @param file Source file recorded with the allocation.
+ * @param line Source line recorded with the allocation.
+ * @return Newly allocated memory, or NULL on failure.
+ */
+typedef void *(*CRYPTO_malloc_fn)(size_t num, const char *file, int line);
+/**
+ * @brief Reallocator callback type used by CRYPTO_set_mem_functions().
+ * @param addr Existing allocation to resize, or NULL to allocate.
+ * @param num Desired new size in bytes.
+ * @param file Source file recorded with the (re)allocation.
+ * @param line Source line recorded with the (re)allocation.
+ * @return Resized memory, or NULL on failure.
+ */
+typedef void *(*CRYPTO_realloc_fn)(void *addr, size_t num, const char *file,
+    int line);
+/**
+ * @brief Deallocator callback type used by CRYPTO_set_mem_functions().
+ * @param addr Memory to free (may be NULL depending on implementation).
+ * @param file Source file associated with the free site.
+ * @param line Source line associated with the free site.
+ */
+typedef void (*CRYPTO_free_fn)(void *addr, const char *file, int line);
+/**
+ * @brief Install process-wide CRYPTO memory allocator callbacks (before first allocation).
+ * @param malloc_fn Replacement malloc, or NULL to leave the current malloc unchanged.
+ * @param realloc_fn Replacement realloc, or NULL to leave the current realloc unchanged.
+ * @param free_fn Replacement free, or NULL to leave the current free unchanged.
+ * @return 1 on success, or 0 if allocators cannot be changed (already in use).
+ */
+int CRYPTO_set_mem_functions(CRYPTO_malloc_fn malloc_fn,
+    CRYPTO_realloc_fn realloc_fn,
+    CRYPTO_free_fn free_fn);
+/**
+ * @brief Retrieve the process-wide CRYPTO memory allocator callbacks currently installed.
+ * @param malloc_fn Receives the malloc callback, or may be NULL.
+ * @param realloc_fn Receives the realloc callback, or may be NULL.
+ * @param free_fn Receives the free callback, or may be NULL.
+ */
+void CRYPTO_get_mem_functions(CRYPTO_malloc_fn *malloc_fn,
+    CRYPTO_realloc_fn *realloc_fn,
+    CRYPTO_free_fn *free_fn);
+
+/**
+ * @brief Allocate @p num bytes using the installed CRYPTO malloc callback.
+ * @param num Number of bytes to allocate.
+ * @param file Source file for tracking (usually OPENSSL_FILE).
+ * @param line Source line for tracking (usually OPENSSL_LINE).
+ * @return Newly allocated memory, or NULL on failure.
+ */
+OSSL_CRYPTO_ALLOC void *CRYPTO_malloc(size_t num, const char *file, int line);
+/**
+ * @brief Allocate @p num bytes of zero-initialized memory (file/line for debugging).
+ * @param num Number of bytes to allocate.
+ * @param file Source file name recorded with the allocation (usually __FILE__).
+ * @param line Source line recorded with the allocation (usually __LINE__).
+ * @return Pointer to zeroed memory, or NULL on failure.
+ */
+OSSL_CRYPTO_ALLOC void *CRYPTO_zalloc(size_t num, const char *file, int line);
+/**
+ * @brief Duplicate @p siz bytes from @p str using the OpenSSL allocator.
+ * @param str Source memory to copy.
+ * @param siz Number of bytes to duplicate.
+ * @param file Source file name recorded with the allocation (usually __FILE__).
+ * @param line Source line recorded with the allocation (usually __LINE__).
+ * @return Newly allocated copy, or NULL on failure.
+ */
+void *CRYPTO_memdup(const void *str, size_t siz, const char *file, int line);
+/**
+ * @brief Duplicate a NUL-terminated string using the OpenSSL allocator.
+ * @param str String to copy.
+ * @param file Source file name recorded with the allocation (usually __FILE__).
+ * @param line Source line recorded with the allocation (usually __LINE__).
+ * @return Newly allocated copy, or NULL on failure.
+ */
+char *CRYPTO_strdup(const char *str, const char *file, int line);
+/**
+ * @brief Duplicate at most @p s characters of @p str using the OpenSSL allocator.
+ * @param str Source bytes (NUL-terminated or truncated at @p s).
+ * @param s Maximum number of characters to copy (excluding the added NUL).
+ * @param file Source file name recorded with the allocation (usually __FILE__).
+ * @param line Source line recorded with the allocation (usually __LINE__).
+ * @return Newly allocated NUL-terminated copy, or NULL on failure.
+ */
+char *CRYPTO_strndup(const char *str, size_t s, const char *file, int line);
+/**
+ * @brief Free memory previously allocated by CRYPTO_malloc() / OPENSSL_malloc().
+ * @param ptr Memory to free, or NULL (no-op).
+ * @param file Source file name for tracking (usually __FILE__).
+ * @param line Source line for tracking (usually __LINE__).
+ */
+void CRYPTO_free(void *ptr, const char *file, int line);
+/**
+ * @brief Securely clear @p num bytes at @p ptr and free the allocation.
+ * @param ptr Memory to clear and free, or NULL.
+ * @param num Number of bytes at @p ptr to zero before freeing.
+ * @param file Source file name for tracking (usually __FILE__).
+ * @param line Source line for tracking (usually __LINE__).
+ */
+void CRYPTO_clear_free(void *ptr, size_t num, const char *file, int line);
+/**
+ * @brief Resize an OpenSSL allocation to @p num bytes (file/line for debugging).
+ * @param addr Existing allocation, or NULL to allocate anew.
+ * @param num New size in bytes (0 frees @p addr and returns NULL).
+ * @param file Source file name recorded with the allocation (usually __FILE__).
+ * @param line Source line recorded with the allocation (usually __LINE__).
+ * @return Reallocated pointer, or NULL on failure (original block left allocated on failure).
+ */
+void *CRYPTO_realloc(void *addr, size_t num, const char *file, int line);
+/**
+ * @brief Reallocate a buffer, securely clearing any released trailing bytes.
+ * @param addr Existing allocation, or NULL to allocate anew.
+ * @param old_num Previous size in bytes (used when clearing shrunk regions).
+ * @param num New size in bytes.
+ * @param file Source file name recorded with the allocation (usually __FILE__).
+ * @param line Source line recorded with the allocation (usually __LINE__).
+ * @return Reallocated pointer, or NULL on failure (original block left allocated on failure).
+ */
+void *CRYPTO_clear_realloc(void *addr, size_t old_num, size_t num,
+    const char *file, int line);
+
+/**
+ * @brief Initialize the secure heap used by CRYPTO_secure_malloc().
+ * @param sz Total size of the secure heap in bytes.
+ * @param minsize Minimum allocation granularity / guard size.
+ * @return 1 on success, or 0 on failure.
+ */
+int CRYPTO_secure_malloc_init(size_t sz, size_t minsize);
+/**
+ * @brief Tear down the secure heap after CRYPTO_secure_malloc_init() (when unused).
+ * @return 1 if the secure heap was released, or 0 if allocations remain / not initialised.
+ */
+int CRYPTO_secure_malloc_done(void);
+/**
+ * @brief Allocate @p num bytes from the secure heap (after CRYPTO_secure_malloc_init()).
+ * @param num Number of bytes to allocate.
+ * @param file Source file for tracking (usually OPENSSL_FILE).
+ * @param line Source line for tracking (usually OPENSSL_LINE).
+ * @return Secure allocation, or NULL on failure.
+ */
+OSSL_CRYPTO_ALLOC void *CRYPTO_secure_malloc(size_t num, const char *file, int line);
+/**
+ * @brief Allocate @p num bytes from the secure heap and zero them.
+ * @param num Number of bytes to allocate.
+ * @param file Source file name for allocation tracking (usually OPENSSL_FILE).
+ * @param line Source line for allocation tracking (usually OPENSSL_LINE).
+ * @return Pointer to zeroed secure memory, or NULL on failure.
+ */
+OSSL_CRYPTO_ALLOC void *CRYPTO_secure_zalloc(size_t num, const char *file, int line);
+/**
+ * @brief Free memory previously allocated from the secure heap.
+ * @param ptr Pointer returned by CRYPTO_secure_malloc(), or NULL.
+ * @param file Source file name recorded for diagnostics (usually __FILE__).
+ * @param line Source line recorded for diagnostics (usually __LINE__).
+ */
+void CRYPTO_secure_free(void *ptr, const char *file, int line);
+/**
+ * @brief Clear @p num bytes at @p ptr then free a secure-heap allocation.
+ * @param ptr Secure allocation to clear and free, or NULL.
+ * @param num Number of bytes at @p ptr to zero before freeing.
+ * @param file Source file name for tracking (usually __FILE__).
+ * @param line Source line for tracking (usually __LINE__).
+ */
+void CRYPTO_secure_clear_free(void *ptr, size_t num,
+    const char *file, int line);
+/**
+ * @brief Report whether @p ptr was allocated from the OpenSSL secure heap.
+ * @param ptr Pointer to test.
+ * @return 1 if @p ptr is a secure-heap allocation, or 0 otherwise.
+ */
+int CRYPTO_secure_allocated(const void *ptr);
+/**
+ * @brief Report whether the secure heap has been successfully initialised.
+ * @return 1 if CRYPTO_secure_malloc_init() succeeded, or 0 otherwise.
+ */
+int CRYPTO_secure_malloc_initialized(void);
+/**
+ * @brief Return the actual secure-heap block size reserved for @p ptr.
+ * @param ptr Secure allocation from CRYPTO_secure_malloc().
+ * @return Usable size of the secure block, or 0 if @p ptr is not secure-allocated.
+ */
+size_t CRYPTO_secure_actual_size(void *ptr);
+/**
+ * @brief Return how many bytes are currently allocated from the secure heap.
+ * @return Total secure-heap bytes in use, or 0 if the secure heap is not initialised.
+ */
+size_t CRYPTO_secure_used(void);
+
+/**
+ * @brief Overwrite @p len bytes at @p ptr with zeros in a way that resists compiler elision.
+ * @param ptr Buffer to scrub (may be NULL when @p len is 0).
+ * @param len Number of bytes to clear.
+ */
+void OPENSSL_cleanse(void *ptr, size_t len);
+
+#ifndef OPENSSL_NO_CRYPTO_MDEBUG
+/*
+ * The following can be used to detect memory leaks in the library. If
+ * used, it turns on malloc checking
+ */
+#define CRYPTO_MEM_CHECK_OFF 0x0 /* Control only */
+#define CRYPTO_MEM_CHECK_ON 0x1 /* Control and mode bit */
+#define CRYPTO_MEM_CHECK_ENABLE 0x2 /* Control and mode bit */
+#define CRYPTO_MEM_CHECK_DISABLE 0x3 /* Control only */
+
+void CRYPTO_get_alloc_counts(int *mcount, int *rcount, int *fcount);
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#define OPENSSL_mem_debug_push(info) \
+    CRYPTO_mem_debug_push(info, OPENSSL_FILE, OPENSSL_LINE)
+#define OPENSSL_mem_debug_pop() \
+    CRYPTO_mem_debug_pop()
+#endif
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+OSSL_DEPRECATEDIN_3_0 int CRYPTO_set_mem_debug(int flag);
+OSSL_DEPRECATEDIN_3_0 int CRYPTO_mem_ctrl(int mode);
+OSSL_DEPRECATEDIN_3_0 int CRYPTO_mem_debug_push(const char *info,
+    const char *file, int line);
+OSSL_DEPRECATEDIN_3_0 int CRYPTO_mem_debug_pop(void);
+OSSL_DEPRECATEDIN_3_0 void CRYPTO_mem_debug_malloc(void *addr, size_t num,
+    int flag,
+    const char *file, int line);
+OSSL_DEPRECATEDIN_3_0 void CRYPTO_mem_debug_realloc(void *addr1, void *addr2,
+    size_t num, int flag,
+    const char *file, int line);
+OSSL_DEPRECATEDIN_3_0 void CRYPTO_mem_debug_free(void *addr, int flag,
+    const char *file, int line);
+OSSL_DEPRECATEDIN_3_0
+int CRYPTO_mem_leaks_cb(int (*cb)(const char *str, size_t len, void *u),
+    void *u);
+#endif
+#ifndef OPENSSL_NO_STDIO
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+OSSL_DEPRECATEDIN_3_0 int CRYPTO_mem_leaks_fp(FILE *);
+#endif
+#endif
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+OSSL_DEPRECATEDIN_3_0 int CRYPTO_mem_leaks(BIO *bio);
+#endif
+#endif /* OPENSSL_NO_CRYPTO_MDEBUG */
+
+/* die if we have to */
+/**
+ * @brief Abort the process after printing an internal OpenSSL assertion failure.
+ * @param assertion Text describing the failed condition.
+ * @param file Source file where the failure was detected.
+ * @param line Source line where the failure was detected.
+ */
+ossl_noreturn void OPENSSL_die(const char *assertion, const char *file, int line);
+#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+#define OpenSSLDie(f, l, a) OPENSSL_die((a), (f), (l))
+#endif
+#define OPENSSL_assert(e) \
+    (void)((e) ? 0 : (OPENSSL_die("assertion failed: " #e, OPENSSL_FILE, OPENSSL_LINE), 1))
+
+int OPENSSL_isservice(void);
+
+/**
+ * @brief Perform legacy low-level OpenSSL library initialization (prefer OPENSSL_init_crypto()).
+ */
+void OPENSSL_init(void);
+#ifdef OPENSSL_SYS_UNIX
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+/**
+ * @brief Prepare OpenSSL internal state before a POSIX fork (deprecated).
+ *
+ * Call in the parent before fork(); pair with OPENSSL_fork_parent() / OPENSSL_fork_child().
+ */
+OSSL_DEPRECATEDIN_3_0 void OPENSSL_fork_prepare(void);
+/**
+ * @brief Resume OpenSSL internal state in the parent after a POSIX fork (deprecated).
+ */
+OSSL_DEPRECATEDIN_3_0 void OPENSSL_fork_parent(void);
+/**
+ * @brief Rebuild per-process cryptographic state in a freshly forked child (deprecated).
+ */
+OSSL_DEPRECATEDIN_3_0 void OPENSSL_fork_child(void);
+#endif
+#endif
+
+/**
+ * @brief Convert a time_t to UTC broken-down time into caller-provided storage.
+ * @param timer Instant to convert.
+ * @param result Destination struct tm (thread-safe alternative to gmtime()).
+ * @return @p result on success, or NULL on error.
+ */
+struct tm *OPENSSL_gmtime(const time_t *timer, struct tm *result);
+/**
+ * @brief Add a day/second offset to a UTC struct tm in place.
+ * @param tm Time value to adjust (UTC).
+ * @param offset_day Number of days to add (may be negative).
+ * @param offset_sec Number of seconds to add (may be negative).
+ * @return 1 on success, or 0 on error.
+ */
+int OPENSSL_gmtime_adj(struct tm *tm, int offset_day, long offset_sec);
+/**
+ * @brief Compute the day/second difference between two broken-down UTC times.
+ * @param pday Receives the whole-day difference (@p to - @p from).
+ * @param psec Receives the remaining second difference after whole days are removed.
+ * @param from Starting time (UTC).
+ * @param to Ending time (UTC).
+ * @return 1 on success, or 0 on failure.
+ */
+int OPENSSL_gmtime_diff(int *pday, int *psec,
+    const struct tm *from, const struct tm *to);
+
+/**
+ * @brief Compare two memory regions in constant time with respect to their contents.
+ * @param in_a First buffer.
+ * @param in_b Second buffer.
+ * @param len Number of bytes to compare.
+ * @return 0 if the @p len bytes are equal; non-zero otherwise (ordering is undefined).
+ *
+ * Runtime depends on @p len but not on the data at @p in_a / @p in_b. Unlike memcmp,
+ * the non-zero return value must not be used to sort elements.
+ */
+int CRYPTO_memcmp(const void *in_a, const void *in_b, size_t len);
+
+/* Standard initialisation options */
+#define OPENSSL_INIT_NO_LOAD_CRYPTO_STRINGS 0x00000001L
+#define OPENSSL_INIT_LOAD_CRYPTO_STRINGS 0x00000002L
+#define OPENSSL_INIT_ADD_ALL_CIPHERS 0x00000004L
+#define OPENSSL_INIT_ADD_ALL_DIGESTS 0x00000008L
+#define OPENSSL_INIT_NO_ADD_ALL_CIPHERS 0x00000010L
+#define OPENSSL_INIT_NO_ADD_ALL_DIGESTS 0x00000020L
+#define OPENSSL_INIT_LOAD_CONFIG 0x00000040L
+#define OPENSSL_INIT_NO_LOAD_CONFIG 0x00000080L
+#define OPENSSL_INIT_ASYNC 0x00000100L
+#define OPENSSL_INIT_ENGINE_RDRAND 0x00000200L
+#define OPENSSL_INIT_ENGINE_DYNAMIC 0x00000400L
+#define OPENSSL_INIT_ENGINE_OPENSSL 0x00000800L
+#define OPENSSL_INIT_ENGINE_CRYPTODEV 0x00001000L
+#define OPENSSL_INIT_ENGINE_CAPI 0x00002000L
+#define OPENSSL_INIT_ENGINE_PADLOCK 0x00004000L
+#define OPENSSL_INIT_ENGINE_AFALG 0x00008000L
+/* FREE:                                     0x00010000L */
+#define OPENSSL_INIT_ATFORK 0x00020000L
+/* OPENSSL_INIT_BASE_ONLY                    0x00040000L */
+#define OPENSSL_INIT_NO_ATEXIT 0x00080000L
+/* OPENSSL_INIT flag range 0x03f00000 reserved for OPENSSL_init_ssl() */
+/* FREE: 0x04000000L */
+/* FREE: 0x08000000L */
+/* FREE: 0x10000000L */
+/* FREE: 0x20000000L */
+/* FREE: 0x40000000L */
+/* FREE: 0x80000000L */
+/* Max OPENSSL_INIT flag value is 0x80000000 */
+
+/* openssl and dasync not counted as builtin */
+#define OPENSSL_INIT_ENGINE_ALL_BUILTIN                       \
+    (OPENSSL_INIT_ENGINE_RDRAND | OPENSSL_INIT_ENGINE_DYNAMIC \
+        | OPENSSL_INIT_ENGINE_CRYPTODEV | OPENSSL_INIT_ENGINE_CAPI | OPENSSL_INIT_ENGINE_PADLOCK)
+
+/* Library initialisation functions */
+/**
+ * @brief Deinitialize OpenSSL: run atexit handlers, free global crypto state, and stop threads.
+ *
+ * After this call, most OpenSSL APIs must not be used until the process re-initializes.
+ */
+void OPENSSL_cleanup(void);
+/**
+ * @brief Initialize libcrypto with option flags and optional settings.
+ * @param opts Bitmask of OPENSSL_INIT_* options (for example OPENSSL_INIT_LOAD_CONFIG).
+ * @param settings Optional settings from OPENSSL_INIT_new(), or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int OPENSSL_init_crypto(uint64_t opts, const OPENSSL_INIT_SETTINGS *settings);
+/**
+ * @brief Register a handler to run during OPENSSL_cleanup().
+ * @param handler Function invoked once when OpenSSL is deinitialized.
+ * @return 1 on success, or 0 on failure.
+ */
+int OPENSSL_atexit(void (*handler)(void));
+/**
+ * @brief Run per-thread OpenSSL cleanup handlers for the calling thread in the default library context.
+ *
+ * Invoked automatically from OPENSSL_cleanup() and on thread exit when thread-local destructors are active.
+ */
+void OPENSSL_thread_stop(void);
+/**
+ * @brief Release per-thread OpenSSL state associated with library context @p ctx.
+ * @param ctx Library context whose thread-local resources are torn down for this thread.
+ */
+void OPENSSL_thread_stop_ex(OSSL_LIB_CTX *ctx);
+
+/* Low-level control of initialization */
+/**
+ * @brief Allocate an OPENSSL_INIT_SETTINGS object for OPENSSL_init_crypto().
+ * @return New settings object, or NULL on failure; free with OPENSSL_INIT_free().
+ */
+OPENSSL_INIT_SETTINGS *OPENSSL_INIT_new(void);
+#ifndef OPENSSL_NO_STDIO
+/**
+ * @brief Set the configuration file path used when OPENSSL_init_crypto() loads config.
+ * @param settings Initialization settings object from OPENSSL_INIT_new().
+ * @param config_filename Path to an openssl.cnf-style file.
+ * @return 1 on success, or 0 on failure.
+ */
+int OPENSSL_INIT_set_config_filename(OPENSSL_INIT_SETTINGS *settings,
+    const char *config_filename);
+/**
+ * @brief Set CONF_modules_load_file() flags used when OPENSSL_init_crypto() loads config.
+ * @param settings Initialization settings object from OPENSSL_INIT_new().
+ * @param flags Bitmask such as CONF_MFLAGS_IGNORE_MISSING_FILE or CONF_MFLAGS_DEFAULT_SECTION.
+ */
+void OPENSSL_INIT_set_config_file_flags(OPENSSL_INIT_SETTINGS *settings,
+    unsigned long flags);
+/**
+ * @brief Set the application section name used when OPENSSL_init_crypto() loads config.
+ * @param settings Initialization settings object from OPENSSL_INIT_new().
+ * @param config_appname Application name / section passed to CONF_modules_load_file().
+ * @return 1 on success, or 0 on failure.
+ */
+int OPENSSL_INIT_set_config_appname(OPENSSL_INIT_SETTINGS *settings,
+    const char *config_appname);
+#endif
+/**
+ * @brief Free an OPENSSL_INIT_SETTINGS object allocated with OPENSSL_INIT_new().
+ * @param settings Settings object to free, or NULL.
+ */
+void OPENSSL_INIT_free(OPENSSL_INIT_SETTINGS *settings);
+
+#if defined(OPENSSL_THREADS) && !defined(CRYPTO_TDEBUG)
+#if defined(_WIN32)
+#if defined(BASETYPES) || defined(_WINDEF_H)
+/* application has to include <windows.h> in order to use this */
+/**
+ * @brief Platform thread-local storage key used by CRYPTO_THREAD_*_local() on Windows.
+ *
+ * On Windows builds this is DWORD (TlsAlloc index); POSIX builds use pthread_key_t; no-thread fallbacks use unsigned int.
+ */
+typedef DWORD CRYPTO_THREAD_LOCAL;
+typedef DWORD CRYPTO_THREAD_ID;
+
+/**
+ * @brief Once-control type used with CRYPTO_THREAD_run_once() on Windows builds.
+ */
+typedef LONG CRYPTO_ONCE;
+#define CRYPTO_ONCE_STATIC_INIT 0
+#endif
+#else
+#if defined(__TANDEM) && defined(_SPT_MODEL_)
+#define SPT_THREAD_SIGNAL 1
+#define SPT_THREAD_AWARE 1
+#include <spthread.h>
+#else
+#include <pthread.h>
+#endif
+/**
+ * @brief Once-control type used with CRYPTO_THREAD_run_once() on POSIX builds.
+ */
+typedef pthread_once_t CRYPTO_ONCE;
+/**
+ * @brief Platform thread-local storage key used by CRYPTO_THREAD_*_local().
+ *
+ * On POSIX builds this is pthread_key_t; Windows builds use DWORD; no-thread fallbacks use unsigned int.
+ */
+typedef pthread_key_t CRYPTO_THREAD_LOCAL;
+/**
+ * @brief Platform thread identifier used by CRYPTO_THREAD_get_current_id() and friends.
+ *
+ * On POSIX builds this is pthread_t; Windows and no-thread fallbacks use other underlying types.
+ */
+typedef pthread_t CRYPTO_THREAD_ID;
+
+#define CRYPTO_ONCE_STATIC_INIT PTHREAD_ONCE_INIT
+#endif
+#endif
+
+#if !defined(CRYPTO_ONCE_STATIC_INIT)
+/**
+ * @brief Once-control type used with CRYPTO_THREAD_run_once() when threads are disabled.
+ */
+typedef unsigned int CRYPTO_ONCE;
+/**
+ * @brief Stub thread-local key type when OpenSSL is built without thread support.
+ *
+ * On threaded builds this is pthread_key_t (POSIX) or DWORD (Windows).
+ */
+typedef unsigned int CRYPTO_THREAD_LOCAL;
+typedef unsigned int CRYPTO_THREAD_ID;
+#define CRYPTO_ONCE_STATIC_INIT 0
+#endif
+
+/**
+ * @brief Run @p init exactly once across threads using a CRYPTO_ONCE control.
+ * @param once Once-control variable (initialize with CRYPTO_ONCE_STATIC_INIT).
+ * @param init Function invoked at most once process-wide for @p once.
+ * @return 1 on success, or 0 on failure.
+ */
+int CRYPTO_THREAD_run_once(CRYPTO_ONCE *once, void (*init)(void));
+
+/**
+ * @brief Allocate a thread-local storage key for use with CRYPTO_THREAD_get/set_local().
+ * @param key Receives the new key on success.
+ * @param cleanup Optional destructor invoked on thread exit for non-NULL values, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int CRYPTO_THREAD_init_local(CRYPTO_THREAD_LOCAL *key, void (*cleanup)(void *));
+/**
+ * @brief Return the calling thread's value for thread-local key @p key.
+ * @param key Thread-local key from CRYPTO_THREAD_init_local().
+ * @return Stored pointer for this thread, or NULL if unset.
+ */
+void *CRYPTO_THREAD_get_local(CRYPTO_THREAD_LOCAL *key);
+/**
+ * @brief Store @p val in the thread-local slot identified by @p key.
+ * @param key Thread-local key previously created with CRYPTO_THREAD_init_local().
+ * @param val Pointer to store for the calling thread.
+ * @return 1 on success, or 0 on failure.
+ */
+int CRYPTO_THREAD_set_local(CRYPTO_THREAD_LOCAL *key, void *val);
+/**
+ * @brief Destroy a thread-local key previously created with CRYPTO_THREAD_init_local().
+ * @param key Key to clean up (invalid after success).
+ * @return 1 on success, or 0 on failure.
+ */
+int CRYPTO_THREAD_cleanup_local(CRYPTO_THREAD_LOCAL *key);
+
+/**
+ * @brief Return an identifier for the calling thread.
+ * @return Opaque CRYPTO_THREAD_ID for the current thread.
+ */
+CRYPTO_THREAD_ID CRYPTO_THREAD_get_current_id(void);
+/**
+ * @brief Compare two CRYPTO_THREAD_ID values for equality.
+ * @param a First thread id.
+ * @param b Second thread id.
+ * @return 1 if @p a and @p b identify the same thread, or 0 otherwise.
+ */
+int CRYPTO_THREAD_compare_id(CRYPTO_THREAD_ID a, CRYPTO_THREAD_ID b);
+
+/**
+ * @brief Allocate a new OpenSSL library context (provider / property scope).
+ * @return Newly allocated OSSL_LIB_CTX, or NULL on failure; free with OSSL_LIB_CTX_free().
+ */
+OSSL_LIB_CTX *OSSL_LIB_CTX_new(void);
+/**
+ * @brief Allocate an OSSL_LIB_CTX wired to core BIO upcalls from a provider dispatch table.
+ * @param handle Core handle passed to the provider (reserved for future use; may be NULL).
+ * @param in Provider-to-core OSSL_DISPATCH table containing BIO upcall function pointers.
+ * @return New library context, or NULL on failure; free with OSSL_LIB_CTX_free().
+ */
+OSSL_LIB_CTX *OSSL_LIB_CTX_new_from_dispatch(const OSSL_CORE_HANDLE *handle,
+    const OSSL_DISPATCH *in);
+/**
+ * @brief Create a child library context mirroring providers from a provider's parent context.
+ * @param handle Core handle identifying the provider whose parent libctx is mirrored.
+ * @param in Provider-to-core OSSL_DISPATCH table (BIO and related upcalls).
+ * @return New child OSSL_LIB_CTX, or NULL on failure; free with OSSL_LIB_CTX_free().
+ */
+OSSL_LIB_CTX *OSSL_LIB_CTX_new_child(const OSSL_CORE_HANDLE *handle,
+    const OSSL_DISPATCH *in);
+/**
+ * @brief Load providers and configuration directives from @p config_file into @p ctx.
+ * @param ctx Library context to configure.
+ * @param config_file Path to an OpenSSL configuration file.
+ * @return 1 on success, or 0 on failure.
+ */
+int OSSL_LIB_CTX_load_config(OSSL_LIB_CTX *ctx, const char *config_file);
+/**
+ * @brief Free a library context and its associated provider/algorithm state.
+ * @param ctx Context to free, or NULL.
+ */
+void OSSL_LIB_CTX_free(OSSL_LIB_CTX *ctx);
+/**
+ * @brief Return the process-wide global default OSSL_LIB_CTX (not thread-local).
+ * @return Borrowed pointer to the global default context; do not free.
+ */
+OSSL_LIB_CTX *OSSL_LIB_CTX_get0_global_default(void);
+/**
+ * @brief Set the thread-local default OSSL_LIB_CTX used when NULL is passed for libctx.
+ * @param libctx Library context to install as the default, or NULL to restore the global default.
+ * @return The previous default library context.
+ */
+OSSL_LIB_CTX *OSSL_LIB_CTX_set0_default(OSSL_LIB_CTX *libctx);
+
+/**
+ * @brief Sleep the calling thread for approximately @p millis milliseconds.
+ * @param millis Duration to sleep; platforms may round up to their timer resolution.
+ */
+void OSSL_sleep(uint64_t millis);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

@@ -1,0 +1,2145 @@
+/*
+ * {- join("\n * ", @autowarntext) -}
+ *
+ * Copyright 1995-2024 The OpenSSL Project Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License 2.0 (the "License").  You may not use
+ * this file except in compliance with the License.  You can obtain a copy
+ * in the file LICENSE in the source distribution or at
+ * https://www.openssl.org/source/license.html
+ */
+/* clang-format off */
+{-
+use OpenSSL::stackhash qw(generate_stack_macros);
+-}
+/* clang-format on */
+
+#ifndef OPENSSL_BIO_H
+#define OPENSSL_BIO_H
+#pragma once
+
+#include <openssl/macros.h>
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#define HEADER_BIO_H
+#endif
+
+#include <openssl/e_os2.h>
+
+#ifndef OPENSSL_NO_STDIO
+#include <stdio.h>
+#endif
+#include <stdarg.h>
+
+#include <openssl/crypto.h>
+#include <openssl/bioerr.h>
+#include <openssl/core.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* There are the classes of BIOs */
+#define BIO_TYPE_DESCRIPTOR 0x0100 /* socket, fd, connect or accept */
+#define BIO_TYPE_FILTER 0x0200
+#define BIO_TYPE_SOURCE_SINK 0x0400
+
+/* These are the 'types' of BIOs */
+#define BIO_TYPE_NONE 0
+#define BIO_TYPE_MEM (1 | BIO_TYPE_SOURCE_SINK)
+#define BIO_TYPE_FILE (2 | BIO_TYPE_SOURCE_SINK)
+
+#define BIO_TYPE_FD (4 | BIO_TYPE_SOURCE_SINK | BIO_TYPE_DESCRIPTOR)
+#define BIO_TYPE_SOCKET (5 | BIO_TYPE_SOURCE_SINK | BIO_TYPE_DESCRIPTOR)
+#define BIO_TYPE_NULL (6 | BIO_TYPE_SOURCE_SINK)
+#define BIO_TYPE_SSL (7 | BIO_TYPE_FILTER)
+#define BIO_TYPE_MD (8 | BIO_TYPE_FILTER)
+#define BIO_TYPE_BUFFER (9 | BIO_TYPE_FILTER)
+#define BIO_TYPE_CIPHER (10 | BIO_TYPE_FILTER)
+#define BIO_TYPE_BASE64 (11 | BIO_TYPE_FILTER)
+#define BIO_TYPE_CONNECT (12 | BIO_TYPE_SOURCE_SINK | BIO_TYPE_DESCRIPTOR)
+#define BIO_TYPE_ACCEPT (13 | BIO_TYPE_SOURCE_SINK | BIO_TYPE_DESCRIPTOR)
+
+#define BIO_TYPE_NBIO_TEST (16 | BIO_TYPE_FILTER) /* server proxy BIO */
+#define BIO_TYPE_NULL_FILTER (17 | BIO_TYPE_FILTER)
+#define BIO_TYPE_BIO (19 | BIO_TYPE_SOURCE_SINK) /* half a BIO pair */
+#define BIO_TYPE_LINEBUFFER (20 | BIO_TYPE_FILTER)
+#define BIO_TYPE_DGRAM (21 | BIO_TYPE_SOURCE_SINK | BIO_TYPE_DESCRIPTOR)
+#define BIO_TYPE_ASN1 (22 | BIO_TYPE_FILTER)
+#define BIO_TYPE_COMP (23 | BIO_TYPE_FILTER)
+#ifndef OPENSSL_NO_SCTP
+#define BIO_TYPE_DGRAM_SCTP (24 | BIO_TYPE_SOURCE_SINK | BIO_TYPE_DESCRIPTOR)
+#endif
+#define BIO_TYPE_CORE_TO_PROV (25 | BIO_TYPE_SOURCE_SINK)
+#define BIO_TYPE_DGRAM_PAIR (26 | BIO_TYPE_SOURCE_SINK)
+#define BIO_TYPE_DGRAM_MEM (27 | BIO_TYPE_SOURCE_SINK)
+
+/* Custom type starting index returned by BIO_get_new_index() */
+#define BIO_TYPE_START 128
+/* Custom type maximum index that can be returned by BIO_get_new_index() */
+#define BIO_TYPE_MASK 0xFF
+
+/*
+ * BIO_FILENAME_READ|BIO_CLOSE to open or close on free.
+ * BIO_set_fp(in,stdin,BIO_NOCLOSE);
+ */
+#define BIO_NOCLOSE 0x00
+#define BIO_CLOSE 0x01
+
+/*
+ * These are used in the following macros and are passed to BIO_ctrl()
+ */
+#define BIO_CTRL_RESET 1 /* opt - rewind/zero etc */
+#define BIO_CTRL_EOF 2 /* opt - are we at the eof */
+#define BIO_CTRL_INFO 3 /* opt - extra tit-bits */
+#define BIO_CTRL_SET 4 /* man - set the 'IO' type */
+#define BIO_CTRL_GET 5 /* man - get the 'IO' type */
+#define BIO_CTRL_PUSH 6 /* opt - internal, used to signify change */
+#define BIO_CTRL_POP 7 /* opt - internal, used to signify change */
+#define BIO_CTRL_GET_CLOSE 8 /* man - set the 'close' on free */
+#define BIO_CTRL_SET_CLOSE 9 /* man - set the 'close' on free */
+#define BIO_CTRL_PENDING 10 /* opt - is their more data buffered */
+#define BIO_CTRL_FLUSH 11 /* opt - 'flush' buffered output */
+#define BIO_CTRL_DUP 12 /* man - extra stuff for 'duped' BIO */
+#define BIO_CTRL_WPENDING 13 /* opt - number of bytes still to write */
+#define BIO_CTRL_SET_CALLBACK 14 /* opt - set callback function */
+#define BIO_CTRL_GET_CALLBACK 15 /* opt - set callback function */
+
+#define BIO_CTRL_PEEK 29 /* BIO_f_buffer special */
+#define BIO_CTRL_SET_FILENAME 30 /* BIO_s_file special */
+
+/* dgram BIO stuff */
+#define BIO_CTRL_DGRAM_CONNECT 31 /* BIO dgram special */
+#define BIO_CTRL_DGRAM_SET_CONNECTED 32 /* allow for an externally connected \
+                                         * socket to be passed in */
+#define BIO_CTRL_DGRAM_SET_RECV_TIMEOUT 33 /* setsockopt, essentially */
+#define BIO_CTRL_DGRAM_GET_RECV_TIMEOUT 34 /* getsockopt, essentially */
+#define BIO_CTRL_DGRAM_SET_SEND_TIMEOUT 35 /* setsockopt, essentially */
+#define BIO_CTRL_DGRAM_GET_SEND_TIMEOUT 36 /* getsockopt, essentially */
+
+#define BIO_CTRL_DGRAM_GET_RECV_TIMER_EXP 37 /* flag whether the last */
+#define BIO_CTRL_DGRAM_GET_SEND_TIMER_EXP 38 /* I/O operation timed out */
+
+/* #ifdef IP_MTU_DISCOVER */
+#define BIO_CTRL_DGRAM_MTU_DISCOVER 39 /* set DF bit on egress packets */
+/* #endif */
+
+#define BIO_CTRL_DGRAM_QUERY_MTU 40 /* as kernel for current MTU */
+#define BIO_CTRL_DGRAM_GET_FALLBACK_MTU 47
+#define BIO_CTRL_DGRAM_GET_MTU 41 /* get cached value for MTU */
+#define BIO_CTRL_DGRAM_SET_MTU 42 /* set cached value for MTU.  \
+                                   * want to use this if asking \
+                                   * the kernel fails */
+
+#define BIO_CTRL_DGRAM_MTU_EXCEEDED 43 /* check whether the MTU was    \
+                                        * exceed in the previous write \
+                                        * operation */
+
+#define BIO_CTRL_DGRAM_GET_PEER 46
+#define BIO_CTRL_DGRAM_SET_PEER 44 /* Destination for the data */
+
+#define BIO_CTRL_DGRAM_SET_NEXT_TIMEOUT 45 /* Next DTLS handshake timeout \
+                                            * to adjust socket timeouts */
+#define BIO_CTRL_DGRAM_SET_DONT_FRAG 48
+
+#define BIO_CTRL_DGRAM_GET_MTU_OVERHEAD 49
+
+/* Deliberately outside of OPENSSL_NO_SCTP - used in bss_dgram.c */
+#define BIO_CTRL_DGRAM_SCTP_SET_IN_HANDSHAKE 50
+#ifndef OPENSSL_NO_SCTP
+/* SCTP stuff */
+#define BIO_CTRL_DGRAM_SCTP_ADD_AUTH_KEY 51
+#define BIO_CTRL_DGRAM_SCTP_NEXT_AUTH_KEY 52
+#define BIO_CTRL_DGRAM_SCTP_AUTH_CCS_RCVD 53
+#define BIO_CTRL_DGRAM_SCTP_GET_SNDINFO 60
+#define BIO_CTRL_DGRAM_SCTP_SET_SNDINFO 61
+#define BIO_CTRL_DGRAM_SCTP_GET_RCVINFO 62
+#define BIO_CTRL_DGRAM_SCTP_SET_RCVINFO 63
+#define BIO_CTRL_DGRAM_SCTP_GET_PRINFO 64
+#define BIO_CTRL_DGRAM_SCTP_SET_PRINFO 65
+#define BIO_CTRL_DGRAM_SCTP_SAVE_SHUTDOWN 70
+#endif
+
+#define BIO_CTRL_DGRAM_SET_PEEK_MODE 71
+
+/*
+ * internal BIO:
+ * # define BIO_CTRL_SET_KTLS_SEND                 72
+ * # define BIO_CTRL_SET_KTLS_SEND_CTRL_MSG        74
+ * # define BIO_CTRL_CLEAR_KTLS_CTRL_MSG           75
+ */
+
+#define BIO_CTRL_GET_KTLS_SEND 73
+#define BIO_CTRL_GET_KTLS_RECV 76
+
+#define BIO_CTRL_DGRAM_SCTP_WAIT_FOR_DRY 77
+#define BIO_CTRL_DGRAM_SCTP_MSG_WAITING 78
+
+/* BIO_f_prefix controls */
+#define BIO_CTRL_SET_PREFIX 79
+#define BIO_CTRL_SET_INDENT 80
+#define BIO_CTRL_GET_INDENT 81
+
+#define BIO_CTRL_DGRAM_GET_LOCAL_ADDR_CAP 82
+#define BIO_CTRL_DGRAM_GET_LOCAL_ADDR_ENABLE 83
+#define BIO_CTRL_DGRAM_SET_LOCAL_ADDR_ENABLE 84
+#define BIO_CTRL_DGRAM_GET_EFFECTIVE_CAPS 85
+#define BIO_CTRL_DGRAM_GET_CAPS 86
+#define BIO_CTRL_DGRAM_SET_CAPS 87
+#define BIO_CTRL_DGRAM_GET_NO_TRUNC 88
+#define BIO_CTRL_DGRAM_SET_NO_TRUNC 89
+
+/*
+ * internal BIO:
+ * # define BIO_CTRL_SET_KTLS_TX_ZEROCOPY_SENDFILE 90
+ */
+
+#define BIO_CTRL_GET_RPOLL_DESCRIPTOR 91
+#define BIO_CTRL_GET_WPOLL_DESCRIPTOR 92
+#define BIO_CTRL_DGRAM_DETECT_PEER_ADDR 93
+
+#define BIO_DGRAM_CAP_NONE 0U
+#define BIO_DGRAM_CAP_HANDLES_SRC_ADDR (1U << 0)
+#define BIO_DGRAM_CAP_HANDLES_DST_ADDR (1U << 1)
+#define BIO_DGRAM_CAP_PROVIDES_SRC_ADDR (1U << 2)
+#define BIO_DGRAM_CAP_PROVIDES_DST_ADDR (1U << 3)
+
+#ifndef OPENSSL_NO_KTLS
+#define BIO_get_ktls_send(b) \
+    (BIO_ctrl(b, BIO_CTRL_GET_KTLS_SEND, 0, NULL) > 0)
+#define BIO_get_ktls_recv(b) \
+    (BIO_ctrl(b, BIO_CTRL_GET_KTLS_RECV, 0, NULL) > 0)
+#else
+#define BIO_get_ktls_send(b) (0)
+#define BIO_get_ktls_recv(b) (0)
+#endif
+
+/* modifiers */
+#define BIO_FP_READ 0x02
+#define BIO_FP_WRITE 0x04
+#define BIO_FP_APPEND 0x08
+#define BIO_FP_TEXT 0x10
+
+#define BIO_FLAGS_READ 0x01
+#define BIO_FLAGS_WRITE 0x02
+#define BIO_FLAGS_IO_SPECIAL 0x04
+#define BIO_FLAGS_RWS (BIO_FLAGS_READ | BIO_FLAGS_WRITE | BIO_FLAGS_IO_SPECIAL)
+#define BIO_FLAGS_SHOULD_RETRY 0x08
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+/* This #define was replaced by an internal constant and should not be used. */
+#define BIO_FLAGS_UPLINK 0
+#endif
+
+#define BIO_FLAGS_BASE64_NO_NL 0x100
+
+/*
+ * This is used with memory BIOs:
+ * BIO_FLAGS_MEM_RDONLY means we shouldn't free up or change the data in any way;
+ * BIO_FLAGS_NONCLEAR_RST means we shouldn't clear data on reset.
+ */
+#define BIO_FLAGS_MEM_RDONLY 0x200
+#define BIO_FLAGS_NONCLEAR_RST 0x400
+#define BIO_FLAGS_IN_EOF 0x800
+
+/* the BIO FLAGS values 0x1000 to 0x8000 are reserved for internal KTLS flags */
+
+/**
+ * @brief Opaque socket address union used by BIO socket and datagram APIs.
+ */
+typedef union bio_addr_st BIO_ADDR;
+/**
+ * @brief Opaque linked address-info node returned by BIO_lookup() / BIO_lookup_ex().
+ */
+typedef struct bio_addrinfo_st BIO_ADDRINFO;
+
+/**
+ * @brief Allocate a new unique BIO type index for a custom BIO_METHOD.
+ * @return New type index in the BIO_TYPE_START range, or a negative value on failure.
+ */
+int BIO_get_new_index(void);
+/**
+ * @brief Set the given flag bits on a BIO (bitwise OR into the BIO's flags).
+ * @param b BIO whose flags are updated.
+ * @param flags Bitmask of BIO_FLAGS_* values to set.
+ */
+void BIO_set_flags(BIO *b, int flags);
+/**
+ * @brief Test whether any of the given flag bits are set on a BIO.
+ * @param b BIO whose flags are examined.
+ * @param flags Bitmask of BIO_FLAGS_* values to test.
+ * @return Bitwise AND of the BIO's flags with @p flags.
+ */
+int BIO_test_flags(const BIO *b, int flags);
+/**
+ * @brief Clear the given BIO_FLAGS_* bits from a BIO.
+ * @param b BIO whose flags are updated.
+ * @param flags Bitmask of BIO_FLAGS_* values to clear.
+ */
+void BIO_clear_flags(BIO *b, int flags);
+
+#define BIO_get_flags(b) BIO_test_flags(b, ~(0x0))
+#define BIO_set_retry_special(b) \
+    BIO_set_flags(b, (BIO_FLAGS_IO_SPECIAL | BIO_FLAGS_SHOULD_RETRY))
+#define BIO_set_retry_read(b) \
+    BIO_set_flags(b, (BIO_FLAGS_READ | BIO_FLAGS_SHOULD_RETRY))
+#define BIO_set_retry_write(b) \
+    BIO_set_flags(b, (BIO_FLAGS_WRITE | BIO_FLAGS_SHOULD_RETRY))
+
+/* These are normally used internally in BIOs */
+#define BIO_clear_retry_flags(b) \
+    BIO_clear_flags(b, (BIO_FLAGS_RWS | BIO_FLAGS_SHOULD_RETRY))
+#define BIO_get_retry_flags(b) \
+    BIO_test_flags(b, (BIO_FLAGS_RWS | BIO_FLAGS_SHOULD_RETRY))
+
+/* These should be used by the application to tell why we should retry */
+#define BIO_should_read(a) BIO_test_flags(a, BIO_FLAGS_READ)
+#define BIO_should_write(a) BIO_test_flags(a, BIO_FLAGS_WRITE)
+#define BIO_should_io_special(a) BIO_test_flags(a, BIO_FLAGS_IO_SPECIAL)
+#define BIO_retry_type(a) BIO_test_flags(a, BIO_FLAGS_RWS)
+#define BIO_should_retry(a) BIO_test_flags(a, BIO_FLAGS_SHOULD_RETRY)
+
+/*
+ * The next three are used in conjunction with the BIO_should_io_special()
+ * condition.  After this returns true, BIO *BIO_get_retry_BIO(BIO *bio, int
+ * *reason); will walk the BIO stack and return the 'reason' for the special
+ * and the offending BIO. Given a BIO, BIO_get_retry_reason(bio) will return
+ * the code.
+ */
+/*
+ * Returned from the SSL bio when the certificate retrieval code had an error
+ */
+#define BIO_RR_SSL_X509_LOOKUP 0x01
+/* Returned from the connect BIO when a connect would have blocked */
+#define BIO_RR_CONNECT 0x02
+/* Returned from the accept BIO when an accept would have blocked */
+#define BIO_RR_ACCEPT 0x03
+
+/* These are passed by the BIO callback */
+#define BIO_CB_FREE 0x01
+#define BIO_CB_READ 0x02
+#define BIO_CB_WRITE 0x03
+#define BIO_CB_PUTS 0x04
+#define BIO_CB_GETS 0x05
+#define BIO_CB_CTRL 0x06
+#define BIO_CB_RECVMMSG 0x07
+#define BIO_CB_SENDMMSG 0x08
+
+/*
+ * The callback is called before and after the underling operation, The
+ * BIO_CB_RETURN flag indicates if it is after the call
+ */
+#define BIO_CB_RETURN 0x80
+#define BIO_CB_return(a) ((a) | BIO_CB_RETURN)
+#define BIO_cb_pre(a) (!((a) & BIO_CB_RETURN))
+#define BIO_cb_post(a) ((a) & BIO_CB_RETURN)
+
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+/**
+ * @brief Legacy BIO callback invoked immediately before and after I/O operations (deprecated).
+ * @param b BIO performing the operation.
+ * @param oper BIO_CB_* operation code OR'd with BIO_CB_RETURN after the call.
+ * @param argp Pointer argument (buffer or ctrl pointer), or NULL.
+ * @param argi Integer argument for ctrl-style operations.
+ * @param argl Long argument for ctrl-style operations.
+ * @param ret Return value from the underlying operation (post-call only).
+ * @return Post-call return value (usually @p ret unchanged).
+ */
+typedef long (*BIO_callback_fn)(BIO *b, int oper, const char *argp, int argi,
+    long argl, long ret);
+/**
+ * @brief Return the legacy BIO callback previously set with BIO_set_callback() (deprecated).
+ * @param b BIO to query.
+ * @return Callback function pointer, or NULL if unset.
+ */
+OSSL_DEPRECATEDIN_3_0 BIO_callback_fn BIO_get_callback(const BIO *b);
+/**
+ * @brief Install a legacy pre/post I/O callback on a BIO (deprecated; prefer BIO_set_callback_ex).
+ * @param b BIO whose callback is replaced.
+ * @param callback Legacy callback function, or NULL to clear.
+ */
+OSSL_DEPRECATEDIN_3_0 void BIO_set_callback(BIO *b, BIO_callback_fn callback);
+/**
+ * @brief Default legacy BIO debug logger writing to the BIO's callback-argument BIO (deprecated).
+ * @param bio BIO whose operation is being reported.
+ * @param cmd BIO_CB_* operation code (read, write, ctrl, …).
+ * @param argp Pointer argument for the operation (buffer or ctrl pointer), or NULL.
+ * @param argi Integer argument for ctrl-style operations.
+ * @param argl Long argument for ctrl-style operations.
+ * @param ret Return value being reported for the operation.
+ * @return @p ret unchanged (pass-through debug callback).
+ */
+OSSL_DEPRECATEDIN_3_0 long BIO_debug_callback(BIO *bio, int cmd,
+    const char *argp, int argi,
+    long argl, long ret);
+#endif
+
+/**
+ * @brief Extended BIO callback invoked immediately before and after I/O operations.
+ * @param b BIO performing the operation.
+ * @param oper BIO_CB_* operation code OR'd with BIO_CB_RETURN after the call.
+ * @param argp Pointer argument (buffer or ctrl pointer), or NULL.
+ * @param len Byte count associated with the operation when applicable.
+ * @param argi Integer argument for ctrl-style operations.
+ * @param argl Long argument for ctrl-style operations.
+ * @param ret Return value from the underlying operation (post-call only).
+ * @param processed Optional in/out processed-byte count for read/write/mmsg operations.
+ * @return Post-call return value (usually @p ret unchanged).
+ */
+typedef long (*BIO_callback_fn_ex)(BIO *b, int oper, const char *argp,
+    size_t len, int argi,
+    long argl, int ret, size_t *processed);
+/**
+ * @brief Return the extended BIO callback installed with BIO_set_callback_ex().
+ * @param b BIO to query.
+ * @return Extended callback, or NULL if unset.
+ */
+BIO_callback_fn_ex BIO_get_callback_ex(const BIO *b);
+/**
+ * @brief Install an extended pre/post I/O callback on a BIO.
+ * @param b BIO whose callback is replaced.
+ * @param callback Extended callback function, or NULL to clear.
+ */
+void BIO_set_callback_ex(BIO *b, BIO_callback_fn_ex callback);
+/**
+ * @brief Default BIO info callback that logs operations to the BIO's callback argument BIO.
+ * @param bio BIO whose operation is being reported.
+ * @param oper BIO_CB_* operation code (read, write, ctrl, …).
+ * @param argp Pointer argument for the operation (buffer or ctrl pointer), or NULL.
+ * @param len Byte count associated with the operation when applicable.
+ * @param argi Integer argument for ctrl-style operations.
+ * @param argl Long argument for ctrl-style operations.
+ * @param ret Return value being reported for the operation.
+ * @param processed Optional in/out processed-byte count for extended callbacks.
+ * @return @p ret unchanged (pass-through debug callback).
+ */
+long BIO_debug_callback_ex(BIO *bio, int oper, const char *argp, size_t len,
+    int argi, long argl, int ret, size_t *processed);
+
+/**
+ * @brief Return the opaque callback-argument pointer stored on a BIO.
+ * @param b BIO to query.
+ * @return Pointer previously passed to BIO_set_callback_arg(), or NULL.
+ */
+char *BIO_get_callback_arg(const BIO *b);
+/**
+ * @brief Store an opaque pointer passed to BIO callbacks as the callback argument.
+ * @param b BIO whose callback argument is set.
+ * @param arg Opaque pointer (often a BIO* used for debug logging), or NULL.
+ */
+void BIO_set_callback_arg(BIO *b, char *arg);
+
+/**
+ * @brief Opaque BIO method table describing how a BIO type reads, writes, and controls I/O.
+ */
+typedef struct bio_method_st BIO_METHOD;
+
+/**
+ * @brief Return the human-readable name of the BIO_METHOD attached to @p b.
+ * @param b BIO whose method table is queried.
+ * @return Internal NUL-terminated method name string (do not free).
+ */
+const char *BIO_method_name(const BIO *b);
+/**
+ * @brief Return the BIO type code of the method used by @p b (BIO_TYPE_*).
+ * @param b BIO whose method type is queried.
+ * @return Type identifier such as BIO_TYPE_MEM or BIO_TYPE_SOCKET.
+ */
+int BIO_method_type(const BIO *b);
+
+/**
+ * @brief Ctrl-style info callback type used with BIO_callback_ctrl() / BIO_set_info_callback().
+ * @param b BIO being controlled.
+ * @param cmd BIO control command.
+ * @param arg Integer argument for the control operation.
+ * @return Command-specific result (usually 1 on success).
+ */
+typedef int BIO_info_cb(BIO *, int, int);
+/** @brief Backward-compatible alias for BIO_info_cb. */
+typedef BIO_info_cb bio_info_cb; /* backward compatibility */
+
+/**
+ * @brief Opaque STACK_OF(BIO) container type.
+ */
+struct stack_st_BIO;
+/* clang-format off */
+{-
+    generate_stack_macros("BIO");
+-}
+/* clang-format on */
+
+/**
+ * @brief Prefix/suffix producer for an ASN.1 filter BIO (BIO_f_asn1).
+ * @param b ASN.1 BIO requesting prefix or suffix octets.
+ * @param pbuf Receives a pointer to the produced buffer (owned per BIO_asn1_set_* contract).
+ * @param plen Receives the number of bytes at *@p pbuf.
+ * @param parg Opaque pointer from BIO_asn1_set_prefix() / BIO_asn1_set_suffix().
+ * @return 1 on success, or <=0 on failure.
+ */
+typedef int asn1_ps_func(BIO *b, unsigned char **pbuf, int *plen,
+    void *parg);
+
+/**
+ * @brief Callback invoked when an SCTP datagram BIO receives a notification message.
+ * @param b Datagram BIO that received the notification.
+ * @param context User pointer supplied when the handler was registered.
+ * @param buf Notification payload buffer (SCTP notification structure).
+ */
+typedef void (*BIO_dgram_sctp_notification_handler_fn)(BIO *b,
+    void *context,
+    void *buf);
+#ifndef OPENSSL_NO_SCTP
+/* SCTP parameter structs */
+struct bio_dgram_sctp_sndinfo {
+    uint16_t snd_sid;
+    uint16_t snd_flags;
+    uint32_t snd_ppid;
+    uint32_t snd_context;
+};
+
+struct bio_dgram_sctp_rcvinfo {
+    uint16_t rcv_sid;
+    uint16_t rcv_ssn;
+    uint16_t rcv_flags;
+    uint32_t rcv_ppid;
+    uint32_t rcv_tsn;
+    uint32_t rcv_cumtsn;
+    uint32_t rcv_context;
+};
+
+struct bio_dgram_sctp_prinfo {
+    uint16_t pr_policy;
+    uint32_t pr_value;
+};
+#endif
+
+/* BIO_sendmmsg/BIO_recvmmsg-related definitions */
+/**
+ * @brief Single message descriptor for BIO_sendmmsg() / BIO_recvmmsg().
+ */
+typedef struct bio_msg_st {
+    /** Message payload buffer for send or receive. */
+    void *data;
+    /** Length of @c data in bytes (send length or receive buffer capacity). */
+    size_t data_len;
+    /** Peer socket address associated with this message, or NULL if unused. */
+    BIO_ADDR *peer;
+    /** Local socket address associated with this message, or NULL if unused. */
+    BIO_ADDR *local;
+    /** Operation-specific flags (for example BIO_MSG_FLAG_*). */
+    uint64_t flags;
+} BIO_MSG;
+
+/**
+ * @brief Argument bundle passed to multi-message BIO callbacks (sendmmsg/recvmmsg).
+ */
+typedef struct bio_mmsg_cb_args_st {
+    /** Array of @c num_msg message descriptors spaced @c stride bytes apart. */
+    BIO_MSG *msg;
+    /** Byte stride between consecutive BIO_MSG elements in @c msg. */
+    size_t stride;
+    /** Number of BIO_MSG elements addressed by this multi-message operation. */
+    size_t num_msg;
+    /** Operation-specific flags mirrored from the BIO_sendmmsg()/BIO_recvmmsg() call. */
+    uint64_t flags;
+    /** Optional in/out count of messages processed by the operation. */
+    size_t *msgs_processed;
+} BIO_MMSG_CB_ARGS;
+
+#define BIO_POLL_DESCRIPTOR_TYPE_NONE 0
+#define BIO_POLL_DESCRIPTOR_TYPE_SOCK_FD 1
+#define BIO_POLL_DESCRIPTOR_TYPE_SSL 2
+#define BIO_POLL_DESCRIPTOR_CUSTOM_START 8192
+
+/**
+ * @brief Pollable I/O target returned by BIO_get_rpoll_descriptor / BIO_get_wpoll_descriptor.
+ */
+typedef struct bio_poll_descriptor_st {
+    /** Discriminator: BIO_POLL_DESCRIPTOR_TYPE_* (NONE, SOCK_FD, SSL, or custom). */
+    uint32_t type;
+    /**
+     * @brief Active poll target; which arm is valid depends on @c type.
+     */
+    union {
+        /** Socket or file descriptor when @c type is BIO_POLL_DESCRIPTOR_TYPE_SOCK_FD. */
+        int fd;
+        /** Application-defined pointer for custom poll descriptor types. */
+        void *custom;
+        /** Application-defined integer for custom poll descriptor types. */
+        uintptr_t custom_ui;
+        /** SSL object when @c type is BIO_POLL_DESCRIPTOR_TYPE_SSL. */
+        SSL *ssl;
+    } value;
+} BIO_POLL_DESCRIPTOR;
+
+/*
+ * #define BIO_CONN_get_param_hostname BIO_ctrl
+ */
+
+#define BIO_C_SET_CONNECT 100
+#define BIO_C_DO_STATE_MACHINE 101
+#define BIO_C_SET_NBIO 102
+/* # define BIO_C_SET_PROXY_PARAM                   103 */
+#define BIO_C_SET_FD 104
+#define BIO_C_GET_FD 105
+#define BIO_C_SET_FILE_PTR 106
+#define BIO_C_GET_FILE_PTR 107
+#define BIO_C_SET_FILENAME 108
+#define BIO_C_SET_SSL 109
+#define BIO_C_GET_SSL 110
+#define BIO_C_SET_MD 111
+#define BIO_C_GET_MD 112
+#define BIO_C_GET_CIPHER_STATUS 113
+#define BIO_C_SET_BUF_MEM 114
+#define BIO_C_GET_BUF_MEM_PTR 115
+#define BIO_C_GET_BUFF_NUM_LINES 116
+#define BIO_C_SET_BUFF_SIZE 117
+#define BIO_C_SET_ACCEPT 118
+#define BIO_C_SSL_MODE 119
+#define BIO_C_GET_MD_CTX 120
+/* # define BIO_C_GET_PROXY_PARAM                   121 */
+#define BIO_C_SET_BUFF_READ_DATA 122 /* data to read first */
+#define BIO_C_GET_CONNECT 123
+#define BIO_C_GET_ACCEPT 124
+#define BIO_C_SET_SSL_RENEGOTIATE_BYTES 125
+#define BIO_C_GET_SSL_NUM_RENEGOTIATES 126
+#define BIO_C_SET_SSL_RENEGOTIATE_TIMEOUT 127
+#define BIO_C_FILE_SEEK 128
+#define BIO_C_GET_CIPHER_CTX 129
+#define BIO_C_SET_BUF_MEM_EOF_RETURN 130 /* return end of input \
+                                          * value */
+#define BIO_C_SET_BIND_MODE 131
+#define BIO_C_GET_BIND_MODE 132
+#define BIO_C_FILE_TELL 133
+#define BIO_C_GET_SOCKS 134
+#define BIO_C_SET_SOCKS 135
+
+#define BIO_C_SET_WRITE_BUF_SIZE 136 /* for BIO_s_bio */
+#define BIO_C_GET_WRITE_BUF_SIZE 137
+#define BIO_C_MAKE_BIO_PAIR 138
+#define BIO_C_DESTROY_BIO_PAIR 139
+#define BIO_C_GET_WRITE_GUARANTEE 140
+#define BIO_C_GET_READ_REQUEST 141
+#define BIO_C_SHUTDOWN_WR 142
+#define BIO_C_NREAD0 143
+#define BIO_C_NREAD 144
+#define BIO_C_NWRITE0 145
+#define BIO_C_NWRITE 146
+#define BIO_C_RESET_READ_REQUEST 147
+#define BIO_C_SET_MD_CTX 148
+
+#define BIO_C_SET_PREFIX 149
+#define BIO_C_GET_PREFIX 150
+#define BIO_C_SET_SUFFIX 151
+#define BIO_C_GET_SUFFIX 152
+
+#define BIO_C_SET_EX_ARG 153
+#define BIO_C_GET_EX_ARG 154
+
+#define BIO_C_SET_CONNECT_MODE 155
+
+#define BIO_C_SET_TFO 156 /* like BIO_C_SET_NBIO */
+
+#define BIO_C_SET_SOCK_TYPE 157
+#define BIO_C_GET_SOCK_TYPE 158
+#define BIO_C_GET_DGRAM_BIO 159
+
+#define BIO_set_app_data(s, arg) BIO_set_ex_data(s, 0, arg)
+#define BIO_get_app_data(s) BIO_get_ex_data(s, 0)
+
+#define BIO_set_nbio(b, n) BIO_ctrl(b, BIO_C_SET_NBIO, (n), NULL)
+#define BIO_set_tfo(b, n) BIO_ctrl(b, BIO_C_SET_TFO, (n), NULL)
+
+#ifndef OPENSSL_NO_SOCK
+/* IP families we support, for BIO_s_connect() and BIO_s_accept() */
+/* Note: the underlying operating system may not support some of them */
+#define BIO_FAMILY_IPV4 4
+#define BIO_FAMILY_IPV6 6
+#define BIO_FAMILY_IPANY 256
+
+/* BIO_s_connect() */
+#define BIO_set_conn_hostname(b, name) BIO_ctrl(b, BIO_C_SET_CONNECT, 0, \
+    (char *)(name))
+#define BIO_set_conn_port(b, port) BIO_ctrl(b, BIO_C_SET_CONNECT, 1, \
+    (char *)(port))
+#define BIO_set_conn_address(b, addr) BIO_ctrl(b, BIO_C_SET_CONNECT, 2, \
+    (char *)(addr))
+#define BIO_set_conn_ip_family(b, f) BIO_int_ctrl(b, BIO_C_SET_CONNECT, 3, f)
+#define BIO_get_conn_hostname(b) ((const char *)BIO_ptr_ctrl(b, BIO_C_GET_CONNECT, 0))
+#define BIO_get_conn_port(b) ((const char *)BIO_ptr_ctrl(b, BIO_C_GET_CONNECT, 1))
+#define BIO_get_conn_address(b) ((const BIO_ADDR *)BIO_ptr_ctrl(b, BIO_C_GET_CONNECT, 2))
+#define BIO_get_conn_ip_family(b) BIO_ctrl(b, BIO_C_GET_CONNECT, 3, NULL)
+#define BIO_get_conn_mode(b) BIO_ctrl(b, BIO_C_GET_CONNECT, 4, NULL)
+#define BIO_set_conn_mode(b, n) BIO_ctrl(b, BIO_C_SET_CONNECT_MODE, (n), NULL)
+#define BIO_set_sock_type(b, t) BIO_ctrl(b, BIO_C_SET_SOCK_TYPE, (t), NULL)
+#define BIO_get_sock_type(b) BIO_ctrl(b, BIO_C_GET_SOCK_TYPE, 0, NULL)
+#define BIO_get0_dgram_bio(b, p) BIO_ctrl(b, BIO_C_GET_DGRAM_BIO, 0, (void *)(BIO **)(p))
+
+/* BIO_s_accept() */
+#define BIO_set_accept_name(b, name) BIO_ctrl(b, BIO_C_SET_ACCEPT, 0, \
+    (char *)(name))
+#define BIO_set_accept_port(b, port) BIO_ctrl(b, BIO_C_SET_ACCEPT, 1, \
+    (char *)(port))
+#define BIO_get_accept_name(b) ((const char *)BIO_ptr_ctrl(b, BIO_C_GET_ACCEPT, 0))
+#define BIO_get_accept_port(b) ((const char *)BIO_ptr_ctrl(b, BIO_C_GET_ACCEPT, 1))
+#define BIO_get_peer_name(b) ((const char *)BIO_ptr_ctrl(b, BIO_C_GET_ACCEPT, 2))
+#define BIO_get_peer_port(b) ((const char *)BIO_ptr_ctrl(b, BIO_C_GET_ACCEPT, 3))
+/* #define BIO_set_nbio(b,n)    BIO_ctrl(b,BIO_C_SET_NBIO,(n),NULL) */
+#define BIO_set_nbio_accept(b, n) BIO_ctrl(b, BIO_C_SET_ACCEPT, 2, (n) ? (void *)"a" : NULL)
+#define BIO_set_accept_bios(b, bio) BIO_ctrl(b, BIO_C_SET_ACCEPT, 3, \
+    (char *)(bio))
+#define BIO_set_accept_ip_family(b, f) BIO_int_ctrl(b, BIO_C_SET_ACCEPT, 4, f)
+#define BIO_get_accept_ip_family(b) BIO_ctrl(b, BIO_C_GET_ACCEPT, 4, NULL)
+#define BIO_set_tfo_accept(b, n) BIO_ctrl(b, BIO_C_SET_ACCEPT, 5, (n) ? (void *)"a" : NULL)
+
+/* Aliases kept for backward compatibility */
+#define BIO_BIND_NORMAL 0
+#define BIO_BIND_REUSEADDR BIO_SOCK_REUSEADDR
+#define BIO_BIND_REUSEADDR_IF_UNUSED BIO_SOCK_REUSEADDR
+#define BIO_set_bind_mode(b, mode) BIO_ctrl(b, BIO_C_SET_BIND_MODE, mode, NULL)
+#define BIO_get_bind_mode(b) BIO_ctrl(b, BIO_C_GET_BIND_MODE, 0, NULL)
+#endif /* OPENSSL_NO_SOCK */
+
+#define BIO_do_connect(b) BIO_do_handshake(b)
+#define BIO_do_accept(b) BIO_do_handshake(b)
+
+#define BIO_do_handshake(b) BIO_ctrl(b, BIO_C_DO_STATE_MACHINE, 0, NULL)
+
+/* BIO_s_datagram(), BIO_s_fd(), BIO_s_socket(), BIO_s_accept() and BIO_s_connect() */
+#define BIO_set_fd(b, fd, c) BIO_int_ctrl(b, BIO_C_SET_FD, c, fd)
+#define BIO_get_fd(b, c) BIO_ctrl(b, BIO_C_GET_FD, 0, (char *)(c))
+
+/* BIO_s_file() */
+#define BIO_set_fp(b, fp, c) BIO_ctrl(b, BIO_C_SET_FILE_PTR, c, (char *)(fp))
+#define BIO_get_fp(b, fpp) BIO_ctrl(b, BIO_C_GET_FILE_PTR, 0, (char *)(fpp))
+
+/* BIO_s_fd() and BIO_s_file() */
+#define BIO_seek(b, ofs) (int)BIO_ctrl(b, BIO_C_FILE_SEEK, ofs, NULL)
+#define BIO_tell(b) (int)BIO_ctrl(b, BIO_C_FILE_TELL, 0, NULL)
+
+/*
+ * name is cast to lose const, but might be better to route through a
+ * function so we can do it safely
+ */
+#ifdef CONST_STRICT
+/*
+ * If you are wondering why this isn't defined, its because CONST_STRICT is
+ * purely a compile-time kludge to allow const to be checked.
+ */
+int BIO_read_filename(BIO *b, const char *name);
+#else
+#define BIO_read_filename(b, name) (int)BIO_ctrl(b, BIO_C_SET_FILENAME, \
+    BIO_CLOSE | BIO_FP_READ, (char *)(name))
+#endif
+#define BIO_write_filename(b, name) (int)BIO_ctrl(b, BIO_C_SET_FILENAME, \
+    BIO_CLOSE | BIO_FP_WRITE, name)
+#define BIO_append_filename(b, name) (int)BIO_ctrl(b, BIO_C_SET_FILENAME, \
+    BIO_CLOSE | BIO_FP_APPEND, name)
+#define BIO_rw_filename(b, name) (int)BIO_ctrl(b, BIO_C_SET_FILENAME, \
+    BIO_CLOSE | BIO_FP_READ | BIO_FP_WRITE, name)
+
+/*
+ * WARNING WARNING, this ups the reference count on the read bio of the SSL
+ * structure.  This is because the ssl read BIO is now pointed to by the
+ * next_bio field in the bio.  So when you free the BIO, make sure you are
+ * doing a BIO_free_all() to catch the underlying BIO.
+ */
+#define BIO_set_ssl(b, ssl, c) BIO_ctrl(b, BIO_C_SET_SSL, c, (char *)(ssl))
+#define BIO_get_ssl(b, sslp) BIO_ctrl(b, BIO_C_GET_SSL, 0, (char *)(sslp))
+#define BIO_set_ssl_mode(b, client) BIO_ctrl(b, BIO_C_SSL_MODE, client, NULL)
+#define BIO_set_ssl_renegotiate_bytes(b, num) \
+    BIO_ctrl(b, BIO_C_SET_SSL_RENEGOTIATE_BYTES, num, NULL)
+#define BIO_get_num_renegotiates(b) \
+    BIO_ctrl(b, BIO_C_GET_SSL_NUM_RENEGOTIATES, 0, NULL)
+#define BIO_set_ssl_renegotiate_timeout(b, seconds) \
+    BIO_ctrl(b, BIO_C_SET_SSL_RENEGOTIATE_TIMEOUT, seconds, NULL)
+
+/* defined in evp.h */
+/* #define BIO_set_md(b,md)     BIO_ctrl(b,BIO_C_SET_MD,1,(char *)(md)) */
+
+#define BIO_get_mem_data(b, pp) BIO_ctrl(b, BIO_CTRL_INFO, 0, (char *)(pp))
+#define BIO_set_mem_buf(b, bm, c) BIO_ctrl(b, BIO_C_SET_BUF_MEM, c, (char *)(bm))
+#define BIO_get_mem_ptr(b, pp) BIO_ctrl(b, BIO_C_GET_BUF_MEM_PTR, 0, \
+    (char *)(pp))
+#define BIO_set_mem_eof_return(b, v) \
+    BIO_ctrl(b, BIO_C_SET_BUF_MEM_EOF_RETURN, v, NULL)
+
+/* For the BIO_f_buffer() type */
+#define BIO_get_buffer_num_lines(b) BIO_ctrl(b, BIO_C_GET_BUFF_NUM_LINES, 0, NULL)
+#define BIO_set_buffer_size(b, size) BIO_ctrl(b, BIO_C_SET_BUFF_SIZE, size, NULL)
+#define BIO_set_read_buffer_size(b, size) BIO_int_ctrl(b, BIO_C_SET_BUFF_SIZE, size, 0)
+#define BIO_set_write_buffer_size(b, size) BIO_int_ctrl(b, BIO_C_SET_BUFF_SIZE, size, 1)
+#define BIO_set_buffer_read_data(b, buf, num) BIO_ctrl(b, BIO_C_SET_BUFF_READ_DATA, num, buf)
+
+/* Don't use the next one unless you know what you are doing :-) */
+#define BIO_dup_state(b, ret) BIO_ctrl(b, BIO_CTRL_DUP, 0, (char *)(ret))
+
+#define BIO_reset(b) (int)BIO_ctrl(b, BIO_CTRL_RESET, 0, NULL)
+#define BIO_eof(b) (int)BIO_ctrl(b, BIO_CTRL_EOF, 0, NULL)
+#define BIO_set_close(b, c) (int)BIO_ctrl(b, BIO_CTRL_SET_CLOSE, (c), NULL)
+#define BIO_get_close(b) (int)BIO_ctrl(b, BIO_CTRL_GET_CLOSE, 0, NULL)
+#define BIO_pending(b) (int)BIO_ctrl(b, BIO_CTRL_PENDING, 0, NULL)
+#define BIO_wpending(b) (int)BIO_ctrl(b, BIO_CTRL_WPENDING, 0, NULL)
+/* ...pending macros have inappropriate return type */
+/**
+ * @brief Return the number of bytes buffered for reading in a BIO (ctrl pending read count).
+ * @param b BIO to query.
+ * @return Pending readable byte count.
+ */
+size_t BIO_ctrl_pending(BIO *b);
+/**
+ * @brief Return the number of bytes buffered for writing in a BIO (ctrl pending write count).
+ * @param b BIO to query.
+ * @return Pending write byte count.
+ */
+size_t BIO_ctrl_wpending(BIO *b);
+#define BIO_flush(b) (int)BIO_ctrl(b, BIO_CTRL_FLUSH, 0, NULL)
+#define BIO_get_info_callback(b, cbp) (int)BIO_ctrl(b, BIO_CTRL_GET_CALLBACK, 0, \
+    cbp)
+#define BIO_set_info_callback(b, cb) (int)BIO_callback_ctrl(b, BIO_CTRL_SET_CALLBACK, cb)
+
+/* For the BIO_f_buffer() type */
+#define BIO_buffer_get_num_lines(b) BIO_ctrl(b, BIO_CTRL_GET, 0, NULL)
+#define BIO_buffer_peek(b, s, l) BIO_ctrl(b, BIO_CTRL_PEEK, (l), (s))
+
+/* For BIO_s_bio() */
+#define BIO_set_write_buf_size(b, size) (int)BIO_ctrl(b, BIO_C_SET_WRITE_BUF_SIZE, size, NULL)
+#define BIO_get_write_buf_size(b, size) (size_t)BIO_ctrl(b, BIO_C_GET_WRITE_BUF_SIZE, size, NULL)
+#define BIO_make_bio_pair(b1, b2) (int)BIO_ctrl(b1, BIO_C_MAKE_BIO_PAIR, 0, b2)
+#define BIO_destroy_bio_pair(b) (int)BIO_ctrl(b, BIO_C_DESTROY_BIO_PAIR, 0, NULL)
+#define BIO_shutdown_wr(b) (int)BIO_ctrl(b, BIO_C_SHUTDOWN_WR, 0, NULL)
+/* macros with inappropriate type -- but ...pending macros use int too: */
+#define BIO_get_write_guarantee(b) (int)BIO_ctrl(b, BIO_C_GET_WRITE_GUARANTEE, 0, NULL)
+#define BIO_get_read_request(b) (int)BIO_ctrl(b, BIO_C_GET_READ_REQUEST, 0, NULL)
+/**
+ * @brief Return how many bytes can currently be written without blocking or growing buffers.
+ * @param b Buffering BIO to query.
+ * @return Guaranteed writable byte count.
+ */
+size_t BIO_ctrl_get_write_guarantee(BIO *b);
+size_t BIO_ctrl_get_read_request(BIO *b);
+/**
+ * @brief Clear the pending read-request size tracked by a buffering BIO.
+ * @param b BIO whose read-request state is reset.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_ctrl_reset_read_request(BIO *b);
+
+/* ctrl macros for dgram */
+#define BIO_ctrl_dgram_connect(b, peer) \
+    (int)BIO_ctrl(b, BIO_CTRL_DGRAM_CONNECT, 0, (char *)(peer))
+#define BIO_ctrl_set_connected(b, peer) \
+    (int)BIO_ctrl(b, BIO_CTRL_DGRAM_SET_CONNECTED, 0, (char *)(peer))
+#define BIO_dgram_recv_timedout(b) \
+    (int)BIO_ctrl(b, BIO_CTRL_DGRAM_GET_RECV_TIMER_EXP, 0, NULL)
+#define BIO_dgram_send_timedout(b) \
+    (int)BIO_ctrl(b, BIO_CTRL_DGRAM_GET_SEND_TIMER_EXP, 0, NULL)
+#define BIO_dgram_get_peer(b, peer) \
+    (int)BIO_ctrl(b, BIO_CTRL_DGRAM_GET_PEER, 0, (char *)(peer))
+#define BIO_dgram_set_peer(b, peer) \
+    (int)BIO_ctrl(b, BIO_CTRL_DGRAM_SET_PEER, 0, (char *)(peer))
+#define BIO_dgram_detect_peer_addr(b, peer) \
+    (int)BIO_ctrl(b, BIO_CTRL_DGRAM_DETECT_PEER_ADDR, 0, (char *)(peer))
+#define BIO_dgram_get_mtu_overhead(b) \
+    (unsigned int)BIO_ctrl((b), BIO_CTRL_DGRAM_GET_MTU_OVERHEAD, 0, NULL)
+#define BIO_dgram_get_local_addr_cap(b) \
+    (int)BIO_ctrl((b), BIO_CTRL_DGRAM_GET_LOCAL_ADDR_CAP, 0, NULL)
+#define BIO_dgram_get_local_addr_enable(b, penable) \
+    (int)BIO_ctrl((b), BIO_CTRL_DGRAM_GET_LOCAL_ADDR_ENABLE, 0, (char *)(penable))
+#define BIO_dgram_set_local_addr_enable(b, enable) \
+    (int)BIO_ctrl((b), BIO_CTRL_DGRAM_SET_LOCAL_ADDR_ENABLE, (enable), NULL)
+#define BIO_dgram_get_effective_caps(b) \
+    (uint32_t)BIO_ctrl((b), BIO_CTRL_DGRAM_GET_EFFECTIVE_CAPS, 0, NULL)
+#define BIO_dgram_get_caps(b) \
+    (uint32_t)BIO_ctrl((b), BIO_CTRL_DGRAM_GET_CAPS, 0, NULL)
+#define BIO_dgram_set_caps(b, caps) \
+    (int)BIO_ctrl((b), BIO_CTRL_DGRAM_SET_CAPS, (long)(caps), NULL)
+#define BIO_dgram_get_no_trunc(b) \
+    (unsigned int)BIO_ctrl((b), BIO_CTRL_DGRAM_GET_NO_TRUNC, 0, NULL)
+#define BIO_dgram_set_no_trunc(b, enable) \
+    (int)BIO_ctrl((b), BIO_CTRL_DGRAM_SET_NO_TRUNC, (enable), NULL)
+#define BIO_dgram_get_mtu(b) \
+    (unsigned int)BIO_ctrl((b), BIO_CTRL_DGRAM_GET_MTU, 0, NULL)
+#define BIO_dgram_set_mtu(b, mtu) \
+    (int)BIO_ctrl((b), BIO_CTRL_DGRAM_SET_MTU, (mtu), NULL)
+
+/* ctrl macros for BIO_f_prefix */
+#define BIO_set_prefix(b, p) BIO_ctrl((b), BIO_CTRL_SET_PREFIX, 0, (void *)(p))
+#define BIO_set_indent(b, i) BIO_ctrl((b), BIO_CTRL_SET_INDENT, (i), NULL)
+#define BIO_get_indent(b) BIO_ctrl((b), BIO_CTRL_GET_INDENT, 0, NULL)
+
+#define BIO_get_ex_new_index(l, p, newf, dupf, freef) \
+    CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_BIO, l, p, newf, dupf, freef)
+/**
+ * @brief Store application-specific data on a BIO at the given ex_data index.
+ * @param bio BIO that owns the ex_data table.
+ * @param idx Index obtained from BIO_get_ex_new_index() (or 0 for app data).
+ * @param data Pointer to store; ownership and lifetime are caller-defined.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_set_ex_data(BIO *bio, int idx, void *data);
+/**
+ * @brief Retrieve application data previously stored on a BIO with BIO_set_ex_data().
+ * @param bio BIO to query.
+ * @param idx Ex-data index from BIO_get_ex_new_index() or a class-specific allocator.
+ * @return Stored pointer, or NULL if unset.
+ */
+void *BIO_get_ex_data(const BIO *bio, int idx);
+/**
+ * @brief Return the cumulative number of bytes successfully read through a BIO.
+ * @param bio BIO whose read counter is queried.
+ * @return Total bytes read since the BIO was created.
+ */
+uint64_t BIO_number_read(BIO *bio);
+/**
+ * @brief Return the cumulative number of bytes successfully written through a BIO.
+ * @param bio BIO whose write counter is queried.
+ * @return Total bytes written since the BIO was created.
+ */
+uint64_t BIO_number_written(BIO *bio);
+
+/* For BIO_f_asn1() */
+/**
+ * @brief Install prefix encode/free callbacks on a BIO_f_asn1() filter BIO.
+ * @param b ASN.1 filter BIO to configure.
+ * @param prefix Callback that writes prefix octets before each ASN.1 item, or NULL.
+ * @param prefix_free Optional cleanup for prefix state, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_asn1_set_prefix(BIO *b, asn1_ps_func *prefix,
+    asn1_ps_func *prefix_free);
+/**
+ * @brief Retrieve the ASN.1 prefix producer and optional free callback from a BIO.
+ * @param b ASN.1 filter BIO (BIO_f_asn1).
+ * @param pprefix Receives the prefix producer, or NULL if unset.
+ * @param pprefix_free Receives the matching free callback, or NULL if unset.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_asn1_get_prefix(BIO *b, asn1_ps_func **pprefix,
+    asn1_ps_func **pprefix_free);
+/**
+ * @brief Install suffix encode/free callbacks on a BIO_f_asn1() filter BIO.
+ * @param b ASN.1 filter BIO to configure.
+ * @param suffix Callback that writes suffix octets after each ASN.1 item, or NULL.
+ * @param suffix_free Optional cleanup for suffix state, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_asn1_set_suffix(BIO *b, asn1_ps_func *suffix,
+    asn1_ps_func *suffix_free);
+/**
+ * @brief Retrieve the ASN.1 suffix producer and optional free callback from a BIO.
+ * @param b ASN.1 filter BIO (BIO_f_asn1).
+ * @param psuffix Receives the suffix producer, or NULL if unset.
+ * @param psuffix_free Receives the matching free callback, or NULL if unset.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_asn1_get_suffix(BIO *b, asn1_ps_func **psuffix,
+    asn1_ps_func **psuffix_free);
+
+/**
+ * @brief Return the BIO_METHOD for stdio FILE-backed source/sink BIOs.
+ * @return Pointer to the internal file BIO method table.
+ */
+const BIO_METHOD *BIO_s_file(void);
+/**
+ * @brief Open @p filename and wrap it in a BIO_s_file() BIO.
+ * @param filename Path to open.
+ * @param mode stdio-style mode string (for example "r" or "w").
+ * @return New file BIO, or NULL on error.
+ */
+BIO *BIO_new_file(const char *filename, const char *mode);
+/**
+ * @brief Wrap a provider OSSL_CORE_BIO in a library BIO_s_core() BIO.
+ * @param libctx Library context for the new BIO, or NULL for the default.
+ * @param corebio Provider core BIO to wrap (ownership rules follow the provider API).
+ * @return New core BIO, or NULL on error.
+ */
+BIO *BIO_new_from_core_bio(OSSL_LIB_CTX *libctx, OSSL_CORE_BIO *corebio);
+#ifndef OPENSSL_NO_STDIO
+/**
+ * @brief Wrap a stdio FILE* in a BIO_s_file() BIO.
+ * @param stream FILE handle to associate with the BIO.
+ * @param close_flag BIO_CLOSE to fclose @p stream when the BIO is freed, or BIO_NOCLOSE.
+ * @return New file BIO, or NULL on error.
+ */
+BIO *BIO_new_fp(FILE *stream, int close_flag);
+#endif
+/**
+ * @brief Allocate a new BIO for @p method using the given library context.
+ * @param libctx Library context associated with the BIO, or NULL for the default.
+ * @param method BIO method that defines the BIO's behaviour.
+ * @return New BIO, or NULL on allocation failure.
+ */
+BIO *BIO_new_ex(OSSL_LIB_CTX *libctx, const BIO_METHOD *method);
+/**
+ * @brief Allocate a new BIO using @p type and the default library context.
+ * @param type BIO_METHOD such as BIO_s_mem() or BIO_s_file().
+ * @return New BIO, or NULL on failure; free with BIO_free() / BIO_free_all().
+ */
+BIO *BIO_new(const BIO_METHOD *type);
+/**
+ * @brief Free a single BIO (does not free BIOs linked after it in a chain).
+ * @param a BIO to free; NULL is ignored.
+ * @return 1 on success, or 0 on failure.
+ *
+ * To free an entire chain, use BIO_free_all() / BIO_vfree().
+ */
+int BIO_free(BIO *a);
+/**
+ * @brief Store an implementation-specific pointer on a BIO (used by custom BIO methods).
+ * @param a BIO whose app-data pointer is set.
+ * @param ptr Opaque pointer for the BIO method implementation.
+ */
+void BIO_set_data(BIO *a, void *ptr);
+/**
+ * @brief Return the implementation-specific pointer stored on a BIO.
+ * @param a BIO to query.
+ * @return Opaque pointer previously set with BIO_set_data(), or NULL.
+ */
+void *BIO_get_data(BIO *a);
+/**
+ * @brief Mark whether a custom BIO method has completed its create() initialization.
+ * @param a BIO whose init flag is updated.
+ * @param init Non-zero after BIO_meth create() succeeds; 0 before initialization.
+ */
+void BIO_set_init(BIO *a, int init);
+/**
+ * @brief Test whether a custom BIO has been initialized by its create() callback.
+ * @param a BIO to query.
+ * @return Non-zero if initialized, or 0 otherwise.
+ */
+int BIO_get_init(BIO *a);
+/**
+ * @brief Set whether BIO_free() should close the underlying I/O resource.
+ * @param a BIO to update.
+ * @param shut Non-zero to close the underlying descriptor/handle on free; 0 to leave it open.
+ */
+void BIO_set_shutdown(BIO *a, int shut);
+/**
+ * @brief Return whether BIO_free() will close the underlying I/O resource.
+ * @param a BIO to query.
+ * @return Non-zero if the underlying descriptor/handle is closed on free; 0 otherwise.
+ */
+int BIO_get_shutdown(BIO *a);
+/**
+ * @brief Free a BIO and every BIO linked after it in the chain.
+ * @param a First BIO in the chain to free; NULL is ignored.
+ */
+void BIO_vfree(BIO *a);
+/**
+ * @brief Increment the reference count of a BIO.
+ * @param a BIO to reference.
+ * @return 1 on success, or 0 if reference counting is unavailable.
+ */
+int BIO_up_ref(BIO *a);
+/**
+ * @brief Read up to @p dlen bytes from BIO @p b into @p data.
+ * @param b Source BIO.
+ * @param data Destination buffer.
+ * @param dlen Maximum number of bytes to read (must be non-negative and fit in int).
+ * @return Number of bytes read, 0 on EOF/no data, or a negative value on error (see BIO_should_retry).
+ */
+int BIO_read(BIO *b, void *data, int dlen);
+/**
+ * @brief Attempt to read up to @p dlen bytes from BIO @p b into @p data.
+ * @param b BIO to read from.
+ * @param data Destination buffer for the bytes read.
+ * @param dlen Maximum number of bytes to read.
+ * @param readbytes On success, receives the number of bytes actually read.
+ * @return 1 if any data was successfully read, or 0 otherwise.
+ */
+int BIO_read_ex(BIO *b, void *data, size_t dlen, size_t *readbytes);
+/**
+ * @brief Receive multiple datagram messages through a BIO (recvmmsg-style).
+ * @param b Datagram-capable BIO.
+ * @param msg Array of BIO_MSG descriptors to fill.
+ * @param stride Byte stride between consecutive BIO_MSG elements.
+ * @param num_msg Number of messages that may be received into @p msg.
+ * @param flags Implementation-specific receive flags (often 0).
+ * @param msgs_processed Receives how many messages were filled.
+ * @return 1 on success, 0 on retry/failure (check BIO_should_retry()).
+ */
+__owur int BIO_recvmmsg(BIO *b, BIO_MSG *msg,
+    size_t stride, size_t num_msg, uint64_t flags,
+    size_t *msgs_processed);
+/**
+ * @brief Read a line from a BIO into @p buf (NUL-terminated; strips trailing newline when present).
+ * @param bp Source BIO.
+ * @param buf Destination buffer.
+ * @param size Capacity of @p buf in bytes.
+ * @return Number of bytes read (excluding NUL), 0 on EOF, or a negative value on error.
+ */
+int BIO_gets(BIO *bp, char *buf, int size);
+/**
+ * @brief Read bytes until a newline or EOF, without requiring a trailing NUL in the source.
+ * @param bio Source BIO.
+ * @param buf Destination buffer.
+ * @param size Capacity of @p buf in bytes.
+ * @return Number of bytes stored, 0 on EOF with no data, or a negative value on error.
+ */
+int BIO_get_line(BIO *bio, char *buf, int size);
+/**
+ * @brief Write @p dlen bytes from @p data to a BIO.
+ * @param b Destination BIO.
+ * @param data Bytes to write.
+ * @param dlen Number of bytes to write (must fit in int).
+ * @return Number of bytes written, or a negative value on error (see BIO_should_retry).
+ */
+int BIO_write(BIO *b, const void *data, int dlen);
+/**
+ * @brief Write up to @p dlen bytes from @p data to a BIO.
+ * @param b Destination BIO.
+ * @param data Bytes to write.
+ * @param dlen Number of bytes to write.
+ * @param written On success, receives the number of bytes actually written.
+ * @return 1 if any data was written, or 0 otherwise.
+ */
+int BIO_write_ex(BIO *b, const void *data, size_t dlen, size_t *written);
+/**
+ * @brief Send multiple messages through a BIO (sendmmsg-style interface).
+ * @param b Destination BIO supporting multi-message send.
+ * @param msg Array (or strided sequence) of BIO_MSG descriptors to send.
+ * @param stride Byte stride between consecutive BIO_MSG elements (usually sizeof(BIO_MSG)).
+ * @param num_msg Number of messages in the @p msg sequence.
+ * @param flags Operation flags passed to the BIO method implementation.
+ * @param msgs_processed Receives how many messages were successfully processed, or NULL.
+ * @return 1 on success, or 0 on failure (see BIO_should_retry).
+ */
+__owur int BIO_sendmmsg(BIO *b, BIO_MSG *msg,
+    size_t stride, size_t num_msg, uint64_t flags,
+    size_t *msgs_processed);
+/**
+ * @brief Fill @p desc with the pollable read-side target for a BIO (if any).
+ * @param b BIO to query.
+ * @param desc Receives type/discriminator and fd/ssl/custom value for polling.
+ * @return 1 if a descriptor was returned, or 0 if none / unsupported.
+ */
+__owur int BIO_get_rpoll_descriptor(BIO *b, BIO_POLL_DESCRIPTOR *desc);
+/**
+ * @brief Fill @p desc with the pollable write-side target for a BIO (if any).
+ * @param b BIO to query.
+ * @param desc Receives type/discriminator and fd/ssl/custom value for polling.
+ * @return 1 if a descriptor was returned, or 0 if none / unsupported.
+ */
+__owur int BIO_get_wpoll_descriptor(BIO *b, BIO_POLL_DESCRIPTOR *desc);
+/**
+ * @brief Write the NUL-terminated string @p buf to BIO @p bp.
+ * @param bp Destination BIO.
+ * @param buf C string to write (excluding the terminating NUL).
+ * @return Number of bytes written, or a negative value on error.
+ */
+int BIO_puts(BIO *bp, const char *buf);
+/**
+ * @brief Write up to @p max spaces of indentation to a BIO.
+ * @param b Destination BIO.
+ * @param indent Desired indentation depth in spaces.
+ * @param max Maximum spaces actually written (clamps @p indent).
+ * @return 1 on success, or 0 on write failure.
+ */
+int BIO_indent(BIO *b, int indent, int max);
+/**
+ * @brief Invoke a type-specific control operation on a BIO.
+ * @param bp BIO to control.
+ * @param cmd BIO_CTRL_* (or type-specific) command code.
+ * @param larg Integer/long argument for @p cmd.
+ * @param parg Pointer argument for @p cmd, or NULL.
+ * @return Command-specific long result; often 1 for success and 0/negative for failure.
+ */
+long BIO_ctrl(BIO *bp, int cmd, long larg, void *parg);
+/**
+ * @brief Invoke a BIO ctrl that takes a BIO_info_cb callback pointer.
+ * @param b BIO to control.
+ * @param cmd Control command (for example BIO_CTRL_SET_CALLBACK).
+ * @param fp Callback function pointer passed as the ctrl argument.
+ * @return Command-specific long result, or <=0 on error depending on @p cmd.
+ */
+long BIO_callback_ctrl(BIO *b, int cmd, BIO_info_cb *fp);
+/**
+ * @brief Invoke a BIO ctrl that returns a pointer result.
+ * @param bp BIO to control.
+ * @param cmd Control command that yields a pointer (for example BIO_C_GET_BUF_MEM).
+ * @param larg Long argument passed through to BIO_ctrl().
+ * @return Pointer returned by the ctrl implementation, or NULL.
+ */
+void *BIO_ptr_ctrl(BIO *bp, int cmd, long larg);
+/**
+ * @brief Invoke a BIO ctrl that takes an integer argument in the low word.
+ * @param bp BIO to control.
+ * @param cmd Control command.
+ * @param larg Long argument for the control operation.
+ * @param iarg Integer argument packed into the ctrl call.
+ * @return Command-specific long result, or <=0 on error depending on @p cmd.
+ */
+long BIO_int_ctrl(BIO *bp, int cmd, long larg, int iarg);
+/**
+ * @brief Append @p append to the filter chain rooted at @p b and return the new head.
+ * @param b Head of the existing BIO chain.
+ * @param append BIO to link after the tail of @p b's chain.
+ * @return @p b (unchanged head pointer).
+ */
+BIO *BIO_push(BIO *b, BIO *append);
+/**
+ * @brief Remove the first BIO from a chain and return the new head.
+ * @param b BIO at the head of a chain (may be the only BIO).
+ * @return The next BIO in the chain, or NULL if @p b was the last BIO.
+ */
+BIO *BIO_pop(BIO *b);
+/**
+ * @brief Free @p a and every BIO linked after it in the chain (alias for BIO_vfree()).
+ * @param a First BIO in the chain to free; NULL is ignored.
+ */
+void BIO_free_all(BIO *a);
+/**
+ * @brief Walk a BIO chain and return the first BIO whose method type matches @p bio_type.
+ * @param b Starting BIO in the chain (may be a filter or source/sink).
+ * @param bio_type BIO_TYPE_* mask or exact type to match.
+ * @return Matching BIO in the chain, or NULL if none matches.
+ */
+BIO *BIO_find_type(BIO *b, int bio_type);
+/**
+ * @brief Return the next BIO in a filter chain after @p b.
+ * @param b BIO whose successor is requested.
+ * @return Next BIO in the chain, or NULL if @p b is the last / has no next.
+ */
+BIO *BIO_next(BIO *b);
+/**
+ * @brief Set the next BIO in a filter chain after @p b.
+ * @param b BIO whose successor is replaced.
+ * @param next BIO to become the next filter, or NULL to clear the link.
+ */
+void BIO_set_next(BIO *b, BIO *next);
+/**
+ * @brief Walk a BIO chain after BIO_should_io_special() and locate the BIO requesting a retry.
+ * @param bio Starting BIO (usually the application-facing filter).
+ * @param reason Receives a BIO_RR_* reason code when non-NULL.
+ * @return The BIO in the chain that set the special condition, or NULL if none.
+ */
+BIO *BIO_get_retry_BIO(BIO *bio, int *reason);
+/**
+ * @brief Return the BIO_RR_* retry reason stored on a BIO.
+ * @param bio BIO previously returned by BIO_get_retry_BIO().
+ * @return Retry reason code (for example BIO_RR_CONNECT).
+ */
+int BIO_get_retry_reason(BIO *bio);
+/**
+ * @brief Store a BIO_RR_* retry reason on a BIO (used by BIO methods after special I/O).
+ * @param bio BIO that requested a special retry condition.
+ * @param reason Retry reason code (for example BIO_RR_CONNECT).
+ */
+void BIO_set_retry_reason(BIO *bio, int reason);
+/**
+ * @brief Duplicate an entire BIO chain, copying type-specific state where supported.
+ * @param in Head of the chain to duplicate.
+ * @return Newly allocated chain mirroring @p in, or NULL on failure.
+ */
+BIO *BIO_dup_chain(BIO *in);
+
+/**
+ * @brief Peek at readable bytes in a memory BIO without consuming them.
+ * @param bio Memory BIO to inspect.
+ * @param buf Receives a pointer into the BIO's internal buffer (valid until the next modify).
+ * @return Number of bytes available at *@p buf, or a negative value on error.
+ */
+int BIO_nread0(BIO *bio, char **buf);
+/**
+ * @brief Consume up to @p num bytes from a memory BIO, returning an internal pointer.
+ * @param bio Memory BIO to read from.
+ * @param buf Receives a pointer into the BIO's internal buffer (valid until the next modify).
+ * @param num Maximum number of bytes to consume.
+ * @return Number of bytes made available at *@p buf, or a negative value on error.
+ */
+int BIO_nread(BIO *bio, char **buf, int num);
+/**
+ * @brief Obtain a writable buffer from a memory BIO without advancing the write pointer.
+ * @param bio Memory BIO to write into.
+ * @param buf Receives a pointer into the BIO's internal buffer (valid until the next modify).
+ * @return Number of bytes available at *@p buf, or a negative value on error.
+ *
+ * Call BIO_nwrite() afterward to commit written bytes, or use BIO_nwrite() directly.
+ */
+int BIO_nwrite0(BIO *bio, char **buf);
+/**
+ * @brief Obtain a writable buffer from a memory BIO and advance its write pointer.
+ * @param bio Memory BIO to write into.
+ * @param buf Receives a pointer into the BIO's internal buffer.
+ * @param num Maximum number of bytes to reserve.
+ * @return Number of bytes made available at *@p buf, or a negative value on error.
+ */
+int BIO_nwrite(BIO *bio, char **buf, int num);
+
+/**
+ * @brief Return the BIO_METHOD for a memory (RAM buffer) source/sink BIO.
+ * @return Pointer to the static memory BIO method for use with BIO_new().
+ */
+const BIO_METHOD *BIO_s_mem(void);
+#ifndef OPENSSL_NO_DGRAM
+/**
+ * @brief Return the BIO_METHOD for an in-memory datagram BIO.
+ * @return Pointer to the internal dgram-mem method table.
+ */
+const BIO_METHOD *BIO_s_dgram_mem(void);
+#endif
+/**
+ * @brief Return the BIO_METHOD for a secure-heap memory BIO.
+ * @return Pointer to the static secure-memory BIO method.
+ *
+ * Like BIO_s_mem(), but buffers are allocated from the OpenSSL secure heap.
+ */
+const BIO_METHOD *BIO_s_secmem(void);
+/**
+ * @brief Create a read-only memory BIO that reads from an existing buffer.
+ * @param buf Pointer to @p len bytes of data (not copied; must remain valid for the BIO's life).
+ * @param len Length of @p buf in bytes, or -1 to use strlen(@p buf).
+ * @return New memory BIO, or NULL on error; free with BIO_free().
+ */
+BIO *BIO_new_mem_buf(const void *buf, int len);
+#ifndef OPENSSL_NO_SOCK
+/**
+ * @brief Return the BIO_METHOD for a socket source/sink BIO.
+ * @return Pointer to the static socket BIO method for use with BIO_new().
+ */
+const BIO_METHOD *BIO_s_socket(void);
+/**
+ * @brief Return the BIO_METHOD for a TCP connect (client) socket BIO.
+ * @return Pointer to the static connect BIO method for use with BIO_new().
+ */
+const BIO_METHOD *BIO_s_connect(void);
+/**
+ * @brief Return the BIO_METHOD for a passive TCP accept socket BIO.
+ * @return Pointer to the internal accept method table.
+ */
+const BIO_METHOD *BIO_s_accept(void);
+#endif
+/**
+ * @brief Return the BIO_METHOD for a file-descriptor source/sink BIO.
+ * @return Pointer to the static fd BIO method for use with BIO_new().
+ */
+const BIO_METHOD *BIO_s_fd(void);
+/**
+ * @brief Return the BIO_METHOD for a logging sink BIO (writes to the system log).
+ * @return Pointer to the static log BIO method for use with BIO_new().
+ */
+const BIO_METHOD *BIO_s_log(void);
+/**
+ * @brief Return the BIO_METHOD for a BIO-pair endpoint (in-memory pipe half).
+ * @return Pointer to the static bio-pair method for use with BIO_new() / BIO_new_bio_pair().
+ */
+const BIO_METHOD *BIO_s_bio(void);
+/**
+ * @brief Return the BIO_METHOD for a null source/sink that discards writes and returns EOF on reads.
+ * @return Pointer to the static null BIO method for use with BIO_new().
+ */
+const BIO_METHOD *BIO_s_null(void);
+/**
+ * @brief Return the BIO_METHOD for a null filter that discards writes and yields EOF on reads.
+ * @return Pointer to the internal null-filter method table.
+ */
+const BIO_METHOD *BIO_f_null(void);
+/**
+ * @brief Return the BIO filter method that buffers reads and writes to the next BIO.
+ * @return Pointer to the buffer filter method used with BIO_new().
+ */
+const BIO_METHOD *BIO_f_buffer(void);
+/**
+ * @brief Return the BIO filter method that read-ahead buffers data from the next BIO.
+ * @return Pointer to the read-buffer filter method used with BIO_new().
+ */
+const BIO_METHOD *BIO_f_readbuffer(void);
+/**
+ * @brief Return the BIO_METHOD for a line-buffering filter BIO.
+ * @return Pointer to the static linebuffer filter method.
+ */
+const BIO_METHOD *BIO_f_linebuffer(void);
+/**
+ * @brief Return the BIO filter method that randomly injects non-blocking retry conditions (test aid).
+ * @return Pointer to the nbio-test filter method used with BIO_new().
+ */
+const BIO_METHOD *BIO_f_nbio_test(void);
+/**
+ * @brief Return the BIO filter method that prefixes each output line with a configurable string.
+ * @return Pointer to the prefix filter method used with BIO_new().
+ */
+const BIO_METHOD *BIO_f_prefix(void);
+/**
+ * @brief Return the BIO_METHOD for a core BIO that reads/writes via an OSSL_CORE_BIO.
+ * @return Pointer to the static core method for use with BIO_new() and BIO_set_data().
+ */
+const BIO_METHOD *BIO_s_core(void);
+#ifndef OPENSSL_NO_DGRAM
+/**
+ * @brief Return the BIO_METHOD for a datagram BIO-pair endpoint (in-memory UDP-style pipe half).
+ * @return Pointer to the static dgram-pair method for use with BIO_new() / BIO_new_bio_dgram_pair().
+ */
+const BIO_METHOD *BIO_s_dgram_pair(void);
+/**
+ * @brief Return the BIO_METHOD for a datagram (UDP) socket BIO.
+ * @return Pointer to the internal datagram method table.
+ */
+const BIO_METHOD *BIO_s_datagram(void);
+int BIO_dgram_non_fatal_error(int error);
+/**
+ * @brief Create a datagram (UDP-style) BIO wrapping an existing socket descriptor.
+ * @param fd Socket file descriptor to wrap.
+ * @param close_flag BIO_CLOSE to close @p fd on BIO_free(), or BIO_NOCLOSE.
+ * @return Newly allocated datagram BIO, or NULL on failure.
+ */
+BIO *BIO_new_dgram(int fd, int close_flag);
+#ifndef OPENSSL_NO_SCTP
+const BIO_METHOD *BIO_s_datagram_sctp(void);
+BIO *BIO_new_dgram_sctp(int fd, int close_flag);
+int BIO_dgram_is_sctp(BIO *bio);
+int BIO_dgram_sctp_notification_cb(BIO *b,
+    BIO_dgram_sctp_notification_handler_fn handle_notifications,
+    void *context);
+int BIO_dgram_sctp_wait_for_dry(BIO *b);
+int BIO_dgram_sctp_msg_waiting(BIO *b);
+#endif
+#endif
+
+#ifndef OPENSSL_NO_SOCK
+/**
+ * @brief Decide whether a socket BIO operation should be retried after return value @p i.
+ * @param i Result from a socket read/write (negative on error, or zero in some cases).
+ * @return 1 if the failure is retryable (EAGAIN/EINTR-style), or 0 otherwise.
+ */
+int BIO_sock_should_retry(int i);
+/**
+ * @brief Report whether a socket errno / WSA error is a non-fatal retryable condition.
+ * @param error Platform socket error code (for example EAGAIN or WSAEWOULDBLOCK).
+ * @return 1 if BIO socket I/O should retry, or 0 if the error is fatal.
+ */
+int BIO_sock_non_fatal_error(int error);
+/**
+ * @brief Report whether a system or socket error code is a non-fatal retryable I/O condition.
+ * @param errcode Error code such as a value from errno / WSAGetLastError().
+ * @return 1 if the error is considered non-fatal for BIO I/O, or 0 otherwise.
+ */
+int BIO_err_is_non_fatal(unsigned int errcode);
+int BIO_socket_wait(int fd, int for_read, time_t max_time);
+#endif
+/**
+ * @brief Wait until a BIO is ready for I/O or until @p max_time elapses.
+ * @param bio BIO to poll (typically a socket or non-blocking I/O BIO).
+ * @param max_time Absolute deadline as a time_t (0 means wait indefinitely where supported).
+ * @param nap_milliseconds Sleep quantum between polls when the BIO has no native wait.
+ * @return 1 when ready, 0 on timeout, or a negative value on error.
+ */
+int BIO_wait(BIO *bio, time_t max_time, unsigned int nap_milliseconds);
+/**
+ * @brief Drive BIO_do_connect() with retries until connected, failed, or @p timeout elapses.
+ * @param bio Connect BIO to advance.
+ * @param timeout Overall timeout in seconds; 0 waits forever; <0 tries once without sleeping.
+ * @param nap_milliseconds Sleep between non-blocking retries (or <=0 for a default nap).
+ * @return 1 when connected, <=0 on failure or expiry (see BIO_should_retry()).
+ */
+int BIO_do_connect_retry(BIO *bio, int timeout, int nap_milliseconds);
+
+/**
+ * @brief Decide whether a file-descriptor BIO I/O result should be retried.
+ * @param i Return value from a read/write-style call (negative on error).
+ * @return Non-zero if the operation failed with a non-fatal condition and should be retried, or 0 otherwise.
+ */
+int BIO_fd_should_retry(int i);
+/**
+ * @brief Report whether a file-descriptor errno is a non-fatal retryable I/O condition.
+ * @param error Error code such as a value from errno.
+ * @return 1 if the error is considered non-fatal for fd BIO I/O, or 0 otherwise.
+ */
+int BIO_fd_non_fatal_error(int error);
+/**
+ * @brief Hex-dump @p len bytes at @p s by invoking @p cb for each formatted chunk.
+ * @param cb Callback receiving dump text; return <=0 to abort.
+ * @param u Opaque user pointer forwarded to @p cb.
+ * @param s Bytes to dump.
+ * @param len Number of bytes at @p s.
+ * @return 1 on success, or 0 on error / callback abort.
+ */
+int BIO_dump_cb(int (*cb)(const void *data, size_t len, void *u),
+    void *u, const void *s, int len);
+/**
+ * @brief Hex-dump @p len bytes at @p s with leading indent, via callback output.
+ * @param cb Callback receiving dump text; return <=0 to abort.
+ * @param u Opaque user pointer forwarded to @p cb.
+ * @param s Bytes to dump.
+ * @param len Number of bytes at @p s.
+ * @param indent Number of spaces to prefix each dump line.
+ * @return 1 on success, or 0 on error / callback abort.
+ */
+int BIO_dump_indent_cb(int (*cb)(const void *data, size_t len, void *u),
+    void *u, const void *s, int len, int indent);
+/**
+ * @brief Hex-dump @p len bytes at @p bytes to a BIO (no leading indent).
+ * @param b Destination BIO.
+ * @param bytes Bytes to dump.
+ * @param len Number of bytes at @p bytes.
+ * @return 1 on success, or 0 on error.
+ */
+int BIO_dump(BIO *b, const void *bytes, int len);
+/**
+ * @brief Hex-dump @p len bytes at @p bytes to a BIO with leading indent.
+ * @param b Destination BIO.
+ * @param bytes Bytes to dump.
+ * @param len Number of bytes at @p bytes.
+ * @param indent Number of spaces to prefix each dump line.
+ * @return 1 on success, or 0 on error.
+ */
+int BIO_dump_indent(BIO *b, const void *bytes, int len, int indent);
+#ifndef OPENSSL_NO_STDIO
+/**
+ * @brief Hex-dump @p len bytes at @p s to a stdio FILE.
+ * @param fp Output FILE.
+ * @param s Bytes to dump.
+ * @param len Number of bytes at @p s.
+ * @return 1 on success, or 0 on error.
+ */
+int BIO_dump_fp(FILE *fp, const void *s, int len);
+/**
+ * @brief Hex-dump @p len bytes at @p s to a stdio FILE with leading indent.
+ * @param fp Output FILE.
+ * @param s Bytes to dump.
+ * @param len Number of bytes at @p s.
+ * @param indent Number of spaces to prefix each dump line.
+ * @return 1 on success, or 0 on error.
+ */
+int BIO_dump_indent_fp(FILE *fp, const void *s, int len, int indent);
+#endif
+/**
+ * @brief Write @p datalen bytes from @p data as a colon-separated hex string to a BIO.
+ * @param out Destination BIO.
+ * @param indent Number of spaces to prefix the first line (and continuation lines as needed).
+ * @param width Maximum number of hex octets per line before wrapping (0 for no wrap).
+ * @param data Bytes to format.
+ * @param datalen Number of bytes at @p data.
+ * @return 1 on success, or 0 on error.
+ */
+int BIO_hex_string(BIO *out, int indent, int width, const void *data,
+    int datalen);
+
+#ifndef OPENSSL_NO_SOCK
+/**
+ * @brief Allocate a zero-initialized BIO_ADDR for socket address APIs.
+ * @return New BIO_ADDR, or NULL on failure; free with BIO_ADDR_free().
+ */
+BIO_ADDR *BIO_ADDR_new(void);
+/**
+ * @brief Copy a BIO_ADDR value from @p src into @p dst.
+ * @param dst Destination address object (must already be allocated).
+ * @param src Source address to copy.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_ADDR_copy(BIO_ADDR *dst, const BIO_ADDR *src);
+/**
+ * @brief Duplicate a BIO_ADDR, copying its family and address bytes.
+ * @param ap Address to copy, or NULL.
+ * @return Newly allocated copy, or NULL on failure / if @p ap is NULL.
+ */
+BIO_ADDR *BIO_ADDR_dup(const BIO_ADDR *ap);
+/**
+ * @brief Populate a BIO_ADDR from a raw address family, bytes, and port.
+ * @param ap Destination address object (must already be allocated).
+ * @param family Address family such as AF_INET or AF_INET6.
+ * @param where Network-order address bytes (for example in_addr / in6_addr).
+ * @param wherelen Length of @p where in bytes.
+ * @param port Port number in host byte order.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_ADDR_rawmake(BIO_ADDR *ap, int family,
+    const void *where, size_t wherelen, unsigned short port);
+/**
+ * @brief Free a BIO_ADDR allocated with BIO_ADDR_new() or BIO_ADDR_dup().
+ * @param ap Address object to free, or NULL (no-op).
+ */
+void BIO_ADDR_free(BIO_ADDR *ap);
+/**
+ * @brief Reset a BIO_ADDR to an empty/uninitialized state.
+ * @param ap Address object to clear.
+ */
+void BIO_ADDR_clear(BIO_ADDR *ap);
+/**
+ * @brief Return the address family stored in a BIO_ADDR (for example AF_INET).
+ * @param ap Address object to query.
+ * @return Address family constant, or AF_UNSPEC if unset.
+ */
+int BIO_ADDR_family(const BIO_ADDR *ap);
+/**
+ * @brief Extract the raw network address bytes from a BIO_ADDR.
+ * @param ap Address object to query.
+ * @param p Destination buffer for the raw address, or NULL to query length only.
+ * @param l On input, capacity of @p p when non-NULL; on output, required/written length.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_ADDR_rawaddress(const BIO_ADDR *ap, void *p, size_t *l);
+/**
+ * @brief Return the port number from a BIO_ADDR in host byte order.
+ * @param ap Address object to query.
+ * @return Port number, or 0 if unset / not applicable (for example AF_UNIX).
+ */
+unsigned short BIO_ADDR_rawport(const BIO_ADDR *ap);
+/**
+ * @brief Format the host portion of a BIO_ADDR as an allocated string.
+ * @param ap Address to format.
+ * @param numeric Non-zero to prefer numeric form (NI_NUMERICHOST); 0 may resolve a name.
+ * @return Newly allocated NUL-terminated string; free with OPENSSL_free(), or NULL on error.
+ */
+char *BIO_ADDR_hostname_string(const BIO_ADDR *ap, int numeric);
+/**
+ * @brief Format the service/port portion of a BIO_ADDR as an allocated string.
+ * @param ap Address to format.
+ * @param numeric Non-zero to prefer a numeric port (NI_NUMERICSERV); 0 may use a service name.
+ * @return Newly allocated NUL-terminated string; free with OPENSSL_free(), or NULL on error.
+ */
+char *BIO_ADDR_service_string(const BIO_ADDR *ap, int numeric);
+/**
+ * @brief Return a newly allocated string for the filesystem path in a Unix-domain BIO_ADDR.
+ * @param ap Address object to query (typically AF_UNIX).
+ * @return Heap-allocated path string to free with OPENSSL_free(), or NULL on error / if unset.
+ */
+char *BIO_ADDR_path_string(const BIO_ADDR *ap);
+
+/**
+ * @brief Advance to the next node in a BIO_ADDRINFO linked list.
+ * @param bai Current address-info node.
+ * @return Next node, or NULL at the end of the list.
+ */
+const BIO_ADDRINFO *BIO_ADDRINFO_next(const BIO_ADDRINFO *bai);
+/**
+ * @brief Return the address family of a BIO_ADDRINFO node (for example AF_INET).
+ * @param bai Address-info node to query.
+ * @return Address family constant suitable for socket().
+ */
+int BIO_ADDRINFO_family(const BIO_ADDRINFO *bai);
+/**
+ * @brief Return the socket type of a BIO_ADDRINFO node (for example SOCK_STREAM).
+ * @param bai Address-info node to query.
+ * @return Socket type constant suitable for socket().
+ */
+int BIO_ADDRINFO_socktype(const BIO_ADDRINFO *bai);
+/**
+ * @brief Return the protocol number from an address-info element (for example IPPROTO_TCP).
+ * @param bai Address-info node from BIO_lookup_ex() / BIO_ADDRINFO_next().
+ * @return Protocol constant suitable for socket(), or 0 if unspecified.
+ */
+int BIO_ADDRINFO_protocol(const BIO_ADDRINFO *bai);
+/**
+ * @brief Return the BIO_ADDR carried by an address-info list node.
+ * @param bai Address-info node from BIO_lookup() / BIO_lookup_ex().
+ * @return Pointer to the embedded address (owned by @p bai; do not free separately).
+ */
+const BIO_ADDR *BIO_ADDRINFO_address(const BIO_ADDRINFO *bai);
+/**
+ * @brief Free a BIO_ADDRINFO list allocated by BIO_lookup() / BIO_lookup_ex().
+ * @param bai Head of the list to free, or NULL (no-op).
+ */
+void BIO_ADDRINFO_free(BIO_ADDRINFO *bai);
+
+/**
+ * @brief How BIO_parse_hostserv() disambiguates host vs service in a combined string.
+ */
+enum BIO_hostserv_priorities {
+    /** Prefer interpreting an ambiguous token as a hostname. */
+    BIO_PARSE_PRIO_HOST,
+    /** Prefer interpreting an ambiguous token as a service/port. */
+    BIO_PARSE_PRIO_SERV
+};
+int BIO_parse_hostserv(const char *hostserv, char **host, char **service,
+    enum BIO_hostserv_priorities hostserv_prio);
+/**
+ * @brief Whether BIO_lookup resolves addresses for a client connect or server bind.
+ */
+enum BIO_lookup_type {
+    /** Resolve addresses suitable for an outgoing client connection. */
+    BIO_LOOKUP_CLIENT,
+    /** Resolve addresses suitable for an accepting server socket. */
+    BIO_LOOKUP_SERVER
+};
+/**
+ * @brief Resolve @p host / @p service into a BIO_ADDRINFO list.
+ * @param host Hostname or address string to look up, or NULL for wildcard.
+ * @param service Service name or port string, or NULL.
+ * @param lookup_type BIO_LOOKUP_CLIENT or BIO_LOOKUP_SERVER.
+ * @param family Address family (for example AF_INET, AF_INET6, or AF_UNSPEC).
+ * @param socktype Socket type (for example SOCK_STREAM or SOCK_DGRAM).
+ * @param res Receives the head of the allocated BIO_ADDRINFO list; free with BIO_ADDRINFO_free().
+ * @return 1 on success, or 0 on failure.
+ *
+ * Prefer BIO_lookup_ex() when a specific protocol number is required.
+ */
+int BIO_lookup(const char *host, const char *service,
+    enum BIO_lookup_type lookup_type,
+    int family, int socktype, BIO_ADDRINFO **res);
+/**
+ * @brief Resolve @p host / @p service into a BIO_ADDRINFO list with protocol selection.
+ * @param host Hostname or address string to look up, or NULL for wildcard.
+ * @param service Service name or port string, or NULL.
+ * @param lookup_type BIO_LOOKUP_CLIENT or BIO_LOOKUP_SERVER.
+ * @param family Address family (for example AF_INET, AF_INET6, or AF_UNSPEC).
+ * @param socktype Socket type (for example SOCK_STREAM or SOCK_DGRAM).
+ * @param protocol Protocol number (for example IPPROTO_TCP), or 0 for default.
+ * @param res Receives the head of the allocated BIO_ADDRINFO list; free with BIO_ADDRINFO_free().
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_lookup_ex(const char *host, const char *service,
+    int lookup_type, int family, int socktype, int protocol,
+    BIO_ADDRINFO **res);
+/**
+ * @brief Return the pending socket error for @p sock (clears SO_ERROR).
+ * @param sock Socket file descriptor.
+ * @return Pending errno-style error code, or 0 if none.
+ */
+int BIO_sock_error(int sock);
+/**
+ * @brief Perform an ioctl on a socket descriptor with BIO error reporting.
+ * @param fd Socket file descriptor.
+ * @param type ioctl request code.
+ * @param arg Request-specific argument pointer.
+ * @return 0 on success, or -1 on error (OpenSSL error stack updated).
+ */
+int BIO_socket_ioctl(int fd, long type, void *arg);
+/**
+ * @brief Set or clear non-blocking mode on a socket file descriptor.
+ * @param fd Socket descriptor to configure.
+ * @param mode Non-zero to enable non-blocking I/O; 0 to disable.
+ * @return 1 on success, or 0 on error.
+ */
+int BIO_socket_nbio(int fd, int mode);
+/**
+ * @brief Initialize platform socket support used by BIO socket helpers (Winsock on Windows).
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_sock_init(void);
+#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+#define BIO_sock_cleanup() \
+    while (0)              \
+    continue
+#endif
+/**
+ * @brief Enable or disable TCP_NODELAY on a socket.
+ * @param sock Socket file descriptor.
+ * @param turn_on Non-zero to disable Nagle coalescing (TCP_NODELAY on), or 0 to clear it.
+ * @return 0 on success, or -1 on error.
+ */
+int BIO_set_tcp_ndelay(int sock, int turn_on);
+#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+/**
+ * @brief Resolve @p name with gethostbyname(3) (deprecated; prefer BIO_lookup_ex()).
+ * @param name Host name to look up.
+ * @return Pointer to a static hostent on success, or NULL on failure.
+ */
+OSSL_DEPRECATEDIN_1_1_0 struct hostent *BIO_gethostbyname(const char *name);
+/**
+ * @brief Parse a service name or numeric port string (deprecated; prefer modern address APIs).
+ * @param str Port string such as "443" or a service name.
+ * @param port_ptr Receives the network-byte-order port number on success.
+ * @return 1 on success, or 0 on error.
+ */
+OSSL_DEPRECATEDIN_1_1_0 int BIO_get_port(const char *str, unsigned short *port_ptr);
+/**
+ * @brief Resolve a hostname to four IPv4 octets (deprecated; prefer BIO_lookup()).
+ * @param str Hostname to resolve.
+ * @param ip Receives four bytes of IPv4 address on success.
+ * @return 1 on success, or 0 on error.
+ */
+OSSL_DEPRECATEDIN_1_1_0 int BIO_get_host_ip(const char *str, unsigned char *ip);
+/**
+ * @brief Create a listening TCP socket for @p host_port (deprecated; prefer BIO_new_accept).
+ * @param host_port Host:port string (or ":port" / "port") describing the bind address.
+ * @param mode BIO_BIND_* behaviour (for example BIO_BIND_REUSEADDR).
+ * @return Accepted listening socket fd on success, or INVALID_SOCKET / -1 on error.
+ */
+OSSL_DEPRECATEDIN_1_1_0 int BIO_get_accept_socket(char *host_port, int mode);
+/**
+ * @brief Accept a connection on a listening socket and return peer host:port text (deprecated).
+ * @param sock Listening socket fd from BIO_get_accept_socket().
+ * @param ip_port Receives an allocated "host:port" string for the peer; free with OPENSSL_free().
+ * @return Accepted socket fd on success, or -1 on error.
+ */
+OSSL_DEPRECATEDIN_1_1_0 int BIO_accept(int sock, char **ip_port);
+#endif
+
+/**
+ * @brief Output union for BIO_sock_info(); currently holds a BIO_ADDR pointer.
+ */
+union BIO_sock_info_u {
+    /** Local or peer address when type is BIO_SOCK_INFO_ADDRESS. */
+    BIO_ADDR *addr;
+};
+/**
+ * @brief Kinds of socket metadata that BIO_sock_info() can retrieve.
+ */
+enum BIO_sock_info_type {
+    /** Request the local or peer BIO_ADDR for the socket. */
+    BIO_SOCK_INFO_ADDRESS
+};
+/**
+ * @brief Query socket metadata into a BIO_sock_info_u union.
+ * @param sock Connected or bound socket descriptor.
+ * @param type Information type to retrieve (for example BIO_SOCK_INFO_ADDRESS).
+ * @param info Output union; for BIO_SOCK_INFO_ADDRESS, @c info->addr receives a BIO_ADDR*.
+ * @return 1 on success, or 0 on error.
+ */
+int BIO_sock_info(int sock,
+    enum BIO_sock_info_type type, union BIO_sock_info_u *info);
+
+#define BIO_SOCK_REUSEADDR 0x01
+#define BIO_SOCK_V6_ONLY 0x02
+#define BIO_SOCK_KEEPALIVE 0x04
+#define BIO_SOCK_NONBLOCK 0x08
+#define BIO_SOCK_NODELAY 0x10
+#define BIO_SOCK_TFO 0x20
+
+/**
+ * @brief Create a socket with optional BIO_SOCK_* behaviour flags applied.
+ * @param domain Address family (for example AF_INET).
+ * @param socktype Socket type (for example SOCK_STREAM).
+ * @param protocol Protocol number, or 0 for the default for @p socktype.
+ * @param options Bitmask of BIO_SOCK_* flags (for example BIO_SOCK_NONBLOCK).
+ * @return New socket file descriptor on success, or -1 on failure.
+ */
+int BIO_socket(int domain, int socktype, int protocol, int options);
+/**
+ * @brief Connect socket @p sock to @p addr, applying BIO_SOCK_* @p options.
+ * @param sock Socket file descriptor.
+ * @param addr Destination address.
+ * @param options Bitmask of BIO_SOCK_* flags (for example BIO_SOCK_NONBLOCK).
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_connect(int sock, const BIO_ADDR *addr, int options);
+/**
+ * @brief Bind socket @p sock to @p addr, applying BIO_SOCK_* @p options.
+ * @param sock Socket file descriptor.
+ * @param addr Local address to bind.
+ * @param options Bitmask of BIO_SOCK_* flags (for example BIO_SOCK_REUSEADDR).
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_bind(int sock, const BIO_ADDR *addr, int options);
+/**
+ * @brief Bind and listen on a socket using @p addr and BIO_SOCK_* @p options.
+ * @param sock Socket file descriptor to put into listening state.
+ * @param addr Local address to bind (may be NULL for an already-bound socket).
+ * @param options BIO_SOCK_* flags such as BIO_SOCK_REUSEADDR.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_listen(int sock, const BIO_ADDR *addr, int options);
+/**
+ * @brief Accept a connection on @p accept_sock, optionally capturing the peer address.
+ * @param accept_sock Listening socket.
+ * @param addr Optional BIO_ADDR filled with the peer address, or NULL.
+ * @param options BIO_SOCK_* flags applied to the accepted socket (for example non-blocking).
+ * @return Accepted socket fd on success, or -1 on failure.
+ */
+int BIO_accept_ex(int accept_sock, BIO_ADDR *addr, int options);
+/**
+ * @brief Close a socket descriptor with OpenSSL error reporting.
+ * @param sock Socket file descriptor to close.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_closesocket(int sock);
+
+/**
+ * @brief Wrap an existing socket descriptor in a BIO_s_socket() BIO.
+ * @param sock Socket file descriptor.
+ * @param close_flag BIO_CLOSE to close @p sock when the BIO is freed, or BIO_NOCLOSE.
+ * @return New socket BIO, or NULL on error.
+ */
+BIO *BIO_new_socket(int sock, int close_flag);
+/**
+ * @brief Create a BIO_s_connect() BIO configured for @p host_port.
+ * @param host_port Host:port string describing the peer to connect to.
+ * @return New connect BIO, or NULL on error; free with BIO_free().
+ */
+BIO *BIO_new_connect(const char *host_port);
+/**
+ * @brief Create an accept BIO bound to @p host_port (host:port or port-only form).
+ * @param host_port Local bind specification parsed like BIO_set_accept_name().
+ * @return New accept BIO, or NULL on failure; free with BIO_free_all().
+ */
+BIO *BIO_new_accept(const char *host_port);
+#endif /* OPENSSL_NO_SOCK*/
+
+/**
+ * @brief Create a file-descriptor BIO wrapping an existing OS descriptor.
+ * @param fd File descriptor to wrap.
+ * @param close_flag BIO_CLOSE to close @p fd on BIO_free(), or BIO_NOCLOSE.
+ * @return Newly allocated fd BIO, or NULL on failure.
+ */
+BIO *BIO_new_fd(int fd, int close_flag);
+
+/**
+ * @brief Create two connected memory BIOs that form a reliable in-memory byte pipe.
+ * @param bio1 Receives the first endpoint BIO.
+ * @param writebuf1 Write buffer size for @p *bio1 (0 for default).
+ * @param bio2 Receives the second endpoint BIO.
+ * @param writebuf2 Write buffer size for @p *bio2 (0 for default).
+ * @return 1 on success, or 0 on error.
+ */
+int BIO_new_bio_pair(BIO **bio1, size_t writebuf1,
+    BIO **bio2, size_t writebuf2);
+#ifndef OPENSSL_NO_DGRAM
+/**
+ * @brief Create a connected pair of in-memory datagram BIOs.
+ * @param bio1 Receives the first BIO of the pair.
+ * @param writebuf1 Write-buffer size for @p bio1 (0 selects a default).
+ * @param bio2 Receives the second BIO of the pair.
+ * @param writebuf2 Write-buffer size for @p bio2 (0 selects a default).
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_new_bio_dgram_pair(BIO **bio1, size_t writebuf1,
+    BIO **bio2, size_t writebuf2);
+#endif
+
+/*
+ * If successful, returns 1 and in *bio1, *bio2 two BIO pair endpoints.
+ * Otherwise returns 0 and sets *bio1 and *bio2 to NULL. Size 0 uses default
+ * value.
+ */
+
+/**
+ * @brief Copy retry reason/flags from the next BIO in the chain onto @p b.
+ * @param b BIO whose retry state is updated from BIO_next(b).
+ */
+void BIO_copy_next_retry(BIO *b);
+
+/*
+ * long BIO_ghbn_ctrl(int cmd,int iarg,char *parg);
+ */
+
+#define ossl_bio__attr__(x)
+#if defined(__GNUC__) && defined(__STDC_VERSION__)    \
+    && !defined(__MINGW32__) && !defined(__MINGW64__) \
+    && !defined(__APPLE__)
+/*
+ * Because we support the 'z' modifier, which made its appearance in C99,
+ * we can't use __attribute__ with pre C99 dialects.
+ */
+#if __STDC_VERSION__ >= 199901L
+#undef ossl_bio__attr__
+#define ossl_bio__attr__ __attribute__
+#if __GNUC__ * 10 + __GNUC_MINOR__ >= 44
+#define ossl_bio__printf__ __gnu_printf__
+#else
+#define ossl_bio__printf__ __printf__
+#endif
+#endif
+#endif
+/**
+ * @brief Formatted print to a BIO, analogous to fprintf().
+ * @param bio Destination BIO.
+ * @param format printf-style format string.
+ * @return Number of bytes written, or a negative value on error.
+ */
+int BIO_printf(BIO *bio, const char *format, ...)
+    ossl_bio__attr__((__format__(ossl_bio__printf__, 2, 3)));
+/**
+ * @brief printf-style formatted write to a BIO using a va_list.
+ * @param bio Destination BIO.
+ * @param format printf-style format string.
+ * @param args Variable-argument list matching @p format.
+ * @return Number of bytes written, or a negative value on error.
+ */
+int BIO_vprintf(BIO *bio, const char *format, va_list args)
+    ossl_bio__attr__((__format__(ossl_bio__printf__, 2, 0)));
+/**
+ * @brief Bounded snprintf-style formatting into @p buf (NUL-terminated when @p n > 0).
+ * @param buf Destination buffer.
+ * @param n Capacity of @p buf in bytes.
+ * @param format printf-style format string.
+ * @return Number of characters that would have been written (excluding NUL), or a negative value on error.
+ */
+int BIO_snprintf(char *buf, size_t n, const char *format, ...)
+    ossl_bio__attr__((__format__(ossl_bio__printf__, 3, 4)));
+/**
+ * @brief Format a string into @p buf like vsnprintf, using OpenSSL's portable formatter.
+ * @param buf Destination buffer.
+ * @param n Capacity of @p buf in bytes (including the trailing NUL).
+ * @param format printf-style format string.
+ * @param args Variable-argument list for @p format.
+ * @return Length that would have been written excluding the NUL, or -1 on encoding error.
+ */
+int BIO_vsnprintf(char *buf, size_t n, const char *format, va_list args)
+    ossl_bio__attr__((__format__(ossl_bio__printf__, 3, 0)));
+#undef ossl_bio__attr__
+#undef ossl_bio__printf__
+
+/**
+ * @brief Allocate a new custom BIO_METHOD with the given type index and name.
+ * @param type BIO type index (often from BIO_get_new_index(), combined with BIO_TYPE_* flags).
+ * @param name Human-readable method name stored on the BIO_METHOD.
+ * @return New method table, or NULL on allocation failure; free with BIO_meth_free().
+ */
+BIO_METHOD *BIO_meth_new(int type, const char *name);
+/**
+ * @brief Free a BIO_METHOD allocated with BIO_meth_new().
+ * @param biom Method table to free, or NULL (no-op).
+ */
+void BIO_meth_free(BIO_METHOD *biom);
+/**
+ * @brief Return the legacy write function installed on a BIO_METHOD.
+ * @param biom Method to query.
+ * @return Write callback, or NULL if unset.
+ */
+int (*BIO_meth_get_write(const BIO_METHOD *biom))(BIO *, const char *, int);
+/**
+ * @brief Return the extended write function installed on a BIO_METHOD.
+ * @param biom Method to query.
+ * @return Write-ex callback, or NULL if unset.
+ */
+int (*BIO_meth_get_write_ex(const BIO_METHOD *biom))(BIO *, const char *, size_t,
+    size_t *);
+/**
+ * @brief Install the legacy write callback on a BIO_METHOD.
+ * @param biom Method table to update.
+ * @param write Callback implementing BIO_write()-style output.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_meth_set_write(BIO_METHOD *biom,
+    int (*write)(BIO *, const char *, int));
+/**
+ * @brief Install the size_t-based write callback on a BIO_METHOD.
+ * @param biom Method table to update.
+ * @param bwrite Callback implementing BIO_write_ex()-style output; may be NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_meth_set_write_ex(BIO_METHOD *biom,
+    int (*bwrite)(BIO *, const char *, size_t, size_t *));
+int BIO_meth_set_sendmmsg(BIO_METHOD *biom,
+    int (*f)(BIO *, BIO_MSG *, size_t, size_t,
+        uint64_t, size_t *));
+/**
+ * @brief Return the multi-message send callback installed on a BIO_METHOD.
+ * @param biom Method to query.
+ * @return sendmmsg-style callback, or NULL if unset.
+ */
+int (*BIO_meth_get_sendmmsg(const BIO_METHOD *biom))(BIO *, BIO_MSG *,
+    size_t, size_t,
+    uint64_t, size_t *);
+/**
+ * @brief Return the legacy read function installed on a BIO_METHOD.
+ * @param biom Method to query.
+ * @return Read callback, or NULL if unset.
+ */
+int (*BIO_meth_get_read(const BIO_METHOD *biom))(BIO *, char *, int);
+/**
+ * @brief Return the extended read function installed on a BIO_METHOD.
+ * @param biom Method to query.
+ * @return Read-ex callback, or NULL if unset.
+ */
+int (*BIO_meth_get_read_ex(const BIO_METHOD *biom))(BIO *, char *, size_t, size_t *);
+/**
+ * @brief Install the legacy read callback on a BIO_METHOD.
+ * @param biom Method table to update.
+ * @param read Callback implementing BIO_read()-style input.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_meth_set_read(BIO_METHOD *biom,
+    int (*read)(BIO *, char *, int));
+/**
+ * @brief Install the extended read callback on a BIO_METHOD.
+ * @param biom Method table to update.
+ * @param bread Callback implementing BIO_read_ex()-style input.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_meth_set_read_ex(BIO_METHOD *biom,
+    int (*bread)(BIO *, char *, size_t, size_t *));
+/**
+ * @brief Install the multi-message receive callback on a BIO_METHOD.
+ * @param biom Method table to update.
+ * @param f Callback implementing recvmmsg-style reception into BIO_MSG entries.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_meth_set_recvmmsg(BIO_METHOD *biom,
+    int (*f)(BIO *, BIO_MSG *, size_t, size_t,
+        uint64_t, size_t *));
+/**
+ * @brief Return the multi-message receive callback installed on a BIO_METHOD.
+ * @param biom Method to query.
+ * @return recvmmsg-style callback, or NULL if unset.
+ */
+int (*BIO_meth_get_recvmmsg(const BIO_METHOD *biom))(BIO *, BIO_MSG *,
+    size_t, size_t,
+    uint64_t, size_t *);
+/**
+ * @brief Return the puts callback installed on a BIO_METHOD.
+ * @param biom Method to query.
+ * @return Puts callback, or NULL if unset.
+ */
+int (*BIO_meth_get_puts(const BIO_METHOD *biom))(BIO *, const char *);
+/**
+ * @brief Install the puts callback on a BIO_METHOD.
+ * @param biom Method table to update.
+ * @param puts Callback implementing BIO_puts()-style string output.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_meth_set_puts(BIO_METHOD *biom,
+    int (*puts)(BIO *, const char *));
+/**
+ * @brief Return the gets function installed on a BIO_METHOD.
+ * @param biom Method to query.
+ * @return Gets callback, or NULL if unset.
+ */
+int (*BIO_meth_get_gets(const BIO_METHOD *biom))(BIO *, char *, int);
+/**
+ * @brief Install the gets callback on a BIO_METHOD.
+ * @param biom Method table to update.
+ * @param ossl_gets Callback implementing BIO_gets()-style line input.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_meth_set_gets(BIO_METHOD *biom,
+    int (*ossl_gets)(BIO *, char *, int));
+/**
+ * @brief Return the ctrl function installed on a BIO_METHOD.
+ * @param biom Method to query.
+ * @return Ctrl callback pointer, or NULL if unset.
+ */
+long (*BIO_meth_get_ctrl(const BIO_METHOD *biom))(BIO *, int, long, void *);
+/**
+ * @brief Install the ctrl callback on a BIO_METHOD.
+ * @param biom Method table to update.
+ * @param ctrl Callback implementing BIO_ctrl()-style commands.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_meth_set_ctrl(BIO_METHOD *biom,
+    long (*ctrl)(BIO *, int, long, void *));
+/**
+ * @brief Return the create callback installed on a BIO_METHOD.
+ * @param bion Method to query.
+ * @return Create callback invoked when a BIO of this method is allocated, or NULL if unset.
+ */
+int (*BIO_meth_get_create(const BIO_METHOD *bion))(BIO *);
+/**
+ * @brief Install the create callback invoked when a BIO of this method is allocated.
+ * @param biom Method being configured.
+ * @param create Callback that initializes method-specific state for a BIO; may be NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_meth_set_create(BIO_METHOD *biom, int (*create)(BIO *));
+/**
+ * @brief Return the destroy callback installed on a BIO_METHOD.
+ * @param biom Method to query.
+ * @return Destroy callback, or NULL if unset.
+ */
+int (*BIO_meth_get_destroy(const BIO_METHOD *biom))(BIO *);
+/**
+ * @brief Install the destroy callback invoked when a BIO of this method is freed.
+ * @param biom Method being configured.
+ * @param destroy Callback that releases method-specific state for a BIO; may be NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_meth_set_destroy(BIO_METHOD *biom, int (*destroy)(BIO *));
+/**
+ * @brief Return the callback-ctrl function installed on a BIO_METHOD.
+ * @param biom Method to query.
+ * @return Callback-ctrl function, or NULL if unset.
+ */
+long (*BIO_meth_get_callback_ctrl(const BIO_METHOD *biom))(BIO *, int, BIO_info_cb *);
+/**
+ * @brief Install the callback-ctrl function on a custom BIO_METHOD.
+ * @param biom Method object to update.
+ * @param callback_ctrl Function invoked for BIO_callback_ctrl()-style commands.
+ * @return 1 on success, or 0 on failure.
+ */
+int BIO_meth_set_callback_ctrl(BIO_METHOD *biom,
+    long (*callback_ctrl)(BIO *, int,
+        BIO_info_cb *));
+
+#ifdef __cplusplus
+}
+#endif
+#endif

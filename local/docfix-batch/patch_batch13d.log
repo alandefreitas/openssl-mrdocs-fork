@@ -1,0 +1,134 @@
+=== batch 13d: x509 family ===
+  OK: x509.h :: X509_PKEY.enc_pkey
+  OK: x509.h.in :: X509_PKEY.enc_pkey
+  OK: x509.h :: X509_PKEY.key_data
+  OK: x509.h.in :: X509_PKEY.key_data
+  OK: x509.h :: X509_verify
+  OK: x509.h.in :: X509_verify
+  OK: x509.h :: d2i_X509_fp
+  OK: x509.h.in :: d2i_X509_fp
+  OK: x509.h :: d2i_X509_REQ_fp
+  OK: x509.h.in :: d2i_X509_REQ_fp
+  OK: x509.h :: i2d_RSAPrivateKey_fp
+  OK: x509.h.in :: i2d_RSAPrivateKey_fp
+  OK: x509.h :: i2d_RSAPublicKey_fp
+  OK: x509.h.in :: i2d_RSAPublicKey_fp
+  OK: x509.h :: d2i_DSA_PUBKEY_fp
+  OK: x509.h.in :: d2i_DSA_PUBKEY_fp
+  OK: x509.h :: i2d_PKCS8_PRIV_KEY_INFO_fp
+  OK: x509.h.in :: i2d_PKCS8_PRIV_KEY_INFO_fp
+  OK: x509.h :: i2d_X509_bio
+  OK: x509.h.in :: i2d_X509_bio
+  OK: x509.h :: i2d_X509_CRL_bio
+  OK: x509.h.in :: i2d_X509_CRL_bio
+  OK: x509.h :: i2d_RSA_PUBKEY_bio
+  OK: x509.h.in :: i2d_RSA_PUBKEY_bio
+  OK: x509.h :: i2d_DSA_PUBKEY_bio
+  OK: x509.h.in :: i2d_DSA_PUBKEY_bio
+  OK: x509.h :: i2d_DSAPrivateKey_bio
+  OK: x509.h.in :: i2d_DSAPrivateKey_bio
+  OK: x509.h :: i2d_PKCS8_PRIV_KEY_INFO_bio
+  OK: x509.h.in :: i2d_PKCS8_PRIV_KEY_INFO_bio
+  OK: x509.h :: d2i_PrivateKey_bio
+  OK: x509.h.in :: d2i_PrivateKey_bio
+  OK: x509.h :: d2i_PUBKEY_ex_bio
+  OK: x509.h.in :: d2i_PUBKEY_ex_bio
+  OK: x509.h :: X509_dup
+  OK: x509.h.in :: X509_dup
+  OK: x509.h :: X509_CRL_dup
+  OK: x509.h.in :: X509_CRL_dup
+  OK: x509.h :: X509_ALGOR_get0
+  OK: x509.h.in :: X509_ALGOR_get0
+  OK: x509.h :: X509_time_adj_ex
+  OK: x509.h.in :: X509_time_adj_ex
+  OK: x509.h :: X509_PUBKEY ASN.1
+  OK: x509.h.in :: X509_PUBKEY ASN.1
+  OK: x509.h :: X509_PUBKEY_get0
+  OK: x509.h.in :: X509_PUBKEY_get0
+  OK: x509.h :: X509_get_pubkey_parameters
+  OK: x509.h.in :: X509_get_pubkey_parameters
+  OK: x509.h :: d2i_i2d_DSA_PUBKEY
+  OK: x509.h.in :: d2i_i2d_DSA_PUBKEY
+  OK: x509.h :: X509_SIG_get0
+  OK: x509.h.in :: X509_SIG_get0
+  OK: x509.h :: X509_SIG_getm
+  OK: x509.h.in :: X509_SIG_getm
+  OK: x509.h :: X509_REQ ASN.1
+  OK: x509.h.in :: X509_REQ ASN.1
+  OK: x509.h :: X509_NAME_set
+  OK: x509.h.in :: X509_NAME_set
+  OK: x509.h :: X509_SIG_INFO_set
+  OK: x509.h.in :: X509_SIG_INFO_set
+  OK: x509.h :: X509_get_signature_nid
+  OK: x509.h.in :: X509_get_signature_nid
+  OK: x509.h :: X509_REQ_set0_distinguishing_id
+  OK: x509.h.in :: X509_REQ_set0_distinguishing_id
+  OK: x509.h :: X509_alias_set1
+  OK: x509.h.in :: X509_alias_set1
+  OK: x509.h :: X509_CRL_INFO ASN.1
+  OK: x509.h.in :: X509_CRL_INFO ASN.1
+  OK: x509.h :: X509_CRL_get0_by_serial
+  OK: x509.h.in :: X509_CRL_get0_by_serial
+  OK: x509.h :: X509_CRL_get0_by_cert
+  OK: x509.h.in :: X509_CRL_get0_by_cert
+  OK: x509.h :: NETSCAPE_SPKI ASN.1
+  OK: x509.h.in :: NETSCAPE_SPKI ASN.1
+  OK: x509.h :: X509_set_serialNumber
+  OK: x509.h.in :: X509_set_serialNumber
+  OK: x509.h :: X509_get0_extensions
+  OK: x509.h.in :: X509_get0_extensions
+  OK: x509.h :: X509_get_pubkey
+  OK: x509.h.in :: X509_get_pubkey
+  OK: x509.h :: X509_REQ_get_version
+  OK: x509.h.in :: X509_REQ_get_version
+  OK: x509.h :: X509_REQ_set_version
+  OK: x509.h.in :: X509_REQ_set_version
+  OK: x509.h :: X509_aux_print
+  OK: x509.h.in :: X509_aux_print
+  OK: x509.h :: X509_CRL_get_ext
+  OK: x509.h.in :: X509_CRL_get_ext
+  OK: x509.h :: X509_EXTENSION_get_critical
+  OK: x509.h.in :: X509_EXTENSION_get_critical
+  OK: x509.h :: EVP_PKEY_add1_attr_by_OBJ
+  OK: x509.h.in :: EVP_PKEY_add1_attr_by_OBJ
+  OK: x509_vfy.h :: X509_TRUST_get0
+  OK: x509_vfy.h.in :: X509_TRUST_get0
+  OK: x509_vfy.h :: X509_trusted
+  OK: x509_vfy.h.in :: X509_trusted
+  OK: x509_vfy.h :: X509_get0_reject_objects
+  OK: x509_vfy.h.in :: X509_get0_reject_objects
+  OK: x509_vfy.h :: X509_build_chain
+  OK: x509_vfy.h.in :: X509_build_chain
+  OK: x509_vfy.h :: X509_OBJECT_retrieve_by_subject
+  OK: x509_vfy.h.in :: X509_OBJECT_retrieve_by_subject
+  OK: x509_vfy.h :: X509_STORE_CTX_get1_crls
+  OK: x509_vfy.h.in :: X509_STORE_CTX_get1_crls
+  OK: x509_vfy.h :: X509_STORE_set1_param
+  OK: x509_vfy.h.in :: X509_STORE_set1_param
+  OK: x509_vfy.h :: X509_STORE_CTX_free
+  OK: x509_vfy.h.in :: X509_STORE_CTX_free
+  OK: x509_vfy.h :: X509_LOOKUP_meth_set_new_item
+  OK: x509_vfy.h.in :: X509_LOOKUP_meth_set_new_item
+  OK: x509_vfy.h :: X509_STORE_CTX_set_purpose
+  OK: x509_vfy.h.in :: X509_STORE_CTX_set_purpose
+  OK: x509_vfy.h :: X509_VERIFY_PARAM_set1_host
+  OK: x509_vfy.h.in :: X509_VERIFY_PARAM_set1_host
+  OK: x509v3.h :: stack_st_DIST_POINT
+  MISS: x509v3.h.in :: stack_st_DIST_POINT
+  OK: x509v3.h :: i2d_PROXY_CERT_INFO_EXTENSION
+  OK: x509v3.h.in :: i2d_PROXY_CERT_INFO_EXTENSION
+  OK: x509v3.h :: X509v3_addr_add_prefix
+  OK: x509v3.h.in :: X509v3_addr_add_prefix
+  OK: x509v3.h :: X509v3_addr_inherits
+  OK: x509v3.h.in :: X509v3_addr_inherits
+  OK: x509v3.h :: X509v3_addr_validate_resource_set
+  OK: x509v3.h.in :: X509v3_addr_validate_resource_set
+  OK: x509v3.h :: NAMING_AUTHORITY_set0_authorityURL
+  OK: x509v3.h.in :: NAMING_AUTHORITY_set0_authorityURL
+  OK: x509v3.h :: PROFESSION_INFO_set0_professionItems
+  OK: x509v3.h.in :: PROFESSION_INFO_set0_professionItems
+  OK: x509v3.h :: PROFESSION_INFO_get0_registrationNumber
+  OK: x509v3.h.in :: PROFESSION_INFO_get0_registrationNumber
+
+OK=129 MISS=1
+  x509v3.h.in:stack_st_DIST_POINT

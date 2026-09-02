@@ -1,0 +1,275 @@
+### async.h :: ASYNC_cleanup_thread
+void ASYNC_cleanup_thread(void);
+
+### cms.h :: CMS_ReceiptRequest_get0_values
+void CMS_ReceiptRequest_get0_values(CMS_ReceiptRequest *rr,
+    ASN1_STRING **pcid,
+    int *pallorfirst,
+    STACK_OF(GENERAL_NAMES) **plist,
+    STACK_OF(GENERAL_NAMES) **prto);
+
+### cms.h :: CMS_ReceiptRequest_create0_ex
+CMS_ReceiptRequest *CMS_ReceiptRequest_create0_ex(
+    unsigned char *id, int idlen, int allorfirst,
+    STACK_OF(GENERAL_NAMES) *receiptList,
+    STACK_OF(GENERAL_NAMES) *receiptsTo,
+    OSSL_LIB_CTX *libctx);
+
+### cms.h :: CMS_signed_get_attr
+X509_ATTRIBUTE *CMS_signed_get_attr(const CMS_SignerInfo *si, int loc);
+
+### cms.h :: CMS_SignerInfo_verify_content
+int CMS_SignerInfo_verify_content(CMS_SignerInfo *si, BIO *chain);
+
+### cms.h :: CMS_get0_SignerInfos
+STACK_OF(CMS_SignerInfo) *CMS_get0_SignerInfos(CMS_ContentInfo *cms);
+
+### cms.h :: CMS_RecipientInfo_get0_pkey_ctx
+EVP_PKEY_CTX *CMS_RecipientInfo_get0_pkey_ctx(CMS_RecipientInfo *ri);
+
+### cms.h :: CMS_get0_signers
+STACK_OF(X509) *CMS_get0_signers(CMS_ContentInfo *cms);
+
+### cms.h :: CMS_EncryptedData_encrypt_ex
+CMS_ContentInfo *CMS_EncryptedData_encrypt_ex(BIO *in, const EVP_CIPHER *cipher,
+    const unsigned char *key,
+    size_t keylen, unsigned int flags,
+    OSSL_LIB_CTX *libctx,
+    const char *propq);
+
+### cms.h :: CMS_EncryptedData_decrypt
+int CMS_EncryptedData_decrypt(CMS_ContentInfo *cms,
+    const unsigned char *key, size_t keylen,
+    BIO *dcont, BIO *out, unsigned int flags);
+
+### cms.h :: CMS_dataFinal
+int CMS_dataFinal(CMS_ContentInfo *cms, BIO *bio);
+
+### dh.h :: DH_up_ref
+OSSL_DEPRECATEDIN_3_0 int DH_up_ref(DH *dh);
+
+### dh.h :: EVP_PKEY_CTX_set0_dh_kdf_oid
+int EVP_PKEY_CTX_set0_dh_kdf_oid(EVP_PKEY_CTX *ctx, ASN1_OBJECT *oid);
+
+### dsa.h :: DSA_meth_new
+OSSL_DEPRECATEDIN_3_0 DSA_METHOD *DSA_meth_new(const char *name, int flags);
+
+### dsa.h :: DSA_set0_pqg
+OSSL_DEPRECATEDIN_3_0 int DSA_set0_pqg(DSA *d, BIGNUM *p, BIGNUM *q, BIGNUM *g);
+
+### dsa.h :: DSA_new
+OSSL_DEPRECATEDIN_3_0 DSA *DSA_new(void);
+
+### ec.h :: ec_group_st
+typedef struct ec_group_st EC_GROUP;
+
+### engine.h :: ENGINE_get_pkey_meth_engine
+OSSL_DEPRECATEDIN_3_0 ENGINE *ENGINE_get_pkey_meth_engine(int nid);
+
+### engine.h :: ENGINE_set_id
+OSSL_DEPRECATEDIN_3_0 int ENGINE_set_id(ENGINE *e, const char *id);
+
+### engine.h :: ENGINE_cmd_is_executable
+OSSL_DEPRECATEDIN_3_0 int ENGINE_cmd_is_executable(ENGINE *e, int cmd);
+
+### engine.h :: ENGINE_unregister_DH
+OSSL_DEPRECATEDIN_3_0 void ENGINE_unregister_DH(ENGINE *e);
+
+### engine.h :: ENGINE_register_DH
+OSSL_DEPRECATEDIN_3_0 int ENGINE_register_DH(ENGINE *e);
+
+### engine.h :: ENGINE_set_table_flags
+OSSL_DEPRECATEDIN_3_0 void ENGINE_set_table_flags(unsigned int flags);
+
+### engine.h :: ENGINE_remove
+OSSL_DEPRECATEDIN_3_0 int ENGINE_remove(ENGINE *e);
+
+### evp.h :: EVP_PKEY_meth_set_digest_custom
+OSSL_DEPRECATEDIN_3_0 void EVP_PKEY_meth_set_digest_custom(EVP_PKEY_METHOD *pmeth, int (*digest_custom)(EVP_PKEY_CTX *ctx, EVP_MD_CTX *mctx));
+
+### evp.h :: EVP_SIGNATURE_get0_provider
+OSSL_PROVIDER *EVP_SIGNATURE_get0_provider(const EVP_SIGNATURE *signature);
+
+### evp.h :: EVP_RAND_CTX_get_params
+int EVP_RAND_CTX_get_params(EVP_RAND_CTX *ctx, OSSL_PARAM params[]);
+
+### evp.h :: EVP_MD_CTX_set_params
+int EVP_MD_CTX_set_params(EVP_MD_CTX *ctx, const OSSL_PARAM params[]);
+
+### evp.h :: EVP_MD_meth_get_copy
+int (*EVP_MD_meth_get_copy(const EVP_MD *md))(EVP_MD_CTX *to,
+    const EVP_MD_CTX *from);
+
+### pem.h :: PEM_write
+int PEM_write(FILE *fp, const char *name, const char *hdr,
+    const unsigned char *data, long len);
+
+### pem.h :: PEM_bytes_read_bio
+int PEM_bytes_read_bio(unsigned char **pdata, long *plen, char **pnm,
+    const char *name, BIO *bp, pem_password_cb *cb,
+    void *u);
+
+### pkcs7.h :: SMIME_read_PKCS7
+PKCS7 *SMIME_read_PKCS7(BIO *bio, BIO **bcont);
+
+### pkcs7.h :: PKCS7_decrypt
+int PKCS7_decrypt(PKCS7 *p7, EVP_PKEY *pkey, X509 *cert, BIO *data,
+    int flags);
+
+### pkcs7.h :: PKCS7_sign
+PKCS7 *PKCS7_sign(X509 *signcert, EVP_PKEY *pkey, STACK_OF(X509) *certs,
+    BIO *data, int flags);
+
+### pkcs7.h :: PKCS7_add_attribute
+int PKCS7_add_attribute(PKCS7_SIGNER_INFO *p7si, int nid, int atrtype,
+    void *value);
+
+### pkcs7.h :: PKCS7_get_issuer_and_serial
+PKCS7_ISSUER_AND_SERIAL *PKCS7_get_issuer_and_serial(PKCS7 *p7, int idx);
+
+### pkcs7.h :: PKCS7_stream
+int PKCS7_stream(unsigned char ***boundary, PKCS7 *p7);
+
+### pkcs7.h :: PKCS7_signatureVerify
+int PKCS7_signatureVerify(BIO *bio, PKCS7 *p7, PKCS7_SIGNER_INFO *si,
+    X509 *signer);
+
+### pkcs7.h :: PKCS7_SIGNER_INFO_sign
+int PKCS7_SIGNER_INFO_sign(PKCS7_SIGNER_INFO *si);
+
+### pkcs7.h :: PKCS7_ctrl
+    PKCS7_ctrl(p, PKCS7_OP_SET_DETACHED_SIGNATURE, v, NULL)
+#define PKCS7_get_detached(p) \
+    PKCS7_ctrl(p, PKCS7_OP_GET_DETACHED_SIGNATURE, 0, NULL)
+
+#define PKCS7_is_detached(p7) (PKCS7_type_is_signed(p7) && PKCS7_get_detached(p7))
+
+/* S/MIME related flags */
+
+#define PKCS7_TEXT 0x1
+#define PKCS7_NOCERTS 0x2
+#define PKCS7_NOSIGS 0x4
+#define PKCS7_NOCHAIN 0x8
+#define PKCS7_NOINTERN 0x10
+#define PKCS7_NOVERIFY 0x20
+
+### pkcs7.h :: PKCS7_print_ctx
+DECLARE_ASN1_PRINT_FUNCTION(PKCS7)
+
+### pkcs7.h :: PKCS7_ATTR_SIGN_it
+DECLARE_ASN1_ITEM(PKCS7_ATTR_SIGN)
+
+### pkcs7.h :: PKCS7_ENCRYPT
+DECLARE_ASN1_FUNCTIONS(PKCS7_ENCRYPT)
+
+### pkcs7.h :: PKCS7_ISSUER_AND_SERIAL_digest
+int PKCS7_ISSUER_AND_SERIAL_digest(PKCS7_ISSUER_AND_SERIAL *data,
+    const EVP_MD *type, unsigned char *md,
+    unsigned int *len);
+
+### pkcs7.h :: stack_st_PKCS7
+SKM_DEFINE_STACK_OF_INTERNAL(PKCS7, PKCS7, PKCS7)
+
+### rand.h :: RAND_get0_private
+EVP_RAND_CTX *RAND_get0_private(OSSL_LIB_CTX *ctx);
+
+### rand.h :: RAND_set_rand_engine
+OSSL_DEPRECATEDIN_3_0 int RAND_set_rand_engine(ENGINE *engine);
+
+### rsa.h :: RSA_meth_get_priv_dec
+int (*RSA_meth_get_priv_dec(const RSA_METHOD *meth))(int flen,
+    const unsigned char *from,
+    unsigned char *to,
+    RSA *rsa, int padding);
+
+### rsa.h :: RSA_PKCS1_OpenSSL
+OSSL_DEPRECATEDIN_3_0 const RSA_METHOD *RSA_PKCS1_OpenSSL(void);
+
+### rsa.h :: RSA_get0_dmq1
+OSSL_DEPRECATEDIN_3_0 const BIGNUM *RSA_get0_dmq1(const RSA *r);
+
+### ssl.h :: SSL_CTX_get0_security_ex_data
+__owur void *SSL_CTX_get0_security_ex_data(const SSL_CTX *ctx);
+
+### ssl.h :: SSL_get_stream_read_error_code
+__owur int SSL_get_stream_read_error_code(SSL *ssl, uint64_t *app_error_code);
+
+### ssl.h :: SSL_set_blocking_mode
+__owur int SSL_set_blocking_mode(SSL *s, int blocking);
+
+### ssl.h :: SSL_get_wpoll_descriptor
+__owur int SSL_get_wpoll_descriptor(SSL *s, BIO_POLL_DESCRIPTOR *desc);
+
+### ssl.h :: SSL_CIPHER_description
+__owur char *SSL_CIPHER_description(const SSL_CIPHER *, char *buf, int size);
+
+### ssl.h :: SSL_CTX_add_client_CA
+__owur int SSL_CTX_add_client_CA(SSL_CTX *ctx, X509 *x);
+
+### ssl.h :: SSL_set_client_CA_list
+void SSL_set_client_CA_list(SSL *s, STACK_OF(X509_NAME) *name_list);
+
+### ssl.h :: SSL_shutdown
+int SSL_shutdown(SSL *s);
+
+### ssl.h :: TLSv1_2_server_method
+OSSL_DEPRECATEDIN_1_1_0 __owur const SSL_METHOD *TLSv1_2_server_method(void);
+
+### ssl.h :: SSL_set_async_callback
+__owur int SSL_set_async_callback(SSL *s, SSL_async_callback_fn callback);
+
+### ssl.h :: SSL_CTX_set_async_callback_arg
+__owur int SSL_CTX_set_async_callback_arg(SSL_CTX *ctx, void *arg);
+
+### ssl.h :: SSL_CTX_set_async_callback
+__owur int SSL_CTX_set_async_callback(SSL_CTX *ctx, SSL_async_callback_fn callback);
+
+### ssl.h :: SSL_get_srp_N
+OSSL_DEPRECATEDIN_3_0 __owur BIGNUM *SSL_get_srp_N(SSL *s);
+
+### ssl.h :: SSL_CTX_set_srp_username
+OSSL_DEPRECATEDIN_3_0 int SSL_CTX_set_srp_username(SSL_CTX *ctx, char *name);
+
+### ssl.h :: SSL_CTX_dane_enable
+__owur int SSL_CTX_dane_enable(SSL_CTX *ctx);
+
+### ssl.h :: SSL_CTX_get_default_passwd_cb_userdata
+void *SSL_CTX_get_default_passwd_cb_userdata(SSL_CTX *ctx);
+
+### ssl.h :: SSL_CTX_set_generate_session_id
+__owur int SSL_CTX_set_generate_session_id(SSL_CTX *ctx, GEN_SESSION_CB cb);
+
+### ssl.h :: SSL_CTX_remove_session
+int SSL_CTX_remove_session(SSL_CTX *ctx, SSL_SESSION *session);
+
+### ssl.h :: SSL_SESSION_get0_peer
+__owur X509 *SSL_SESSION_get0_peer(SSL_SESSION *s);
+
+### ssl.h :: SSL_load_client_CA_file_ex
+__owur STACK_OF(X509_NAME) *SSL_load_client_CA_file_ex(const char *file, OSSL_LIB_CTX *libctx,
+    const char *propq);
+
+### ssl.h :: SSL_CTX_set1_cert_store
+void SSL_CTX_set1_cert_store(SSL_CTX *, X509_STORE *);
+
+### ssl.h :: SSL_is_init_finished
+int SSL_is_init_finished(const SSL *s);
+
+### ssl.h :: SSL_CTX_set_psk_find_session_callback
+void SSL_CTX_set_psk_find_session_callback(SSL_CTX *ctx,
+    SSL_psk_find_session_cb_func cb);
+
+### ssl.h :: SSL_CTX_set_client_cert_engine
+__owur int SSL_CTX_set_client_cert_engine(SSL_CTX *ctx, ENGINE *e);
+
+### ssl.h :: ssl_method_st
+typedef struct ssl_method_st SSL_METHOD;
+
+### tls1.h :: SSL_get_shared_sigalgs
+int SSL_get_shared_sigalgs(SSL *s, int idx,
+    int *psign, int *phash, int *psignandhash,
+    unsigned char *rsig, unsigned char *rhash);
+
+### ui.h :: UI_set_result
+int UI_set_result(UI *ui, UI_STRING *uis, const char *result);
+

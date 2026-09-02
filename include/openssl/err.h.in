@@ -1,0 +1,817 @@
+/*
+ * Copyright 1995-2023 The OpenSSL Project Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License 2.0 (the "License").  You may not use
+ * this file except in compliance with the License.  You can obtain a copy
+ * in the file LICENSE in the source distribution or at
+ * https://www.openssl.org/source/license.html
+ */
+
+/* clang-format off */
+{-
+use OpenSSL::stackhash qw(generate_lhash_macros);
+-}
+/* clang-format on */
+
+#ifndef OPENSSL_ERR_H
+#define OPENSSL_ERR_H
+#pragma once
+
+#include <openssl/macros.h>
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#define HEADER_ERR_H
+#endif
+
+#include <openssl/e_os2.h>
+
+#ifndef OPENSSL_NO_STDIO
+#include <stdio.h>
+#include <stdlib.h>
+#endif
+
+#include <openssl/types.h>
+#include <openssl/bio.h>
+#include <openssl/lhash.h>
+#include <openssl/cryptoerr_legacy.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#ifndef OPENSSL_NO_FILENAMES
+#define ERR_PUT_error(l, f, r, fn, ln) ERR_put_error(l, f, r, fn, ln)
+#else
+#define ERR_PUT_error(l, f, r, fn, ln) ERR_put_error(l, f, r, NULL, 0)
+#endif
+#endif
+
+#include <limits.h>
+#include <errno.h>
+
+#define ERR_TXT_MALLOCED 0x01
+#define ERR_TXT_STRING 0x02
+
+#if !defined(OPENSSL_NO_DEPRECATED_3_0) || defined(OSSL_FORCE_ERR_STATE)
+#define ERR_FLAG_MARK 0x01
+#define ERR_FLAG_CLEAR 0x02
+
+#define ERR_NUM_ERRORS 16
+struct err_state_st {
+    /** Per-slot internal flags (for example ERR_FLAG_MARK, ERR_FLAG_CLEAR). */
+    int err_flags[ERR_NUM_ERRORS];
+    /** Mark nesting depth at each ring-buffer slot (used by ERR_set_mark()). */
+    int err_marks[ERR_NUM_ERRORS];
+    /** Packed error code stored in each slot (OpenSSL or system error). */
+    unsigned long err_buffer[ERR_NUM_ERRORS];
+    /** Optional auxiliary detail strings for each error slot (see ERR_TXT_*). */
+    char *err_data[ERR_NUM_ERRORS];
+    /** Allocated size in bytes of each @c err_data slot. */
+    size_t err_data_size[ERR_NUM_ERRORS];
+    /** ERR_TXT_* flags describing how @c err_data[i] is owned and formatted. */
+    int err_data_flags[ERR_NUM_ERRORS];
+    /** Source file name associated with each error slot (may be NULL). */
+    char *err_file[ERR_NUM_ERRORS];
+    /** Source line number for each error (-1 when unset). */
+    int err_line[ERR_NUM_ERRORS];
+    /** Function-name strings associated with each slot in the error ring buffer. */
+    char *err_func[ERR_NUM_ERRORS];
+    /** Index of the newest error slot in the ring buffer. */
+    int top;
+    /** Index of the oldest error slot in the ring buffer. */
+    int bottom;
+};
+#endif
+
+/* library */
+#define ERR_LIB_NONE 1
+#define ERR_LIB_SYS 2
+#define ERR_LIB_BN 3
+#define ERR_LIB_RSA 4
+#define ERR_LIB_DH 5
+#define ERR_LIB_EVP 6
+#define ERR_LIB_BUF 7
+#define ERR_LIB_OBJ 8
+#define ERR_LIB_PEM 9
+#define ERR_LIB_DSA 10
+#define ERR_LIB_X509 11
+/* #define ERR_LIB_METH         12 */
+#define ERR_LIB_ASN1 13
+#define ERR_LIB_CONF 14
+#define ERR_LIB_CRYPTO 15
+#define ERR_LIB_EC 16
+#define ERR_LIB_SSL 20
+/* #define ERR_LIB_SSL23        21 */
+/* #define ERR_LIB_SSL2         22 */
+/* #define ERR_LIB_SSL3         23 */
+/* #define ERR_LIB_RSAREF       30 */
+/* #define ERR_LIB_PROXY        31 */
+#define ERR_LIB_BIO 32
+#define ERR_LIB_PKCS7 33
+#define ERR_LIB_X509V3 34
+#define ERR_LIB_PKCS12 35
+#define ERR_LIB_RAND 36
+#define ERR_LIB_DSO 37
+#define ERR_LIB_ENGINE 38
+#define ERR_LIB_OCSP 39
+#define ERR_LIB_UI 40
+#define ERR_LIB_COMP 41
+#define ERR_LIB_ECDSA 42
+#define ERR_LIB_ECDH 43
+#define ERR_LIB_OSSL_STORE 44
+#define ERR_LIB_FIPS 45
+#define ERR_LIB_CMS 46
+#define ERR_LIB_TS 47
+#define ERR_LIB_HMAC 48
+/* # define ERR_LIB_JPAKE       49 */
+#define ERR_LIB_CT 50
+#define ERR_LIB_ASYNC 51
+#define ERR_LIB_KDF 52
+#define ERR_LIB_SM2 53
+#define ERR_LIB_ESS 54
+#define ERR_LIB_PROP 55
+#define ERR_LIB_CRMF 56
+#define ERR_LIB_PROV 57
+#define ERR_LIB_CMP 58
+#define ERR_LIB_OSSL_ENCODER 59
+#define ERR_LIB_OSSL_DECODER 60
+#define ERR_LIB_HTTP 61
+
+#define ERR_LIB_USER 128
+
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#define ASN1err(f, r) ERR_raise_data(ERR_LIB_ASN1, (r), NULL)
+#define ASYNCerr(f, r) ERR_raise_data(ERR_LIB_ASYNC, (r), NULL)
+#define BIOerr(f, r) ERR_raise_data(ERR_LIB_BIO, (r), NULL)
+#define BNerr(f, r) ERR_raise_data(ERR_LIB_BN, (r), NULL)
+#define BUFerr(f, r) ERR_raise_data(ERR_LIB_BUF, (r), NULL)
+#define CMPerr(f, r) ERR_raise_data(ERR_LIB_CMP, (r), NULL)
+#define CMSerr(f, r) ERR_raise_data(ERR_LIB_CMS, (r), NULL)
+#define COMPerr(f, r) ERR_raise_data(ERR_LIB_COMP, (r), NULL)
+#define CONFerr(f, r) ERR_raise_data(ERR_LIB_CONF, (r), NULL)
+#define CRMFerr(f, r) ERR_raise_data(ERR_LIB_CRMF, (r), NULL)
+#define CRYPTOerr(f, r) ERR_raise_data(ERR_LIB_CRYPTO, (r), NULL)
+#define CTerr(f, r) ERR_raise_data(ERR_LIB_CT, (r), NULL)
+#define DHerr(f, r) ERR_raise_data(ERR_LIB_DH, (r), NULL)
+#define DSAerr(f, r) ERR_raise_data(ERR_LIB_DSA, (r), NULL)
+#define DSOerr(f, r) ERR_raise_data(ERR_LIB_DSO, (r), NULL)
+#define ECDHerr(f, r) ERR_raise_data(ERR_LIB_ECDH, (r), NULL)
+#define ECDSAerr(f, r) ERR_raise_data(ERR_LIB_ECDSA, (r), NULL)
+#define ECerr(f, r) ERR_raise_data(ERR_LIB_EC, (r), NULL)
+#define ENGINEerr(f, r) ERR_raise_data(ERR_LIB_ENGINE, (r), NULL)
+#define ESSerr(f, r) ERR_raise_data(ERR_LIB_ESS, (r), NULL)
+#define EVPerr(f, r) ERR_raise_data(ERR_LIB_EVP, (r), NULL)
+#define FIPSerr(f, r) ERR_raise_data(ERR_LIB_FIPS, (r), NULL)
+#define HMACerr(f, r) ERR_raise_data(ERR_LIB_HMAC, (r), NULL)
+#define HTTPerr(f, r) ERR_raise_data(ERR_LIB_HTTP, (r), NULL)
+#define KDFerr(f, r) ERR_raise_data(ERR_LIB_KDF, (r), NULL)
+#define OBJerr(f, r) ERR_raise_data(ERR_LIB_OBJ, (r), NULL)
+#define OCSPerr(f, r) ERR_raise_data(ERR_LIB_OCSP, (r), NULL)
+#define OSSL_STOREerr(f, r) ERR_raise_data(ERR_LIB_OSSL_STORE, (r), NULL)
+#define PEMerr(f, r) ERR_raise_data(ERR_LIB_PEM, (r), NULL)
+#define PKCS12err(f, r) ERR_raise_data(ERR_LIB_PKCS12, (r), NULL)
+#define PKCS7err(f, r) ERR_raise_data(ERR_LIB_PKCS7, (r), NULL)
+#define PROPerr(f, r) ERR_raise_data(ERR_LIB_PROP, (r), NULL)
+#define PROVerr(f, r) ERR_raise_data(ERR_LIB_PROV, (r), NULL)
+#define RANDerr(f, r) ERR_raise_data(ERR_LIB_RAND, (r), NULL)
+#define RSAerr(f, r) ERR_raise_data(ERR_LIB_RSA, (r), NULL)
+#define KDFerr(f, r) ERR_raise_data(ERR_LIB_KDF, (r), NULL)
+#define SM2err(f, r) ERR_raise_data(ERR_LIB_SM2, (r), NULL)
+#define SSLerr(f, r) ERR_raise_data(ERR_LIB_SSL, (r), NULL)
+#define SYSerr(f, r) ERR_raise_data(ERR_LIB_SYS, (r), NULL)
+#define TSerr(f, r) ERR_raise_data(ERR_LIB_TS, (r), NULL)
+#define UIerr(f, r) ERR_raise_data(ERR_LIB_UI, (r), NULL)
+#define X509V3err(f, r) ERR_raise_data(ERR_LIB_X509V3, (r), NULL)
+#define X509err(f, r) ERR_raise_data(ERR_LIB_X509, (r), NULL)
+#endif
+
+/*-
+ * The error code packs differently depending on if it records a system
+ * error or an OpenSSL error.
+ *
+ * A system error packs like this (we follow POSIX and only allow positive
+ * numbers that fit in an |int|):
+ *
+ * +-+-------------------------------------------------------------+
+ * |1|                     system error number                     |
+ * +-+-------------------------------------------------------------+
+ *
+ * An OpenSSL error packs like this:
+ *
+ * <---------------------------- 32 bits -------------------------->
+ *    <--- 8 bits ---><------------------ 23 bits ----------------->
+ * +-+---------------+---------------------------------------------+
+ * |0|    library    |                    reason                   |
+ * +-+---------------+---------------------------------------------+
+ *
+ * A few of the reason bits are reserved as flags with special meaning:
+ *
+ *                    <5 bits-<>--------- 19 bits ----------------->
+ *                   +-------+-+-----------------------------------+
+ *                   | rflags| |          reason                   |
+ *                   +-------+-+-----------------------------------+
+ *                            ^
+ *                            |
+ *                           ERR_RFLAG_FATAL = ERR_R_FATAL
+ *
+ * The reason flags are part of the overall reason code for practical
+ * reasons, as they provide an easy way to place different types of
+ * reason codes in different numeric ranges.
+ *
+ * The currently known reason flags are:
+ *
+ * ERR_RFLAG_FATAL      Flags that the reason code is considered fatal.
+ *                      For backward compatibility reasons, this flag
+ *                      is also the code for ERR_R_FATAL (that reason
+ *                      code served the dual purpose of flag and reason
+ *                      code in one in pre-3.0 OpenSSL).
+ * ERR_RFLAG_COMMON     Flags that the reason code is common to all
+ *                      libraries.  All ERR_R_ macros must use this flag,
+ *                      and no other _R_ macro is allowed to use it.
+ */
+
+/* Macros to help decode recorded system errors */
+#define ERR_SYSTEM_FLAG ((unsigned int)INT_MAX + 1)
+#define ERR_SYSTEM_MASK ((unsigned int)INT_MAX)
+
+/*
+ * Macros to help decode recorded OpenSSL errors
+ * As expressed above, RFLAGS and REASON overlap by one bit to allow
+ * ERR_R_FATAL to use ERR_RFLAG_FATAL as its reason code.
+ */
+#define ERR_LIB_OFFSET 23L
+#define ERR_LIB_MASK 0xFF
+#define ERR_RFLAGS_OFFSET 18L
+#define ERR_RFLAGS_MASK 0x1F
+#define ERR_REASON_MASK 0X7FFFFF
+
+/*
+ * Reason flags are defined pre-shifted to easily combine with the reason
+ * number.
+ */
+#define ERR_RFLAG_FATAL (0x1 << ERR_RFLAGS_OFFSET)
+#define ERR_RFLAG_COMMON (0x2 << ERR_RFLAGS_OFFSET)
+
+#define ERR_SYSTEM_ERROR(errcode) (((errcode) & ERR_SYSTEM_FLAG) != 0)
+
+/**
+ * @brief Extract the library number from a packed OpenSSL error code.
+ * @param errcode Error code as returned by ERR_get_error() or ERR_peek_error().
+ * @return ERR_LIB_* library number, or ERR_LIB_SYS for a recorded system error.
+ */
+static ossl_unused ossl_inline int ERR_GET_LIB(unsigned long errcode)
+{
+    if (ERR_SYSTEM_ERROR(errcode))
+        return ERR_LIB_SYS;
+    return (errcode >> ERR_LIB_OFFSET) & ERR_LIB_MASK;
+}
+
+/**
+ * @brief Extract reason-flag bits (ERR_RFLAG_*) from a packed OpenSSL error code.
+ * @param errcode Error code as returned by ERR_get_error() or ERR_peek_error().
+ * @return Flag bits shifted into place, or 0 for a recorded system error.
+ */
+static ossl_unused ossl_inline int ERR_GET_RFLAGS(unsigned long errcode)
+{
+    if (ERR_SYSTEM_ERROR(errcode))
+        return 0;
+    return errcode & (ERR_RFLAGS_MASK << ERR_RFLAGS_OFFSET);
+}
+
+/**
+ * @brief Extract the reason code from a packed OpenSSL or system error code.
+ * @param errcode Error code as returned by ERR_get_error() or ERR_peek_error().
+ * @return Reason code within the library, or the errno value for a system error.
+ */
+static ossl_unused ossl_inline int ERR_GET_REASON(unsigned long errcode)
+{
+    if (ERR_SYSTEM_ERROR(errcode))
+        return errcode & ERR_SYSTEM_MASK;
+    return errcode & ERR_REASON_MASK;
+}
+
+/**
+ * @brief Return whether a packed error code is marked fatal.
+ * @param errcode Error code as returned by ERR_get_error() or ERR_peek_error().
+ * @return Non-zero if ERR_RFLAG_FATAL is set on @p errcode, otherwise 0.
+ */
+static ossl_unused ossl_inline int ERR_FATAL_ERROR(unsigned long errcode)
+{
+    return (ERR_GET_RFLAGS(errcode) & ERR_RFLAG_FATAL) != 0;
+}
+
+/**
+ * @brief Return whether an error code is a system-independent common ERR reason.
+ * @param errcode Packed OpenSSL error code.
+ * @return Non-zero if ERR_RFLAG_COMMON is set on @p errcode, otherwise 0.
+ */
+static ossl_unused ossl_inline int ERR_COMMON_ERROR(unsigned long errcode)
+{
+    return (ERR_GET_RFLAGS(errcode) & ERR_RFLAG_COMMON) != 0;
+}
+
+/*
+ * ERR_PACK is a helper macro to properly pack OpenSSL error codes and may
+ * only be used for that purpose.  System errors are packed internally.
+ * ERR_PACK takes reason flags and reason code combined in |reason|.
+ * ERR_PACK ignores |func|, that parameter is just legacy from pre-3.0 OpenSSL.
+ */
+#define ERR_PACK(lib, func, reason) \
+    ((((unsigned long)(lib) & ERR_LIB_MASK) << ERR_LIB_OFFSET) | (((unsigned long)(reason) & ERR_REASON_MASK)))
+
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#define SYS_F_FOPEN 0
+#define SYS_F_CONNECT 0
+#define SYS_F_GETSERVBYNAME 0
+#define SYS_F_SOCKET 0
+#define SYS_F_IOCTLSOCKET 0
+#define SYS_F_BIND 0
+#define SYS_F_LISTEN 0
+#define SYS_F_ACCEPT 0
+#define SYS_F_WSASTARTUP 0
+#define SYS_F_OPENDIR 0
+#define SYS_F_FREAD 0
+#define SYS_F_GETADDRINFO 0
+#define SYS_F_GETNAMEINFO 0
+#define SYS_F_SETSOCKOPT 0
+#define SYS_F_GETSOCKOPT 0
+#define SYS_F_GETSOCKNAME 0
+#define SYS_F_GETHOSTBYNAME 0
+#define SYS_F_FFLUSH 0
+#define SYS_F_OPEN 0
+#define SYS_F_CLOSE 0
+#define SYS_F_IOCTL 0
+#define SYS_F_STAT 0
+#define SYS_F_FCNTL 0
+#define SYS_F_FSTAT 0
+#define SYS_F_SENDFILE 0
+#endif
+
+/*
+ * All ERR_R_ codes must be combined with ERR_RFLAG_COMMON.
+ */
+
+/* "we came from here" global reason codes, range 1..255 */
+#define ERR_R_SYS_LIB (ERR_LIB_SYS /* 2 */ | ERR_RFLAG_COMMON)
+#define ERR_R_BN_LIB (ERR_LIB_BN /* 3 */ | ERR_RFLAG_COMMON)
+#define ERR_R_RSA_LIB (ERR_LIB_RSA /* 4 */ | ERR_RFLAG_COMMON)
+#define ERR_R_DH_LIB (ERR_LIB_DH /* 5 */ | ERR_RFLAG_COMMON)
+#define ERR_R_EVP_LIB (ERR_LIB_EVP /* 6 */ | ERR_RFLAG_COMMON)
+#define ERR_R_BUF_LIB (ERR_LIB_BUF /* 7 */ | ERR_RFLAG_COMMON)
+#define ERR_R_OBJ_LIB (ERR_LIB_OBJ /* 8 */ | ERR_RFLAG_COMMON)
+#define ERR_R_PEM_LIB (ERR_LIB_PEM /* 9 */ | ERR_RFLAG_COMMON)
+#define ERR_R_DSA_LIB (ERR_LIB_DSA /* 10 */ | ERR_RFLAG_COMMON)
+#define ERR_R_X509_LIB (ERR_LIB_X509 /* 11 */ | ERR_RFLAG_COMMON)
+#define ERR_R_ASN1_LIB (ERR_LIB_ASN1 /* 13 */ | ERR_RFLAG_COMMON)
+#define ERR_R_CONF_LIB (ERR_LIB_CONF /* 14 */ | ERR_RFLAG_COMMON)
+#define ERR_R_CRYPTO_LIB (ERR_LIB_CRYPTO /* 15 */ | ERR_RFLAG_COMMON)
+#define ERR_R_EC_LIB (ERR_LIB_EC /* 16 */ | ERR_RFLAG_COMMON)
+#define ERR_R_SSL_LIB (ERR_LIB_SSL /* 20 */ | ERR_RFLAG_COMMON)
+#define ERR_R_BIO_LIB (ERR_LIB_BIO /* 32 */ | ERR_RFLAG_COMMON)
+#define ERR_R_PKCS7_LIB (ERR_LIB_PKCS7 /* 33 */ | ERR_RFLAG_COMMON)
+#define ERR_R_X509V3_LIB (ERR_LIB_X509V3 /* 34 */ | ERR_RFLAG_COMMON)
+#define ERR_R_PKCS12_LIB (ERR_LIB_PKCS12 /* 35 */ | ERR_RFLAG_COMMON)
+#define ERR_R_RAND_LIB (ERR_LIB_RAND /* 36 */ | ERR_RFLAG_COMMON)
+#define ERR_R_DSO_LIB (ERR_LIB_DSO /* 37 */ | ERR_RFLAG_COMMON)
+#define ERR_R_ENGINE_LIB (ERR_LIB_ENGINE /* 38 */ | ERR_RFLAG_COMMON)
+#define ERR_R_UI_LIB (ERR_LIB_UI /* 40 */ | ERR_RFLAG_COMMON)
+#define ERR_R_ECDSA_LIB (ERR_LIB_ECDSA /* 42 */ | ERR_RFLAG_COMMON)
+#define ERR_R_OSSL_STORE_LIB (ERR_LIB_OSSL_STORE /* 44 */ | ERR_RFLAG_COMMON)
+#define ERR_R_CMS_LIB (ERR_LIB_CMS /* 46 */ | ERR_RFLAG_COMMON)
+#define ERR_R_TS_LIB (ERR_LIB_TS /* 47 */ | ERR_RFLAG_COMMON)
+#define ERR_R_CT_LIB (ERR_LIB_CT /* 50 */ | ERR_RFLAG_COMMON)
+#define ERR_R_PROV_LIB (ERR_LIB_PROV /* 57 */ | ERR_RFLAG_COMMON)
+#define ERR_R_ESS_LIB (ERR_LIB_ESS /* 54 */ | ERR_RFLAG_COMMON)
+#define ERR_R_CMP_LIB (ERR_LIB_CMP /* 58 */ | ERR_RFLAG_COMMON)
+#define ERR_R_OSSL_ENCODER_LIB (ERR_LIB_OSSL_ENCODER /* 59 */ | ERR_RFLAG_COMMON)
+#define ERR_R_OSSL_DECODER_LIB (ERR_LIB_OSSL_DECODER /* 60 */ | ERR_RFLAG_COMMON)
+
+/* Other common error codes, range 256..2^ERR_RFLAGS_OFFSET-1 */
+#define ERR_R_FATAL (ERR_RFLAG_FATAL | ERR_RFLAG_COMMON)
+#define ERR_R_MALLOC_FAILURE (256 | ERR_R_FATAL)
+#define ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED (257 | ERR_R_FATAL)
+#define ERR_R_PASSED_NULL_PARAMETER (258 | ERR_R_FATAL)
+#define ERR_R_INTERNAL_ERROR (259 | ERR_R_FATAL)
+#define ERR_R_DISABLED (260 | ERR_R_FATAL)
+#define ERR_R_INIT_FAIL (261 | ERR_R_FATAL)
+#define ERR_R_PASSED_INVALID_ARGUMENT (262 | ERR_RFLAG_COMMON)
+#define ERR_R_OPERATION_FAIL (263 | ERR_R_FATAL)
+#define ERR_R_INVALID_PROVIDER_FUNCTIONS (264 | ERR_R_FATAL)
+#define ERR_R_INTERRUPTED_OR_CANCELLED (265 | ERR_RFLAG_COMMON)
+#define ERR_R_NESTED_ASN1_ERROR (266 | ERR_RFLAG_COMMON)
+#define ERR_R_MISSING_ASN1_EOS (267 | ERR_RFLAG_COMMON)
+#define ERR_R_UNSUPPORTED (268 | ERR_RFLAG_COMMON)
+#define ERR_R_FETCH_FAILED (269 | ERR_RFLAG_COMMON)
+#define ERR_R_INVALID_PROPERTY_DEFINITION (270 | ERR_RFLAG_COMMON)
+#define ERR_R_UNABLE_TO_GET_READ_LOCK (271 | ERR_R_FATAL)
+#define ERR_R_UNABLE_TO_GET_WRITE_LOCK (272 | ERR_R_FATAL)
+
+/**
+ * @brief Mapping from a packed OpenSSL error code to a human-readable string.
+ */
+typedef struct ERR_string_data_st {
+    /** Packed error code as produced by ERR_PACK(lib, func, reason). */
+    unsigned long error;
+    /** NUL-terminated description corresponding to @c error. */
+    const char *string;
+} ERR_STRING_DATA;
+
+/* clang-format off */
+{-
+    generate_lhash_macros("ERR_STRING_DATA");
+-}
+/* clang-format on */
+
+/* 12 lines and some on an 80 column terminal */
+#define ERR_MAX_DATA_SIZE 1024
+
+/* Building blocks */
+/**
+ * @brief Allocate a new empty slot on the current thread's OpenSSL error queue.
+ *
+ * Typically followed by ERR_set_debug() and ERR_set_error() (see ERR_raise()).
+ */
+void ERR_new(void);
+/**
+ * @brief Attach source location debug information to the current error-queue entry.
+ * @param file Source file name pointer (must remain valid; not copied).
+ * @param line Source line number.
+ * @param func Function name pointer (must remain valid; not copied).
+ */
+void ERR_set_debug(const char *file, int line, const char *func);
+/**
+ * @brief Set library, reason, and optional formatted auxiliary data on the current error entry.
+ * @param lib ERR_LIB_* library number for the error.
+ * @param reason Reason code within @p lib (or errno when @p lib is ERR_LIB_SYS).
+ * @param fmt printf-style format for extra data, or NULL for none; remaining arguments match @p fmt when non-NULL.
+ */
+void ERR_set_error(int lib, int reason, const char *fmt, ...);
+/**
+ * @brief Push an error onto the thread's error queue with a printf-style detail (va_list form).
+ * @param lib Library number (ERR_LIB_*).
+ * @param reason Reason code within that library.
+ * @param fmt Optional printf-style detail format, or NULL.
+ * @param args Variadic arguments matching @p fmt.
+ */
+void ERR_vset_error(int lib, int reason, const char *fmt, va_list args);
+
+/* Main error raising functions */
+#define ERR_raise(lib, reason) ERR_raise_data((lib), (reason), NULL)
+#define ERR_raise_data                                           \
+    (ERR_new(),                                                  \
+        ERR_set_debug(OPENSSL_FILE, OPENSSL_LINE, OPENSSL_FUNC), \
+        ERR_set_error)
+
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+/* Backward compatibility */
+#define ERR_put_error(lib, func, reason, file, line) \
+    (ERR_new(),                                      \
+        ERR_set_debug((file), (line), OPENSSL_FUNC), \
+        ERR_set_error((lib), (reason), NULL))
+#endif
+
+/**
+ * @brief Replace auxiliary data on the most recent error, taking ownership when flagged.
+ * @param data Auxiliary string or buffer; ownership transfers if @p flags includes ERR_TXT_MALLOCED.
+ * @param flags ERR_TXT_MALLOCED and/or ERR_TXT_STRING describing @p data.
+ */
+void ERR_set_error_data(char *data, int flags);
+
+/**
+ * @brief Pop the earliest error code from the current thread's error queue.
+ * @return Packed error code, or 0 if the queue is empty.
+ */
+unsigned long ERR_get_error(void);
+/**
+ * @brief Pop the earliest error and optionally return file, line, function, data, and flags.
+ * @param file Receives the source file name, or unchanged if NULL.
+ * @param line Receives the source line number, or unchanged if NULL.
+ * @param func Receives the function name, or unchanged if NULL.
+ * @param data Receives optional auxiliary data, or unchanged if NULL.
+ * @param flags Receives ERR_TXT_* flags for @p data, or unchanged if NULL.
+ * @return Packed error code, or 0 if the queue is empty.
+ */
+unsigned long ERR_get_error_all(const char **file, int *line,
+    const char **func,
+    const char **data, int *flags);
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+/**
+ * @brief Pop the earliest error and optionally return file and line (deprecated).
+ * @param file Receives the source file name, or unchanged if NULL.
+ * @param line Receives the source line number, or unchanged if NULL.
+ * @return Packed error code, or 0 if the queue is empty.
+ */
+OSSL_DEPRECATEDIN_3_0
+unsigned long ERR_get_error_line(const char **file, int *line);
+/**
+ * @brief Pop the earliest error with file, line, data, and flags (deprecated).
+ * @param file Receives the source file name, or unchanged if NULL.
+ * @param line Receives the source line number, or unchanged if NULL.
+ * @param data Receives optional auxiliary data, or unchanged if NULL.
+ * @param flags Receives ERR_TXT_* flags for @p data, or unchanged if NULL.
+ * @return Packed error code, or 0 if the queue is empty.
+ */
+OSSL_DEPRECATEDIN_3_0
+unsigned long ERR_get_error_line_data(const char **file, int *line,
+    const char **data, int *flags);
+#endif
+/**
+ * @brief Return the earliest error code without removing it from the queue.
+ * @return Packed error code, or 0 if the queue is empty.
+ */
+unsigned long ERR_peek_error(void);
+/**
+ * @brief Peek at the earliest error and optionally return its source file and line.
+ * @param file Receives the source file name, or unchanged if NULL.
+ * @param line Receives the source line number, or unchanged if NULL.
+ * @return Earliest error code, or 0 if the queue is empty (queue unchanged).
+ */
+unsigned long ERR_peek_error_line(const char **file, int *line);
+/**
+ * @brief Peek at the earliest error and optionally return its function name.
+ * @param func Receives the function name string, or unchanged if NULL.
+ * @return Earliest error code, or 0 if the queue is empty (queue unchanged).
+ */
+unsigned long ERR_peek_error_func(const char **func);
+/**
+ * @brief Peek at the earliest error and optionally return auxiliary data and flags.
+ * @param data Receives optional auxiliary data, or unchanged if NULL.
+ * @param flags Receives ERR_TXT_* flags for @p data, or unchanged if NULL.
+ * @return Earliest error code, or 0 if the queue is empty (queue unchanged).
+ */
+unsigned long ERR_peek_error_data(const char **data, int *flags);
+/**
+ * @brief Peek at the earliest error and optionally return file, line, function, data, and flags.
+ * @param file Receives the source file name, or unchanged if NULL.
+ * @param line Receives the source line number, or unchanged if NULL.
+ * @param func Receives the function name, or unchanged if NULL.
+ * @param data Receives optional auxiliary data, or unchanged if NULL.
+ * @param flags Receives ERR_TXT_* flags for @p data, or unchanged if NULL.
+ * @return Earliest error code, or 0 if the queue is empty (queue unchanged).
+ */
+unsigned long ERR_peek_error_all(const char **file, int *line,
+    const char **func,
+    const char **data, int *flags);
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+/**
+ * @brief Peek at the earliest error with file, line, data, and flags (deprecated).
+ * @param file Receives the source file name, or unchanged if NULL.
+ * @param line Receives the source line number, or unchanged if NULL.
+ * @param data Receives optional auxiliary data, or unchanged if NULL.
+ * @param flags Receives ERR_TXT_* flags for @p data, or unchanged if NULL.
+ * @return Earliest error code, or 0 if the queue is empty (queue unchanged).
+ */
+OSSL_DEPRECATEDIN_3_0
+unsigned long ERR_peek_error_line_data(const char **file, int *line,
+    const char **data, int *flags);
+#endif
+/**
+ * @brief Return the newest error code without removing it from the queue.
+ * @return Packed error code, or 0 if the queue is empty.
+ */
+unsigned long ERR_peek_last_error(void);
+/**
+ * @brief Peek at the newest error code and optionally its source file/line.
+ * @param file Receives the source file name associated with the error, or may be NULL.
+ * @param line Receives the source line number associated with the error, or may be NULL.
+ * @return Newest error code, or 0 if the queue is empty (queue unchanged).
+ */
+unsigned long ERR_peek_last_error_line(const char **file, int *line);
+/**
+ * @brief Peek at the newest error code and optionally its function name.
+ * @param func Receives the function name string associated with the error, or may be NULL.
+ * @return Newest error code, or 0 if the queue is empty (queue unchanged).
+ */
+unsigned long ERR_peek_last_error_func(const char **func);
+/**
+ * @brief Peek at the newest error and optionally return auxiliary data and flags.
+ * @param data Receives optional auxiliary data, or unchanged if NULL.
+ * @param flags Receives ERR_TXT_* flags for @p data, or unchanged if NULL.
+ * @return Newest error code, or 0 if the queue is empty (queue unchanged).
+ */
+unsigned long ERR_peek_last_error_data(const char **data, int *flags);
+/**
+ * @brief Peek at the newest error and optionally return file, line, function, data, and flags.
+ * @param file Receives the source file name, or unchanged if NULL.
+ * @param line Receives the source line number, or unchanged if NULL.
+ * @param func Receives the function name, or unchanged if NULL.
+ * @param data Receives optional auxiliary data, or unchanged if NULL.
+ * @param flags Receives ERR_TXT_* flags for @p data, or unchanged if NULL.
+ * @return Newest error code, or 0 if the queue is empty (queue unchanged).
+ */
+unsigned long ERR_peek_last_error_all(const char **file, int *line,
+    const char **func,
+    const char **data, int *flags);
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+/**
+ * @brief Peek at the newest error with file, line, data, and flags (deprecated).
+ * @param file Receives the source file name, or may be NULL.
+ * @param line Receives the source line number, or may be NULL.
+ * @param data Receives optional error data string, or may be NULL.
+ * @param flags Receives ERR_TXT_* flags for @p data, or may be NULL.
+ * @return Newest error code, or 0 if the queue is empty (queue unchanged).
+ */
+OSSL_DEPRECATEDIN_3_0
+unsigned long ERR_peek_last_error_line_data(const char **file, int *line,
+    const char **data, int *flags);
+#endif
+
+/**
+ * @brief Clear all errors from the current thread's OpenSSL error queue.
+ */
+void ERR_clear_error(void);
+
+/**
+ * @brief Format a human-readable description of error code @p e into a buffer.
+ * @param e Packed error code from ERR_get_error() or similar.
+ * @param buf Destination buffer of at least 256 bytes, or NULL to use a static buffer (not thread-safe).
+ * @return Pointer to @p buf, or to the static buffer when @p buf is NULL.
+ */
+char *ERR_error_string(unsigned long e, char *buf);
+/**
+ * @brief Format an OpenSSL error code into a caller-provided buffer.
+ * @param e Packed error code from ERR_get_error() or similar.
+ * @param buf Destination buffer that receives a NUL-terminated description.
+ * @param len Capacity of @p buf in bytes.
+ */
+void ERR_error_string_n(unsigned long e, char *buf, size_t len);
+/**
+ * @brief Return the human-readable library name for a packed error code.
+ * @param e Error code as returned by ERR_get_error() (library field is used).
+ * @return Internal library name string (do not free), or NULL if unknown.
+ */
+const char *ERR_lib_error_string(unsigned long e);
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+/**
+ * @brief Return the function name for a packed error code (deprecated; always returns NULL in 3.0).
+ * @param e Packed error code (function field is ignored).
+ * @return Always NULL in OpenSSL 3.0 and later.
+ */
+OSSL_DEPRECATEDIN_3_0 const char *ERR_func_error_string(unsigned long e);
+#endif
+/**
+ * @brief Return the registered reason-string for a packed error code.
+ * @param e Packed error code whose reason field is looked up.
+ * @return Reason description string (do not free), or NULL if none is registered.
+ */
+const char *ERR_reason_error_string(unsigned long e);
+
+/**
+ * @brief Print and clear all queued errors, invoking @p cb for each formatted line.
+ * @param cb Callback receiving each error line and @p u; return value is ignored.
+ * @param u Opaque argument passed to @p cb.
+ */
+void ERR_print_errors_cb(int (*cb)(const char *str, size_t len, void *u),
+    void *u);
+#ifndef OPENSSL_NO_STDIO
+/**
+ * @brief Print and clear all queued OpenSSL errors to stdio stream @p fp.
+ * @param fp Destination FILE (for example stderr).
+ */
+void ERR_print_errors_fp(FILE *fp);
+#endif
+/**
+ * @brief Print and clear all queued OpenSSL errors to BIO @p bp.
+ * @param bp Destination BIO for human-readable error lines.
+ */
+void ERR_print_errors(BIO *bp);
+
+/**
+ * @brief Append concatenated C strings as auxiliary data to the most recent error.
+ * @param num Number of following NUL-terminated @c char * arguments to concatenate (total length per error capped at 4096 bytes).
+ */
+void ERR_add_error_data(int num, ...);
+/**
+ * @brief Append additional string data to the most recent error, from a va_list.
+ * @param num Number of @c char * arguments in @p args to concatenate.
+ * @param args va_list of @p num C strings associated with the last error code.
+ *
+ * Like ERR_add_error_data() but takes a va_list; total extra data per error is capped at 4096 characters.
+ */
+void ERR_add_error_vdata(int num, va_list args);
+/**
+ * @brief Append text to the most recent error, optionally inserting a separator first.
+ * @param sepr Separator inserted before @p txt when the top entry has no data yet, or NULL.
+ * @param txt Additional text to append (may be split across new queue entries if too long).
+ */
+void ERR_add_error_txt(const char *sepr, const char *txt);
+/**
+ * @brief Append the contents of memory BIO @p bio as auxiliary data to the most recent error.
+ * @param sep Optional separator inserted before the BIO contents when needed, or NULL.
+ * @param bio Memory BIO whose contents are appended (a trailing NUL is added if missing).
+ */
+void ERR_add_error_mem_bio(const char *sep, BIO *bio);
+
+/**
+ * @brief Register a mutable ERR_STRING_DATA table for library @p lib.
+ * @param lib ERR_LIB_* library number the strings belong to.
+ * @param str Array of {error, string} pairs terminated by {0, NULL}.
+ * @return 1 on success, or 0 on failure.
+ */
+int ERR_load_strings(int lib, ERR_STRING_DATA *str);
+/**
+ * @brief Register a const ERR_STRING_DATA table whose last entry has error == 0.
+ * @param str Array of error-code / string pairs terminated by a zero error code.
+ * @return 1 on success, or 0 on error.
+ */
+int ERR_load_strings_const(const ERR_STRING_DATA *str);
+/**
+ * @brief Remove previously registered error strings for library @p lib.
+ * @param lib ERR_LIB_* library number passed to ERR_load_strings().
+ * @param str Same table pointer used with ERR_load_strings() (entries must match).
+ * @return 1 on success, or 0 on failure.
+ */
+int ERR_unload_strings(int lib, ERR_STRING_DATA *str);
+
+#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+#define ERR_load_crypto_strings() \
+    OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL)
+#define ERR_free_strings() \
+    while (0)              \
+    continue
+#endif
+#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+/**
+ * @brief Free the error queue for a thread identifier (deprecated; automatic since 1.1.0).
+ * @param tid Opaque thread identifier, or NULL for the current thread.
+ */
+OSSL_DEPRECATEDIN_1_1_0 void ERR_remove_thread_state(void *tid);
+#endif
+#ifndef OPENSSL_NO_DEPRECATED_1_0_0
+/**
+ * @brief Remove the error queue for a process id (deprecated; use ERR_remove_thread_state).
+ * @param pid Ignored; historically identified the process whose state was cleared.
+ */
+OSSL_DEPRECATEDIN_1_0_0 void ERR_remove_state(unsigned long pid);
+#endif
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+/**
+ * @brief Return the current thread's ERR_STATE (deprecated internal accessor).
+ * @return Thread-local error state, or NULL on allocation failure.
+ */
+OSSL_DEPRECATEDIN_3_0 ERR_STATE *ERR_get_state(void);
+#endif
+
+/**
+ * @brief Allocate a unique library number for a dynamically registered error library.
+ * @return New ERR_LIB_* style library index for use with ERR_load_strings().
+ */
+int ERR_get_next_error_library(void);
+
+/**
+ * @brief Place a mark on the current topmost error-queue entry.
+ * @return 1 if a mark was placed, or 0 if the queue is empty.
+ */
+int ERR_set_mark(void);
+/**
+ * @brief Pop errors until (and including) the most recent mark set by ERR_set_mark().
+ * @return 1 if a mark was found and cleared, or 0 if no mark was present.
+ */
+int ERR_pop_to_mark(void);
+/**
+ * @brief Remove the most recently set error-stack mark without popping errors.
+ * @return 1 if a mark was cleared, or 0 if no mark was active.
+ */
+int ERR_clear_last_mark(void);
+/**
+ * @brief Count error-stack entries above the most recently set mark.
+ * @return Number of errors pushed since ERR_set_mark(), or 0 if no mark is active.
+ */
+int ERR_count_to_mark(void);
+/**
+ * @brief Unconditionally remove the newest error from the queue.
+ * @return 1 if an error was removed, or 0 if the queue was empty.
+ */
+int ERR_pop(void);
+
+/**
+ * @brief Allocate an empty saved error-state object.
+ * @return New ERR_STATE for use with OSSL_ERR_STATE_save(), or NULL on failure.
+ */
+ERR_STATE *OSSL_ERR_STATE_new(void);
+/**
+ * @brief Copy the current thread's error queue into @p es and clear the thread queue.
+ * @param es Destination error-state object from OSSL_ERR_STATE_new().
+ */
+void OSSL_ERR_STATE_save(ERR_STATE *es);
+/**
+ * @brief Move errors above the most recent mark from the thread queue into @p es.
+ * @param es Destination from OSSL_ERR_STATE_new(); prior contents are cleared first.
+ */
+void OSSL_ERR_STATE_save_to_mark(ERR_STATE *es);
+/**
+ * @brief Append errors saved in @p es onto the current thread's error queue.
+ * @param es Saved state from OSSL_ERR_STATE_save() or OSSL_ERR_STATE_save_to_mark().
+ */
+void OSSL_ERR_STATE_restore(const ERR_STATE *es);
+/**
+ * @brief Free a saved error-state object and its duplicated auxiliary data.
+ * @param es Object from OSSL_ERR_STATE_new(), or NULL (no-op).
+ */
+void OSSL_ERR_STATE_free(ERR_STATE *es);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

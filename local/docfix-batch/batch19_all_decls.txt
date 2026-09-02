@@ -1,0 +1,664 @@
+===== NEED asn1.h:2677 ASN1_item_d2i (lines 2676-2676) =====
+    OSSL_LIB_CTX *libctx, const char *propq);
+
+===== NEED bio.h:1569 BIO_meth_get_destroy (lines 1569-1569) =====
+int (*BIO_meth_get_destroy(const BIO_METHOD *biom))(BIO *);
+
+===== NEED bio.h:1568 BIO_meth_set_create (lines 1568-1568) =====
+int BIO_meth_set_create(BIO_METHOD *biom, int (*create)(BIO *));
+
+===== NEED bio.h:1560 BIO_meth_set_ctrl (lines 1560-1560) =====
+int BIO_meth_set_ctrl(BIO_METHOD *biom,
+
+===== NEED bio.h:1552 BIO_meth_set_gets (lines 1552-1552) =====
+int BIO_meth_set_gets(BIO_METHOD *biom,
+
+===== NEED bio.h:1551 BIO_meth_get_gets (lines 1551-1551) =====
+int (*BIO_meth_get_gets(const BIO_METHOD *biom))(BIO *, char *, int);
+
+===== NEED bio.h:1549 BIO_meth_set_puts (lines 1549-1549) =====
+int BIO_meth_set_puts(BIO_METHOD *biom,
+
+===== NEED bio.h:1545 BIO_meth_get_recvmmsg (lines 1545-1545) =====
+int (*BIO_meth_get_recvmmsg(const BIO_METHOD *biom))(BIO *, BIO_MSG *,
+
+===== NEED bio.h:1534 BIO_meth_set_read_ex (lines 1534-1534) =====
+int BIO_meth_set_read_ex(BIO_METHOD *biom,
+
+===== NEED bio.h:1532 BIO_meth_set_read (lines 1532-1532) =====
+int BIO_meth_set_read(BIO_METHOD *biom,
+
+===== NEED bio.h:1531 BIO_meth_get_read_ex (lines 1531-1531) =====
+int (*BIO_meth_get_read_ex(const BIO_METHOD *biom))(BIO *, char *, size_t, size_t *);
+
+===== NEED bio.h:1530 BIO_meth_get_read (lines 1530-1530) =====
+int (*BIO_meth_get_read(const BIO_METHOD *biom))(BIO *, char *, int);
+
+===== NEED bio.h:1527 BIO_meth_get_sendmmsg (lines 1527-1527) =====
+int (*BIO_meth_get_sendmmsg(const BIO_METHOD *biom))(BIO *, BIO_MSG *,
+
+===== NEED bio.h:1520 BIO_meth_set_write (lines 1520-1520) =====
+int BIO_meth_set_write(BIO_METHOD *biom,
+
+===== NEED bio.h:1512 BIO_meth_get_write (lines 1512-1512) =====
+int (*BIO_meth_get_write(const BIO_METHOD *biom))(BIO *, const char *, int);
+
+===== NEED bio.h:1510 BIO_meth_new (lines 1510-1510) =====
+BIO_METHOD *BIO_meth_new(int type, const char *name);
+
+===== NEED bio.h:1503 BIO_snprintf (lines 1503-1504) =====
+int BIO_snprintf(char *buf, size_t n, const char *format, ...)
+    ossl_bio__attr__((__format__(ossl_bio__printf__, 3, 4)));
+
+===== NEED bio.h:1436 BIO_new_connect (lines 1436-1436) =====
+BIO *BIO_new_connect(const char *host_port);
+
+===== NEED bio.h:1427 BIO_closesocket (lines 1427-1427) =====
+int BIO_closesocket(int sock);
+
+===== NEED bio.h:1424 BIO_bind (lines 1424-1424) =====
+int BIO_bind(int sock, const BIO_ADDR *addr, int options);
+
+===== NEED bio.h:1423 BIO_connect (lines 1423-1423) =====
+int BIO_connect(int sock, const BIO_ADDR *addr, int options);
+
+===== NEED bio.h:1400 addr (lines 1399-1401) =====
+union BIO_sock_info_u {
+    BIO_ADDR *addr;
+};
+
+===== NEED bio.h:1322 BIO_lookup (lines 1322-1322) =====
+int BIO_lookup(const char *host, const char *service,
+
+===== NEED bio.h:1309 BIO_PARSE_PRIO_SERV (lines 1308-1308) =====
+    BIO_PARSE_PRIO_HOST,
+
+===== NEED bio.h:1307 BIO_hostserv_priorities (lines 1307-1310) =====
+enum BIO_hostserv_priorities {
+    BIO_PARSE_PRIO_HOST,
+    BIO_PARSE_PRIO_SERV
+};
+
+===== NEED bio.h:1305 BIO_ADDRINFO_free (lines 1305-1305) =====
+void BIO_ADDRINFO_free(BIO_ADDRINFO *bai);
+
+===== NEED bio.h:1304 BIO_ADDRINFO_address (lines 1304-1304) =====
+const BIO_ADDR *BIO_ADDRINFO_address(const BIO_ADDRINFO *bai);
+
+===== NEED bio.h:1285 BIO_ADDRINFO_next (lines 1285-1285) =====
+const BIO_ADDRINFO *BIO_ADDRINFO_next(const BIO_ADDRINFO *bai);
+
+===== NEED bio.h:1283 BIO_ADDR_path_string (lines 1283-1283) =====
+char *BIO_ADDR_path_string(const BIO_ADDR *ap);
+
+===== NEED bio.h:1280 BIO_ADDR_rawport (lines 1280-1280) =====
+unsigned short BIO_ADDR_rawport(const BIO_ADDR *ap);
+
+===== NEED bio.h:1279 BIO_ADDR_rawaddress (lines 1279-1279) =====
+int BIO_ADDR_rawaddress(const BIO_ADDR *ap, void *p, size_t *l);
+
+===== NEED bio.h:1278 BIO_ADDR_family (lines 1278-1278) =====
+int BIO_ADDR_family(const BIO_ADDR *ap);
+
+===== NEED bio.h:1264 BIO_ADDR_copy (lines 1264-1264) =====
+int BIO_ADDR_copy(BIO_ADDR *dst, const BIO_ADDR *src);
+
+===== NEED bio.h:1259 BIO_hex_string (lines 1259-1259) =====
+int BIO_hex_string(BIO *out, int indent, int width, const void *data,
+
+===== NEED bio.h:1257 BIO_dump_indent_fp (lines 1257-1257) =====
+int BIO_dump_indent_fp(FILE *fp, const void *s, int len, int indent);
+
+===== NEED bio.h:1247 BIO_dump_indent (lines 1247-1247) =====
+int BIO_dump_indent(BIO *b, const void *bytes, int len, int indent);
+
+===== NEED bio.h:1244 BIO_dump_indent_cb (lines 1244-1244) =====
+int BIO_dump_indent_cb(int (*cb)(const void *data, size_t len, void *u),
+
+===== NEED bio.h:1242 BIO_dump_cb (lines 1242-1242) =====
+int BIO_dump_cb(int (*cb)(const void *data, size_t len, void *u),
+
+===== NEED bio.h:1241 BIO_fd_non_fatal_error (lines 1241-1241) =====
+int BIO_fd_non_fatal_error(int error);
+
+===== NEED bio.h:1187 BIO_s_dgram_pair (lines 1187-1187) =====
+const BIO_METHOD *BIO_s_dgram_pair(void);
+
+===== NEED bio.h:1184 BIO_f_prefix (lines 1184-1184) =====
+const BIO_METHOD *BIO_f_prefix(void);
+
+===== NEED bio.h:1183 BIO_f_nbio_test (lines 1183-1183) =====
+const BIO_METHOD *BIO_f_nbio_test(void);
+
+===== NEED bio.h:1172 BIO_f_buffer (lines 1172-1172) =====
+const BIO_METHOD *BIO_f_buffer(void);
+
+===== NEED bio.h:1170 BIO_s_null (lines 1170-1170) =====
+const BIO_METHOD *BIO_s_null(void);
+
+===== NEED bio.h:1169 BIO_s_bio (lines 1169-1169) =====
+const BIO_METHOD *BIO_s_bio(void);
+
+===== NEED bio.h:1168 BIO_s_log (lines 1168-1168) =====
+const BIO_METHOD *BIO_s_log(void);
+
+===== NEED bio.h:1167 BIO_s_fd (lines 1167-1167) =====
+const BIO_METHOD *BIO_s_fd(void);
+
+===== NEED bio.h:1159 BIO_s_socket (lines 1159-1159) =====
+const BIO_METHOD *BIO_s_socket(void);
+
+===== NEED bio.h:1140 BIO_s_mem (lines 1140-1140) =====
+const BIO_METHOD *BIO_s_mem(void);
+
+===== NEED bio.h:1130 BIO_nwrite0 (lines 1130-1130) =====
+int BIO_nwrite0(BIO *bio, char **buf);
+
+===== NEED bio.h:1118 BIO_set_retry_reason (lines 1118-1118) =====
+void BIO_set_retry_reason(BIO *bio, int reason);
+
+===== NEED bio.h:1030 BIO_sendmmsg (lines 1030-1030) =====
+__owur int BIO_sendmmsg(BIO *b, BIO_MSG *msg,
+
+===== NEED bio.h:965 BIO_get_shutdown (lines 965-965) =====
+int BIO_get_shutdown(BIO *a);
+
+===== NEED bio.h:934 BIO_free (lines 934-934) =====
+int BIO_free(BIO *a);
+
+===== NEED bn.h:1027 BN_get_rfc2409_prime_1024 (lines 1027-1027) =====
+BIGNUM *BN_get_rfc2409_prime_1024(BIGNUM *bn);
+
+===== NEED bn.h:847 BN_mod_mul_reciprocal (lines 847-847) =====
+int BN_mod_mul_reciprocal(BIGNUM *r, const BIGNUM *x, const BIGNUM *y,
+
+===== NEED bn.h:787 BN_BLINDING_invert_ex (lines 787-787) =====
+int BN_BLINDING_invert_ex(BIGNUM *n, const BIGNUM *r, BN_BLINDING *b,
+
+===== NEED bn.h:785 BN_BLINDING_invert (lines 785-785) =====
+int BN_BLINDING_invert(BIGNUM *n, BN_BLINDING *b, BN_CTX *ctx);
+
+===== NEED bn.h:768 BN_BLINDING_new (lines 768-768) =====
+BN_BLINDING *BN_BLINDING_new(const BIGNUM *A, const BIGNUM *Ai, BIGNUM *mod);
+
+===== NEED bn.h:610 BN_mod_inverse (lines 610-610) =====
+BIGNUM *BN_mod_inverse(BIGNUM *ret,
+
+===== NEED bn.h:580 BN_hex2bn (lines 580-580) =====
+int BN_hex2bn(BIGNUM **a, const char *str);
+
+===== NEED bn.h:560 BN_rshift (lines 560-560) =====
+int BN_rshift(BIGNUM *r, const BIGNUM *a, int n);
+
+===== NEED bn.h:542 BN_mod_exp_mont_consttime_x2 (lines 542-542) =====
+int BN_mod_exp_mont_consttime_x2(BIGNUM *rr1, const BIGNUM *a1, const BIGNUM *p1,
+
+===== NEED bn.h:532 BN_mod_exp_mont_consttime (lines 532-532) =====
+int BN_mod_exp_mont_consttime(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
+
+===== NEED bn.h:466 BN_mod_lshift1_quick (lines 466-466) =====
+int BN_mod_lshift1_quick(BIGNUM *r, const BIGNUM *a, const BIGNUM *m);
+
+===== NEED bn.h:384 BN_usub (lines 384-384) =====
+int BN_usub(BIGNUM *r, const BIGNUM *a, const BIGNUM *b);
+
+===== NEED bn.h:373 BN_bn2nativepad (lines 373-373) =====
+int BN_bn2nativepad(const BIGNUM *a, unsigned char *to, int tolen);
+
+===== NEED bn.h:312 BN_num_bits (lines 312-312) =====
+int BN_num_bits(const BIGNUM *a);
+
+===== NEED bn.h:262 BN_rand (lines 262-262) =====
+int BN_rand(BIGNUM *rnd, int bits, int top, int bottom);
+
+===== NEED bn.h:226 BN_value_one (lines 226-226) =====
+const BIGNUM *BN_value_one(void);
+
+===== NEED bn.h:208 BN_is_one (lines 208-208) =====
+int BN_is_one(const BIGNUM *a);
+
+===== NEED bn.h:116 BN_GENCB_free (lines 116-116) =====
+void BN_GENCB_free(BN_GENCB *cb);
+
+===== NEED cms.h:975 CMS_uncompress (lines 975-975) =====
+int CMS_uncompress(CMS_ContentInfo *cms, BIO *dcont, BIO *out,
+
+===== NEED conf.h:293 NCONF_get_section_names (lines 293-293) =====
+STACK_OF(OPENSSL_CSTRING) *NCONF_get_section_names(const CONF *conf);
+
+===== NEED conf.h:240 NCONF_get0_libctx (lines 240-240) =====
+OSSL_LIB_CTX *NCONF_get0_libctx(const CONF *conf);
+
+===== NEED conf.h:192 CONF_get_number (lines 192-192) =====
+long CONF_get_number(LHASH_OF(CONF_VALUE) *conf, const char *group,
+
+===== NEED conf.h:170 CONF_load_fp (lines 170-170) =====
+LHASH_OF(CONF_VALUE) *CONF_load_fp(LHASH_OF(CONF_VALUE) *conf, FILE *fp,
+
+===== NEED conf_api.h:66 _CONF_free_data (lines 66-66) =====
+void _CONF_free_data(CONF *conf);
+
+===== NEED conf_api.h:57 _CONF_get_number (lines 57-57) =====
+long _CONF_get_number(const CONF *conf, const char *section,
+
+===== NEED conf_api.h:29 _CONF_get_section (lines 29-29) =====
+CONF_VALUE *_CONF_get_section(const CONF *conf, const char *section);
+
+===== NEED conf_api.h:27 _CONF_new_section (lines 27-27) =====
+CONF_VALUE *_CONF_new_section(CONF *conf, const char *section);
+
+===== NEED conftypes.h:49 meth_data (lines 49-49) =====
+    void *meth_data;
+
+===== NEED core.h:84 algorithm_names (lines 84-86) =====
+    const char *algorithm_names; /* key */
+    /** Property query string that further identifies this algorithm (provider key). */
+    const char *property_definition;
+
+===== NEED crypto.h:765 OSSL_LIB_CTX_new_child (lines 765-765) =====
+OSSL_LIB_CTX *OSSL_LIB_CTX_new_child(const OSSL_CORE_HANDLE *handle,
+
+===== NEED crypto.h:636 OPENSSL_cleanup (lines 636-636) =====
+void OPENSSL_cleanup(void);
+
+===== NEED crypto.h:574 OPENSSL_fork_prepare (lines 574-574) =====
+OSSL_DEPRECATEDIN_3_0 void OPENSSL_fork_prepare(void);
+
+===== NEED crypto.h:451 CRYPTO_realloc (lines 451-451) =====
+void *CRYPTO_realloc(void *addr, size_t num, const char *file, int line);
+
+===== NEED crypto.h:450 CRYPTO_clear_free (lines 450-450) =====
+void CRYPTO_clear_free(void *ptr, size_t num, const char *file, int line);
+
+===== NEED crypto.h:448 CRYPTO_strndup (lines 448-448) =====
+char *CRYPTO_strndup(const char *str, size_t s, const char *file, int line);
+
+===== NEED crypto.h:417 CRYPTO_set_mem_functions (lines 417-417) =====
+int CRYPTO_set_mem_functions(CRYPTO_malloc_fn malloc_fn,
+
+===== NEED crypto.h:195 OpenSSL_version_num (lines 195-195) =====
+unsigned long OpenSSL_version_num(void);
+
+===== NEED crypto.h:193 OPENSSL_version_build_metadata (lines 193-193) =====
+const char *OPENSSL_version_build_metadata(void);
+
+===== NEED crypto.h:192 OPENSSL_version_pre_release (lines 192-192) =====
+const char *OPENSSL_version_pre_release(void);
+
+===== NEED crypto.h:186 OPENSSL_version_minor (lines 186-186) =====
+unsigned int OPENSSL_version_minor(void);
+
+===== NEED crypto.h:158 OPENSSL_hexstr2buf_ex (lines 158-158) =====
+int OPENSSL_hexstr2buf_ex(unsigned char *buf, size_t buf_n, size_t *buflen,
+
+===== NEED crypto.h:147 OPENSSL_strnlen (lines 147-147) =====
+size_t OPENSSL_strnlen(const char *str, size_t maxlen);
+
+===== NEED crypto.h:102 CRYPTO_atomic_load_int (lines 102-102) =====
+int CRYPTO_atomic_load_int(int *val, int *ret, CRYPTO_RWLOCK *lock);
+
+===== NEED crypto.h:101 CRYPTO_atomic_load (lines 101-101) =====
+int CRYPTO_atomic_load(uint64_t *val, uint64_t *ret, CRYPTO_RWLOCK *lock);
+
+===== NEED crypto.h:99 CRYPTO_atomic_or (lines 99-99) =====
+int CRYPTO_atomic_or(uint64_t *val, uint64_t op, uint64_t *ret,
+
+===== NEED crypto.h:98 CRYPTO_atomic_add (lines 98-98) =====
+int CRYPTO_atomic_add(int *val, int amount, int *ret, CRYPTO_RWLOCK *lock);
+
+===== NEED crypto.h:88 CRYPTO_THREAD_read_lock (lines 88-88) =====
+__owur int CRYPTO_THREAD_read_lock(CRYPTO_RWLOCK *lock);
+
+===== NEED crypto.h:81 CRYPTO_RWLOCK (lines 81-81) =====
+typedef void CRYPTO_RWLOCK;
+
+===== NEED crypto.h:75 CRYPTO_dynlock (lines 75-77) =====
+typedef struct {
+    int dummy;
+} CRYPTO_dynlock;
+
+===== NEED dsa.h:766 DSA_meth_set_paramgen (lines 766-766) =====
+OSSL_DEPRECATEDIN_3_0 int DSA_meth_set_paramgen(DSA_METHOD *dsam,
+
+===== NEED ec.h:409 EC_GROUP_get_point_conversion_form (lines 409-409) =====
+point_conversion_form_t EC_GROUP_get_point_conversion_form(const EC_GROUP *);
+
+===== NEED engine.h:1091 ENGINE_get_cipher (lines 1091-1092) =====
+OSSL_DEPRECATEDIN_3_0
+const EVP_CIPHER *ENGINE_get_cipher(ENGINE *e, int nid);
+
+===== NEED engine.h:438 ENGINE_by_id (lines 438-438) =====
+OSSL_DEPRECATEDIN_3_0 ENGINE *ENGINE_by_id(const char *id);
+
+===== NEED err.h:583 ERR_clear_error (lines 583-583) =====
+void ERR_clear_error(void);
+
+===== NEED err.h:542 ERR_peek_last_error (lines 542-542) =====
+unsigned long ERR_peek_last_error(void);
+
+===== NEED err.h:526 ERR_peek_error_all (lines 526-526) =====
+unsigned long ERR_peek_error_all(const char **file, int *line,
+
+===== NEED err.h:525 ERR_peek_error_data (lines 525-525) =====
+unsigned long ERR_peek_error_data(const char **data, int *flags);
+
+===== NEED err.h:518 ERR_peek_error_line (lines 518-518) =====
+unsigned long ERR_peek_error_line(const char **file, int *line);
+
+===== NEED err.h:428 ERR_new (lines 428-428) =====
+void ERR_new(void);
+
+===== NEED err.h:265 ERR_GET_RFLAGS (lines 265-270) =====
+static ossl_unused ossl_inline int ERR_GET_RFLAGS(unsigned long errcode)
+{
+    if (ERR_SYSTEM_ERROR(errcode))
+        return 0;
+    return errcode & (ERR_RFLAGS_MASK << ERR_RFLAGS_OFFSET);
+}
+
+===== NEED err.h:70 err_file (lines 70-70) =====
+    char *err_file[ERR_NUM_ERRORS];
+
+===== NEED err.h:65 err_data (lines 65-65) =====
+    char *err_data[ERR_NUM_ERRORS];
+
+===== NEED evp.h:5776 EVP_PKEY_todata (lines 5776-5776) =====
+int EVP_PKEY_todata(const EVP_PKEY *pkey, int selection, OSSL_PARAM **params);
+
+===== NEED evp.h:5493 EVP_KEM_get0_description (lines 5493-5493) =====
+const char *EVP_KEM_get0_description(const EVP_KEM *wrap);
+
+===== NEED evp.h:3266 EVP_MAC_CTX_get_mac_size (lines 3266-3266) =====
+size_t EVP_MAC_CTX_get_mac_size(EVP_MAC_CTX *ctx);
+
+===== NEED evp.h:3030 EVP_seed_cbc (lines 3030-3030) =====
+const EVP_CIPHER *EVP_seed_cbc(void);
+
+===== NEED evp.h:2394 EVP_des_ede_cbc (lines 2394-2394) =====
+const EVP_CIPHER *EVP_des_ede_cbc(void);
+
+===== NEED evp.h:2025 EVP_DecodeUpdate (lines 2025-2025) =====
+int EVP_DecodeUpdate(EVP_ENCODE_CTX *ctx, unsigned char *out, int *outl,
+
+===== NEED evp.h:1451 EVP_DigestFinalXOF (lines 1451-1451) =====
+__owur int EVP_DigestFinalXOF(EVP_MD_CTX *ctx, unsigned char *out,
+
+===== NEED evp.h:837 EVP_MD_get_size (lines 837-837) =====
+int EVP_MD_get_size(const EVP_MD *md);
+
+===== NEED evp.h:107 EVP_default_properties_enable_fips (lines 107-107) =====
+int EVP_default_properties_enable_fips(OSSL_LIB_CTX *libctx, int enable);
+
+===== NEED evp.h:100 EVP_set_default_properties (lines 100-100) =====
+int EVP_set_default_properties(OSSL_LIB_CTX *libctx, const char *propq);
+
+===== DOCUMENTED lhash.h:191 OPENSSL_LH_node_usage_stats_bio (lines 190-190) =====
+OSSL_DEPRECATEDIN_3_1 void OPENSSL_LH_node_stats_bio(const OPENSSL_LHASH *lh, BIO *out);
+
+===== NEED lhash.h:144 OPENSSL_LH_doall (lines 144-144) =====
+void OPENSSL_LH_doall(OPENSSL_LHASH *lh, OPENSSL_LH_DOALL_FUNC func);
+
+===== NEED lhash.h:143 OPENSSL_LH_retrieve (lines 143-143) =====
+void *OPENSSL_LH_retrieve(OPENSSL_LHASH *lh, const void *data);
+
+===== NEED lhash.h:120 OPENSSL_LH_set_thunks (lines 120-120) =====
+OPENSSL_LHASH *OPENSSL_LH_set_thunks(OPENSSL_LHASH *lh,
+
+===== NEED lhash.h:119 OPENSSL_LH_new (lines 119-119) =====
+OPENSSL_LHASH *OPENSSL_LH_new(OPENSSL_LH_HASHFUNC h, OPENSSL_LH_COMPFUNC c);
+
+===== NEED lhash.h:53 OPENSSL_LH_DOALL_FUNCARG (lines 53-53) =====
+typedef void (*OPENSSL_LH_DOALL_FUNCARG)(void *, void *);
+
+===== NEED lhash.h:52 OPENSSL_LH_DOALL_FUNC_THUNK (lines 52-52) =====
+typedef void (*OPENSSL_LH_DOALL_FUNC_THUNK)(void *, OPENSSL_LH_DOALL_FUNC doall);
+
+===== NEED lhash.h:43 OPENSSL_LH_HASHFUNC (lines 43-43) =====
+typedef unsigned long (*OPENSSL_LH_HASHFUNC)(const void *);
+
+===== NEED params.h:396 OSSL_PARAM_set_octet_string (lines 396-396) =====
+int OSSL_PARAM_set_octet_string(OSSL_PARAM *p, const void *val, size_t len);
+
+===== NEED params.h:302 OSSL_PARAM_set_ulong (lines 302-302) =====
+int OSSL_PARAM_set_ulong(OSSL_PARAM *p, unsigned long int val);
+
+===== NEED pem.h:423 PEM_bytes_read_bio_secmem (lines 423-423) =====
+int PEM_bytes_read_bio_secmem(unsigned char **pdata, long *plen, char **pnm,
+
+===== NEED pkcs7.h:916 PKCS7_dataInit (lines 916-916) =====
+BIO *PKCS7_dataInit(PKCS7 *p7, BIO *bio);
+
+===== NEED pkcs7.h:309 other (lines 309-309) =====
+        ASN1_TYPE *other;
+
+===== NEED rsa.h:1589 RSA_meth_set_multi_prime_keygen (lines 1589-1590) =====
+OSSL_DEPRECATEDIN_3_0
+int RSA_meth_set_multi_prime_keygen(RSA_METHOD *meth,
+
+===== DOCUMENTED srtp.h:63 SSL_set_tlsext_use_srtp (lines 62-62) =====
+__owur int SSL_CTX_set_tlsext_use_srtp(SSL_CTX *ctx, const char *profiles);
+
+===== NEED ssl.h:6220 OSSL_default_ciphersuites (lines 6220-6220) =====
+const char *OSSL_default_ciphersuites(void);
+
+===== DOCUMENTED ssl.h:4653 SSL_CTX_set_default_verify_file (lines 4652-4652) =====
+__owur int SSL_CTX_set_default_verify_dir(SSL_CTX *ctx);
+
+===== NEED ssl.h:4585 SSL_CTX_get0_certificate (lines 4585-4585) =====
+__owur X509 *SSL_CTX_get0_certificate(const SSL_CTX *ctx);
+
+===== DOCUMENTED ssl.h:4329 SSL_key_update (lines 4328-4328) =====
+__owur int SSL_do_handshake(SSL *s);
+
+===== NEED ssl.h:4101 SSL_write_ex2 (lines 4101-4101) =====
+__owur int SSL_write_ex2(SSL *s, const void *buf, size_t num,
+
+===== NEED ssl.h:3831 SSL_client_hello_get0_session_id (lines 3831-3831) =====
+size_t SSL_client_hello_get0_session_id(SSL *s, const unsigned char **out);
+
+===== NEED ssl.h:3810 SSL_CTX_set_client_hello_cb (lines 3810-3810) =====
+void SSL_CTX_set_client_hello_cb(SSL_CTX *c, SSL_client_hello_cb_fn cb,
+
+===== DOCUMENTED ssl.h:3621 SSL_get0_dane (lines 3621-3621) =====
+SSL_DANE *SSL_get0_dane(SSL *ssl);
+
+===== NEED ssl.h:3439 SSL_get_default_passwd_cb_userdata (lines 3439-3439) =====
+void *SSL_get_default_passwd_cb_userdata(SSL *s);
+
+===== NEED ssl.h:3157 SSL_SESSION_print (lines 3157-3157) =====
+int SSL_SESSION_print(BIO *fp, const SSL_SESSION *ses);
+
+===== NEED ssl.h:1124 SSL_CTX_set_next_protos_advertised_cb (lines 1124-1124) =====
+void SSL_CTX_set_next_protos_advertised_cb(SSL_CTX *s,
+
+===== NEED tls1.h:438 SSL_CTX_set_tlsext_ticket_key_evp_cb (lines 438-438) =====
+int SSL_CTX_set_tlsext_ticket_key_evp_cb(SSL_CTX *ctx, int (*fp)(SSL *, unsigned char *, unsigned char *, EVP_CIPHER_CTX *, EVP_MAC_CTX *, int));
+
+===== NEED types.h:233 rsa_pss_params_st (lines 233-233) =====
+typedef struct rsa_pss_params_st RSA_PSS_PARAMS;
+
+===== NEED types.h:64 ASN1_ENUMERATED (lines 64-64) =====
+typedef struct asn1_string_st ASN1_ENUMERATED;
+
+===== NEED ui.h:55 UI_new (lines 55-55) =====
+UI *UI_new(void);
+
+===== NEED x509.h:4578 PKCS8_pkey_add1_attr_by_NID (lines 4578-4578) =====
+int PKCS8_pkey_add1_attr_by_NID(PKCS8_PRIV_KEY_INFO *p8, int nid, int type,
+
+===== NEED x509.h:4520 EVP_PKCS82PKEY (lines 4520-4520) =====
+EVP_PKEY *EVP_PKCS82PKEY(const PKCS8_PRIV_KEY_INFO *p8);
+
+===== NEED x509.h:4163 EVP_PKEY_get_attr (lines 4163-4163) =====
+X509_ATTRIBUTE *EVP_PKEY_get_attr(const EVP_PKEY *key, int loc);
+
+===== NEED x509.h:4076 X509_ATTRIBUTE_create_by_OBJ (lines 4076-4076) =====
+X509_ATTRIBUTE *X509_ATTRIBUTE_create_by_OBJ(X509_ATTRIBUTE **attr,
+
+===== NEED x509.h:4034 X509at_add1_attr_by_NID (lines 4034-4035) =====
+STACK_OF(X509_ATTRIBUTE) *X509at_add1_attr_by_NID(STACK_OF(X509_ATTRIBUTE)
+                                                      **x,
+
+===== NEED x509.h:3959 X509_EXTENSION_get_object (lines 3959-3959) =====
+ASN1_OBJECT *X509_EXTENSION_get_object(X509_EXTENSION *ex);
+
+===== NEED x509.h:3951 X509_EXTENSION_set_critical (lines 3951-3951) =====
+int X509_EXTENSION_set_critical(X509_EXTENSION *ex, int crit);
+
+===== NEED x509.h:3824 X509_CRL_add_ext (lines 3824-3824) =====
+int X509_CRL_add_ext(X509_CRL *x, X509_EXTENSION *ex, int loc);
+
+===== NEED x509.h:3772 X509_get_ext_d2i (lines 3772-3772) =====
+void *X509_get_ext_d2i(const X509 *x, int nid, int *crit, int *idx);
+
+===== NEED x509.h:3771 X509_add_ext (lines 3771-3771) =====
+int X509_add_ext(X509 *x, X509_EXTENSION *ex, int loc);
+
+===== NEED x509.h:3740 X509_get_ext_by_NID (lines 3740-3740) =====
+int X509_get_ext_by_NID(const X509 *x, int nid, int lastpos);
+
+===== NEED x509.h:3495 X509_NAME_entry_count (lines 3495-3495) =====
+int X509_NAME_entry_count(const X509_NAME *name);
+
+===== NEED x509.h:3331 X509_NAME_cmp (lines 3331-3331) =====
+int X509_NAME_cmp(const X509_NAME *a, const X509_NAME *b);
+
+===== NEED x509.h:3299 X509_subject_name_hash_old (lines 3299-3299) =====
+unsigned long X509_subject_name_hash_old(X509 *x);
+
+===== NEED x509.h:3196 X509_REVOKED_get0_extensions (lines 3196-3197) =====
+const STACK_OF(X509_EXTENSION) *
+X509_REVOKED_get0_extensions(const X509_REVOKED *r);
+
+===== NEED x509.h:3141 X509_CRL_get0_extensions (lines 3141-3141) =====
+const STACK_OF(X509_EXTENSION) *X509_CRL_get0_extensions(const X509_CRL *crl);
+
+===== NEED x509.h:3032 X509_REQ_add1_attr (lines 3032-3032) =====
+int X509_REQ_add1_attr(X509_REQ *req, X509_ATTRIBUTE *attr);
+
+===== NEED x509.h:2946 X509_REQ_get0_pubkey (lines 2946-2946) =====
+EVP_PKEY *X509_REQ_get0_pubkey(const X509_REQ *req);
+
+===== NEED x509.h:2914 X509_REQ_get_signature_nid (lines 2914-2914) =====
+int X509_REQ_get_signature_nid(const X509_REQ *req);
+
+===== NEED x509.h:2899 X509_REQ_get0_signature (lines 2899-2899) =====
+void X509_REQ_get0_signature(const X509_REQ *req, const ASN1_BIT_STRING **psig,
+
+===== NEED x509.h:2857 X509_get0_pubkey (lines 2857-2857) =====
+EVP_PKEY *X509_get0_pubkey(const X509 *x);
+
+===== NEED x509.h:2324 X509_keyid_get0 (lines 2324-2324) =====
+unsigned char *X509_keyid_get0(X509 *x, int *len);
+
+===== NEED x509.h:2261 X509_get0_signature (lines 2261-2261) =====
+void X509_get0_signature(const ASN1_BIT_STRING **psig,
+
+===== NEED x509.h:1303 d2i_X509_PUBKEY_bio (lines 1303-1303) =====
+X509_PUBKEY *d2i_X509_PUBKEY_bio(BIO *bp, X509_PUBKEY **xpk);
+
+===== NEED x509.h:1178 i2d_X509_REQ_bio (lines 1178-1178) =====
+int i2d_X509_REQ_bio(BIO *bp, const X509_REQ *req);
+
+===== NEED x509.h:787 X509_REQ_sign_ctx (lines 787-787) =====
+int X509_REQ_sign_ctx(X509_REQ *x, EVP_MD_CTX *ctx);
+
+===== NEED x509_vfy.h:1856 X509_STORE_CTX_get0_chain (lines 1856-1856) =====
+STACK_OF(X509) *X509_STORE_CTX_get0_chain(const X509_STORE_CTX *ctx);
+
+===== NEED x509_vfy.h:1532 X509_STORE_CTX_get_obj_by_subject (lines 1532-1532) =====
+X509_OBJECT *X509_STORE_CTX_get_obj_by_subject(X509_STORE_CTX *vs,
+
+===== NEED x509_vfy.h:1366 X509_LOOKUP_meth_new (lines 1366-1366) =====
+X509_LOOKUP_METHOD *X509_LOOKUP_meth_new(const char *name);
+
+===== NEED x509_vfy.h:997 X509_STORE_set_lookup_certs (lines 997-997) =====
+void X509_STORE_set_lookup_certs(X509_STORE *xs,
+
+===== NEED x509_vfy.h:840 X509_STORE_set_flags (lines 840-840) =====
+int X509_STORE_set_flags(X509_STORE *xs, unsigned long flags);
+
+===== NEED x509_vfy.h:764 X509_OBJECT_set1_X509 (lines 764-764) =====
+int X509_OBJECT_set1_X509(X509_OBJECT *a, X509 *obj);
+
+===== NEED x509v3.h:3417 X509v3_addr_get_range (lines 3417-3417) =====
+int X509v3_addr_get_range(IPAddressOrRange *aor, const unsigned afi,
+
+===== NEED x509v3.h:2892 stack_st_ASIdOrRange (lines 2892-2924) =====
+SKM_DEFINE_STACK_OF_INTERNAL(ASIdOrRange, ASIdOrRange, ASIdOrRange)
+#define sk_ASIdOrRange_num(sk) OPENSSL_sk_num(ossl_check_const_ASIdOrRange_sk_type(sk))
+#define sk_ASIdOrRange_value(sk, idx) ((ASIdOrRange *)OPENSSL_sk_value(ossl_check_const_ASIdOrRange_sk_type(sk), (idx)))
+#define sk_ASIdOrRange_new(cmp) ((STACK_OF(ASIdOrRange) *)OPENSSL_sk_new(ossl_check_ASIdOrRange_compfunc_type(cmp)))
+#define sk_ASIdOrRange_new_null() ((STACK_OF(ASIdOrRange) *)OPENSSL_sk_new_null())
+#define sk_ASIdOrRange_new_reserve(cmp, n) ((STACK_OF(ASIdOrRange) *)OPENSSL_sk_new_reserve(ossl_check_ASIdOrRange_compfunc_type(cmp), (n)))
+#define sk_ASIdOrRange_reserve(sk, n) OPENSSL_sk_reserve(ossl_check_ASIdOrRange_sk_type(sk), (n))
+#define sk_ASIdOrRange_free(sk) OPENSSL_sk_free(ossl_check_ASIdOrRange_sk_type(sk))
+#define sk_ASIdOrRange_zero(sk) OPENSSL_sk_zero(ossl_check_ASIdOrRange_sk_type(sk))
+#define sk_ASIdOrRange_delete(sk, i) ((ASIdOrRange *)OPENSSL_sk_delete(ossl_check_ASIdOrRange_sk_type(sk), (i)))
+#define sk_ASIdOrRange_delete_ptr(sk, ptr) ((ASIdOrRange *)OPENSSL_sk_delete_ptr(ossl_check_ASIdOrRange_sk_type(sk), ossl_check_ASIdOrRange_type(ptr)))
+#define sk_ASIdOrRange_push(sk, ptr) OPENSSL_sk_push(ossl_check_ASIdOrRange_sk_type(sk), ossl_check_ASIdOrRange_type(ptr))
+#define sk_ASIdOrRange_unshift(sk, ptr) OPENSSL_sk_unshift(ossl_check_ASIdOrRange_sk_type(sk), ossl_check_ASIdOrRange_type(ptr))
+#define sk_ASIdOrRange_pop(sk) ((ASIdOrRange *)OPENSSL_sk_pop(ossl_check_ASIdOrRange_sk_type(sk)))
+#define sk_ASIdOrRange_shift(sk) ((ASIdOrRange *)OPENSSL_sk_shift(ossl_check_ASIdOrRange_sk_type(sk)))
+#define sk_ASIdOrRange_pop_free(sk, freefunc) OPENSSL_sk_pop_free(ossl_check_ASIdOrRange_sk_type(sk),ossl_check_ASIdOrRange_freefunc_type(freefunc))
+#define sk_ASIdOrRange_insert(sk, ptr, idx) OPENSSL_sk_insert(ossl_check_ASIdOrRange_sk_type(sk), ossl_check_ASIdOrRange_type(ptr), (idx))
+#define sk_ASIdOrRange_set(sk, idx, ptr) ((ASIdOrRange *)OPENSSL_sk_set(ossl_check_ASIdOrRange_sk_type(sk), (idx), ossl_check_ASIdOrRange_type(ptr)))
+#define sk_ASIdOrRange_find(sk, ptr) OPENSSL_sk_find(ossl_check_ASIdOrRange_sk_type(sk), ossl_check_ASIdOrRange_type(ptr))
+#define sk_ASIdOrRange_find_ex(sk, ptr) OPENSSL_sk_find_ex(ossl_check_ASIdOrRange_sk_type(sk), ossl_check_ASIdOrRange_type(ptr))
+#define sk_ASIdOrRange_find_all(sk, ptr, pnum) OPENSSL_sk_find_all(ossl_check_ASIdOrRange_sk_type(sk), ossl_check_ASIdOrRange_type(ptr), pnum)
+#define sk_ASIdOrRange_sort(sk) OPENSSL_sk_sort(ossl_check_ASIdOrRange_sk_type(sk))
+#define sk_ASIdOrRange_is_sorted(sk) OPENSSL_sk_is_sorted(ossl_check_const_ASIdOrRange_sk_type(sk))
+#define sk_ASIdOrRange_dup(sk) ((STACK_OF(ASIdOrRange) *)OPENSSL_sk_dup(ossl_check_const_ASIdOrRange_sk_type(sk)))
+#define sk_ASIdOrRange_deep_copy(sk, copyfunc, freefunc) ((STACK_OF(ASIdOrRange) *)OPENSSL_sk_deep_copy(ossl_check_const_ASIdOrRange_sk_type(sk), ossl_check_ASIdOrRange_copyfunc_type(copyfunc), ossl_check_ASIdOrRange_freefunc_type(freefunc)))
+#define sk_ASIdOrRange_set_cmp_func(sk, cmp) ((sk_ASIdOrRange_compfunc)OPENSSL_sk_set_cmp_func(ossl_check_ASIdOrRange_sk_type(sk), ossl_check_ASIdOrRange_compfunc_type(cmp)))
+
+/* clang-format on */
+
+/**
+ * @brief Stack of ASIdOrRange values used in an ASIdentifierChoice.
+ */
+typedef STACK_OF(ASIdOrRange) ASIdOrRanges;
+
+===== NEED x509v3.h:2406 s2i_ASN1_INTEGER (lines 2406-2406) =====
+ASN1_INTEGER *s2i_ASN1_INTEGER(X509V3_EXT_METHOD *meth, const char *value);
+
+===== NEED x509v3.h:2212 X509V3_EXT_REQ_add_nconf (lines 2212-2212) =====
+int X509V3_EXT_REQ_add_nconf(CONF *conf, X509V3_CTX *ctx, const char *section,
+
+===== NEED x509v3.h:2170 X509V3_conf_free (lines 2170-2170) =====
+void X509V3_conf_free(CONF_VALUE *val);
+
+===== NEED x509v3.h:1740 POLICYINFO_new (lines 1740-1740) =====
+POLICYINFO *POLICYINFO_new(void);
+
+===== NEED x509v3.h:1623 GENERAL_NAME_get0_value (lines 1623-1623) =====
+void *GENERAL_NAME_get0_value(const GENERAL_NAME *a, int *ptype);
+
+===== NEED x509v3.h:1194 d2i_SXNET (lines 1194-1194) =====
+SXNET *d2i_SXNET(SXNET **a, const unsigned char **in, long len);
+
+===== NEED x509v3.h:951 onlyattr (lines 951-951) =====
+    int onlyattr;
+
+===== NEED x509v3.h:938 PROXY_CERT_INFO_EXTENSION_it (lines 938-952) =====
+DECLARE_ASN1_ITEM(PROXY_CERT_INFO_EXTENSION)
+
+struct ISSUING_DIST_POINT_st {
+    /** Distribution point name for this issuingDistributionPoint, or NULL if omitted. */
+    DIST_POINT_NAME *distpoint;
+    /** ASN.1 BOOLEAN: when set, the CRL covers end-entity certificates only. */
+    int onlyuser;
+    /** ASN.1 BOOLEAN: when set, the CRL covers CA certificates only. */
+    int onlyCA;
+    /** Optional ReasonFlags bit string limiting which revocation reasons are covered. */
+    ASN1_BIT_STRING *onlysomereasons;
+    /** ASN.1 BOOLEAN: when set, certificate issuer may differ from the CRL issuer. */
+    int indirectCRL;
+    int onlyattr;
+};
+
+===== NEED x509v3.h:432 GENERAL_NAMES (lines 432-432) =====
+typedef STACK_OF(GENERAL_NAME) GENERAL_NAMES;
+
+===== NEED x509v3.h:44 X509V3_EXT_NEW (lines 44-44) =====
+typedef void *(*X509V3_EXT_NEW)(void);

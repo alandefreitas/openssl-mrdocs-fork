@@ -1,0 +1,2306 @@
+/*
+ * {- join("\n * ", @autowarntext) -}
+ *
+ * Copyright 1995-2024 The OpenSSL Project Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License 2.0 (the "License").  You may not use
+ * this file except in compliance with the License.  You can obtain a copy
+ * in the file LICENSE in the source distribution or at
+ * https://www.openssl.org/source/license.html
+ */
+
+/* clang-format off */
+{-
+use OpenSSL::stackhash qw(generate_stack_macros);
+-}
+/* clang-format on */
+
+#ifndef OPENSSL_X509_VFY_H
+#define OPENSSL_X509_VFY_H
+#pragma once
+
+#include <openssl/macros.h>
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#define HEADER_X509_VFY_H
+#endif
+
+/*
+ * Protect against recursion, x509.h and x509_vfy.h each include the other.
+ */
+#ifndef OPENSSL_X509_H
+#include <openssl/x509.h>
+#endif
+
+#include <openssl/opensslconf.h>
+#include <openssl/lhash.h>
+#include <openssl/bio.h>
+#include <openssl/crypto.h>
+#include <openssl/symhacks.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*-
+SSL_CTX -> X509_STORE
+                -> X509_LOOKUP
+                        ->X509_LOOKUP_METHOD
+                -> X509_LOOKUP
+                        ->X509_LOOKUP_METHOD
+
+SSL     -> X509_STORE_CTX
+                ->X509_STORE
+
+The X509_STORE holds the tables etc for verification stuff.
+A X509_STORE_CTX is used while validating a single certificate.
+The X509_STORE has X509_LOOKUPs for looking up certs.
+The X509_STORE then calls a function to actually verify the
+certificate chain.
+*/
+
+/**
+ * @brief Kind of object returned by an X509_LOOKUP.
+ */
+typedef enum {
+    /** No lookup object / empty result. */
+    X509_LU_NONE = 0,
+    /** Lookup result is an X509 certificate. */
+    X509_LU_X509,
+    /** Lookup result is an X509_CRL. */
+    X509_LU_CRL
+} X509_LOOKUP_TYPE;
+
+#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+#define X509_LU_RETRY -1
+#define X509_LU_FAIL 0
+#endif
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(X509_LOOKUP) container type.
+ */
+struct stack_st_X509_LOOKUP;
+/**
+ * @brief Opaque STACK_OF(X509_VERIFY_PARAM) container type.
+ */
+struct stack_st_X509_VERIFY_PARAM;
+{-
+    generate_stack_macros("X509_LOOKUP")
+    .generate_stack_macros("X509_OBJECT")
+    .generate_stack_macros("X509_VERIFY_PARAM");
+-}
+/* clang-format on */
+
+/* This is used for a table of trust checking functions */
+/**
+ * @brief Entry describing a named X.509 trust purpose and its checker callback.
+ */
+typedef struct x509_trust_st {
+    /** Trust purpose NID (X509_TRUST_*). */
+    int trust;
+    /** Behaviour flags for this trust entry (X509_TRUST_DYNAMIC and related). */
+    int flags;
+    /** @brief Callback that checks whether a certificate is trusted for this purpose. */
+    int (*check_trust)(struct x509_trust_st *, X509 *, int);
+    /** Short name of this trust purpose (for example "SSL Client"). */
+    char *name;
+    /** @brief Integer argument associated with this trust entry. */
+    int arg1;
+    /** Opaque application pointer associated with this trust entry. */
+    void *arg2;
+} X509_TRUST;
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(X509_TRUST) container type.
+ */
+struct stack_st_X509_TRUST;
+{-
+    generate_stack_macros("X509_TRUST");
+-}
+/* clang-format on */
+
+/* standard trust ids */
+#define X509_TRUST_DEFAULT 0 /* Only valid in purpose settings */
+#define X509_TRUST_COMPAT 1
+#define X509_TRUST_SSL_CLIENT 2
+#define X509_TRUST_SSL_SERVER 3
+#define X509_TRUST_EMAIL 4
+#define X509_TRUST_OBJECT_SIGN 5
+#define X509_TRUST_OCSP_SIGN 6
+#define X509_TRUST_OCSP_REQUEST 7
+#define X509_TRUST_TSA 8
+/* Keep these up to date! */
+#define X509_TRUST_MIN 1
+#define X509_TRUST_MAX 8
+
+/* trust_flags values */
+#define X509_TRUST_DYNAMIC (1U << 0)
+#define X509_TRUST_DYNAMIC_NAME (1U << 1)
+/* No compat trust if self-signed, preempts "DO_SS" */
+#define X509_TRUST_NO_SS_COMPAT (1U << 2)
+/* Compat trust if no explicit accepted trust EKUs */
+#define X509_TRUST_DO_SS_COMPAT (1U << 3)
+/* Accept "anyEKU" as a wildcard rejection OID and as a wildcard trust OID */
+#define X509_TRUST_OK_ANY_EKU (1U << 4)
+
+/* check_trust return codes */
+#define X509_TRUST_TRUSTED 1
+#define X509_TRUST_REJECTED 2
+#define X509_TRUST_UNTRUSTED 3
+
+/**
+ * @brief Store a trust identifier if it is a known X509_TRUST id.
+ * @param t Destination that receives @p trust on success.
+ * @param trust Trust id such as X509_TRUST_SSL_SERVER (must already be registered).
+ * @return 1 on success, or 0 if @p trust is not a valid trust id.
+ */
+int X509_TRUST_set(int *t, int trust);
+/**
+ * @brief Return the number of entries in the global X509_TRUST table.
+ * @return Count of built-in and dynamically registered trust types.
+ */
+int X509_TRUST_get_count(void);
+/**
+ * @brief Return the X509_TRUST table entry at index @p idx.
+ * @param idx Index from 0 to X509_TRUST_get_count()-1.
+ * @return Internal X509_TRUST pointer (do not free), or NULL if @p idx is out of range.
+ */
+X509_TRUST *X509_TRUST_get0(int idx);
+/**
+ * @brief Return the table index of the X509_TRUST entry with trust id @p id.
+ * @param id Trust purpose identifier (X509_TRUST_*).
+ * @return Index suitable for X509_TRUST_get0, or -1 if not found.
+ */
+int X509_TRUST_get_by_id(int id);
+/**
+ * @brief Register a custom X509_TRUST checking method under @p id.
+ * @param id Trust identifier (X509_TRUST_* or an application-defined id).
+ * @param flags X509_TRUST_* flag bits controlling the entry.
+ * @param ck Callback that evaluates trust for a candidate certificate.
+ * @param name Short name for the trust setting.
+ * @param arg1 Integer argument stored on the X509_TRUST object.
+ * @param arg2 Pointer argument stored on the X509_TRUST object.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_TRUST_add(int id, int flags, int (*ck)(X509_TRUST *, X509 *, int),
+    const char *name, int arg1, void *arg2);
+/**
+ * @brief Free all dynamically registered X509_TRUST table entries.
+ */
+void X509_TRUST_cleanup(void);
+/**
+ * @brief Return the flag bits associated with an X509_TRUST table entry.
+ * @param xp Trust entry to query.
+ * @return Bitmask of X509_TRUST_* flags for @p xp.
+ */
+int X509_TRUST_get_flags(const X509_TRUST *xp);
+/**
+ * @brief Return the short name of an X509_TRUST table entry.
+ * @param xp Trust entry to query.
+ * @return Internal name string; do not free.
+ */
+char *X509_TRUST_get0_name(const X509_TRUST *xp);
+/**
+ * @brief Return the trust purpose identifier of an X509_TRUST table entry.
+ * @param xp Trust entry to query.
+ * @return Trust id such as X509_TRUST_SSL_CLIENT or X509_TRUST_SSL_SERVER.
+ */
+int X509_TRUST_get_trust(const X509_TRUST *xp);
+
+/**
+ * @brief Report whether a certificate has auxiliary trust information attached.
+ * @param x Certificate to query.
+ * @return Non-zero if trust aux data is present, or 0 otherwise.
+ */
+int X509_trusted(const X509 *x);
+/**
+ * @brief Append an OID to a certificate's auxiliary trust list.
+ * @param x Certificate whose trust objects are extended (creates aux data if needed).
+ * @param obj Purpose/OID that should cause the certificate to be trusted when matched.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_add1_trust_object(X509 *x, const ASN1_OBJECT *obj);
+/**
+ * @brief Append an OID to a certificate's auxiliary reject list.
+ * @param x Certificate whose reject objects are extended (creates aux data if needed).
+ * @param obj Purpose/OID that should cause the certificate to be rejected when matched.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_add1_reject_object(X509 *x, const ASN1_OBJECT *obj);
+/**
+ * @brief Clear all explicit trust object identifiers previously set on a certificate.
+ * @param x Certificate whose trust OID stack is freed and reset.
+ */
+void X509_trust_clear(X509 *x);
+/**
+ * @brief Clear all auxiliary reject-object OIDs attached to a certificate.
+ * @param x Certificate whose reject OID stack is freed and reset.
+ */
+void X509_reject_clear(X509 *x);
+/**
+ * @brief Return the stack of explicit trust object identifiers attached to a certificate.
+ * @param x Certificate whose auxiliary trust OIDs are queried.
+ * @return Internal stack of ASN1_OBJECT values, or NULL if none; do not free the result.
+ */
+STACK_OF(ASN1_OBJECT) *X509_get0_trust_objects(X509 *x);
+/**
+ * @brief Return the stack of reject OIDs from a certificate's auxiliary data.
+ * @param x Certificate to query.
+ * @return Internal STACK_OF(ASN1_OBJECT) (do not free), or NULL if none.
+ */
+STACK_OF(ASN1_OBJECT) *X509_get0_reject_objects(X509 *x);
+
+/**
+ * @brief Install a process-wide default trust-checking callback.
+ * @param trust Callback of the form int trust(int id, X509 *x, int flags), or NULL to restore the built-in default.
+ * @return Previous default trust callback.
+ */
+int (*X509_TRUST_set_default(int (*trust)(int, X509 *, int)))(int, X509 *,
+    int);
+/**
+ * @brief Evaluate whether a certificate is trusted for a given trust id.
+ * @param x Certificate to check (including any auxiliary trust/reject OIDs).
+ * @param id Trust purpose id (X509_TRUST_*); X509_TRUST_DEFAULT uses anyExtendedKeyUsage compatibility.
+ * @param flags X509_TRUST_* flag bits controlling compatibility checks.
+ * @return X509_TRUST_TRUSTED, X509_TRUST_REJECTED, or X509_TRUST_UNTRUSTED.
+ */
+int X509_check_trust(X509 *x, int id, int flags);
+
+/**
+ * @brief Discover and validate a certificate chain based on parameters in @p ctx.
+ * @param ctx Initialized verification context (see X509_STORE_CTX_new() and X509_STORE_CTX_init()).
+ * @return 1 if a complete chain can be built and validated, 0 on failure, or a negative value on exceptional error.
+ *
+ * Applications must treat any return value <= 0 as an error. On failure, inspect @p ctx
+ * with X509_STORE_CTX_get_error().
+ */
+int X509_verify_cert(X509_STORE_CTX *ctx);
+/**
+ * @brief Verify the certificate chain prepared in an X509_STORE_CTX.
+ * @param ctx Initialized verification context (see X509_STORE_CTX_init()).
+ * @return 1 if verification succeeded, 0 if it failed, or a negative value on exceptional error.
+ */
+int X509_STORE_CTX_verify(X509_STORE_CTX *ctx);
+/**
+ * @brief Build a certificate chain for @p target using untrusted @p certs and trusted @p store.
+ * @param target End-entity certificate to chain up from.
+ * @param certs Optional untrusted intermediate certificates, or NULL.
+ * @param store Trusted certificate store used for trust anchors, or NULL.
+ * @param with_self_signed Non-zero to include a self-signed trust anchor in the result.
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query string, or NULL.
+ * @return Newly allocated chain stack (caller frees with sk_X509_pop_free), or NULL on failure.
+ */
+STACK_OF(X509) *X509_build_chain(X509 *target, STACK_OF(X509) *certs,
+    X509_STORE *store, int with_self_signed,
+    OSSL_LIB_CTX *libctx, const char *propq);
+
+/**
+ * @brief Set the maximum untrusted chain depth for verifications using @p store.
+ * @param store Certificate store whose default verify parameters are updated.
+ * @param depth Maximum number of untrusted intermediate CA certificates.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_set_depth(X509_STORE *store, int depth);
+
+/**
+ * @brief Verify-result callback invoked for each certificate during chain verification.
+ * @param ok Current verification result (1 if OK so far, 0 if an error was recorded).
+ * @param ctx Store context describing the certificate under examination and any error.
+ * @return Non-zero to continue/accept, or 0 to fail verification.
+ */
+typedef int (*X509_STORE_CTX_verify_cb)(int ok, X509_STORE_CTX *ctx);
+/**
+ * @brief Default verify callback that prints diagnosis details when verification fails.
+ * @param ok Current verification status (1 success, 0 failure).
+ * @param ctx Store context describing the failure/success.
+ * @return The (possibly unchanged) @p ok value after logging.
+ */
+int X509_STORE_CTX_print_verify_cb(int ok, X509_STORE_CTX *ctx);
+/**
+ * @brief Callback that verifies a certificate chain in an X509_STORE_CTX.
+ * @param ctx Store context whose chain and trust settings are used.
+ * @return 1 if verification succeeds, or 0 on failure.
+ */
+typedef int (*X509_STORE_CTX_verify_fn)(X509_STORE_CTX *ctx);
+/**
+ * @brief Callback that finds an issuer certificate for @p x.
+ * @param issuer Receives the issuer certificate (typically with an incremented reference).
+ * @param ctx Store context providing lookup state.
+ * @param x Certificate whose issuer is sought.
+ * @return 1 on success, or 0 on failure.
+ */
+typedef int (*X509_STORE_CTX_get_issuer_fn)(X509 **issuer,
+    X509_STORE_CTX *ctx, X509 *x);
+/**
+ * @brief Callback type that checks whether @p issuer appears to have issued @p x.
+ * @param ctx Verification context performing the check.
+ * @param x Candidate subject certificate.
+ * @param issuer Candidate issuer certificate.
+ * @return 1 if @p issuer issued @p x, or 0 otherwise.
+ */
+typedef int (*X509_STORE_CTX_check_issued_fn)(X509_STORE_CTX *ctx,
+    X509 *x, X509 *issuer);
+/**
+ * @brief Callback that checks revocation status for certificates in a store context.
+ * @param ctx Verification context whose current chain should be revocation-checked.
+ * @return 1 if revocation checks succeed, or 0 on failure.
+ */
+typedef int (*X509_STORE_CTX_check_revocation_fn)(X509_STORE_CTX *ctx);
+/**
+ * @brief Callback type that locates a CRL for certificate @p x.
+ * @param ctx Verification context performing the lookup.
+ * @param crl On success, set to the found CRL (caller/context manages lifetime per OpenSSL rules).
+ * @param x Certificate for which a CRL is needed.
+ * @return 1 on success, or 0 on failure.
+ */
+typedef int (*X509_STORE_CTX_get_crl_fn)(X509_STORE_CTX *ctx,
+    X509_CRL **crl, X509 *x);
+/**
+ * @brief Callback type that verifies the signature/validity of a CRL in context @p ctx.
+ * @param ctx Verification context performing the check.
+ * @param crl CRL whose authenticity is checked.
+ * @return 1 on success, or 0 on failure.
+ */
+typedef int (*X509_STORE_CTX_check_crl_fn)(X509_STORE_CTX *ctx, X509_CRL *crl);
+/**
+ * @brief Callback type that checks the revocation status of a certificate against a CRL.
+ * @param ctx Verification context performing the check.
+ * @param crl CRL to consult.
+ * @param x Certificate whose revocation status is checked.
+ * @return 1 on success, or 0 on failure.
+ */
+typedef int (*X509_STORE_CTX_cert_crl_fn)(X509_STORE_CTX *ctx,
+    X509_CRL *crl, X509 *x);
+/**
+ * @brief Callback type that evaluates certificate policies for a verification context.
+ * @param ctx Store context whose chain and policy state are examined.
+ * @return 1 if policy checking succeeds, or 0 on failure.
+ */
+typedef int (*X509_STORE_CTX_check_policy_fn)(X509_STORE_CTX *ctx);
+/**
+ * @brief Callback type that looks up certificates in a store by subject name.
+ * @param ctx Verification context whose store is searched.
+ * @param nm Subject name to match.
+ * @return New stack of matching certificates (caller frees), or NULL if none / on error.
+ */
+typedef STACK_OF(X509)
+    *(*X509_STORE_CTX_lookup_certs_fn)(X509_STORE_CTX *ctx,
+        const X509_NAME *nm);
+/**
+ * @brief Callback type that returns CRLs matching issuer name @p nm.
+ * @param ctx Verification context performing the lookup.
+ * @param nm CRL issuer name to search for.
+ * @return Newly allocated stack of X509_CRL, or NULL on failure; caller frees with sk_X509_CRL_pop_free.
+ */
+typedef STACK_OF(X509_CRL)
+    *(*X509_STORE_CTX_lookup_crls_fn)(const X509_STORE_CTX *ctx,
+        const X509_NAME *nm);
+/**
+ * @brief Callback type invoked to clean up application state associated with a store context.
+ * @param ctx Verification context being cleaned up.
+ * @return 1 on success, or 0 on failure.
+ */
+typedef int (*X509_STORE_CTX_cleanup_fn)(X509_STORE_CTX *ctx);
+
+/**
+ * @brief Limit how deep an X509_STORE_CTX certificate chain may grow during verification.
+ * @param ctx Verification context to update.
+ * @param depth Maximum number of untrusted CA certificates allowed above the leaf (same meaning as X509_VERIFY_PARAM_set_depth()).
+ */
+void X509_STORE_CTX_set_depth(X509_STORE_CTX *ctx, int depth);
+
+#define X509_STORE_CTX_set_app_data(ctx, data) \
+    X509_STORE_CTX_set_ex_data(ctx, 0, data)
+#define X509_STORE_CTX_get_app_data(ctx) \
+    X509_STORE_CTX_get_ex_data(ctx, 0)
+
+#define X509_L_FILE_LOAD 1
+#define X509_L_ADD_DIR 2
+#define X509_L_ADD_STORE 3
+#define X509_L_LOAD_STORE 4
+
+#define X509_LOOKUP_load_file(x, name, type) \
+    X509_LOOKUP_ctrl((x), X509_L_FILE_LOAD, (name), (long)(type), NULL)
+
+#define X509_LOOKUP_add_dir(x, name, type) \
+    X509_LOOKUP_ctrl((x), X509_L_ADD_DIR, (name), (long)(type), NULL)
+
+#define X509_LOOKUP_add_store(x, name) \
+    X509_LOOKUP_ctrl((x), X509_L_ADD_STORE, (name), 0, NULL)
+
+#define X509_LOOKUP_load_store(x, name) \
+    X509_LOOKUP_ctrl((x), X509_L_LOAD_STORE, (name), 0, NULL)
+
+#define X509_LOOKUP_load_file_ex(x, name, type, libctx, propq)             \
+    X509_LOOKUP_ctrl_ex((x), X509_L_FILE_LOAD, (name), (long)(type), NULL, \
+        (libctx), (propq))
+
+#define X509_LOOKUP_load_store_ex(x, name, libctx, propq)        \
+    X509_LOOKUP_ctrl_ex((x), X509_L_LOAD_STORE, (name), 0, NULL, \
+        (libctx), (propq))
+
+#define X509_LOOKUP_add_store_ex(x, name, libctx, propq)        \
+    X509_LOOKUP_ctrl_ex((x), X509_L_ADD_STORE, (name), 0, NULL, \
+        (libctx), (propq))
+
+#define X509_V_OK 0
+#define X509_V_ERR_UNSPECIFIED 1
+#define X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT 2
+#define X509_V_ERR_UNABLE_TO_GET_CRL 3
+#define X509_V_ERR_UNABLE_TO_DECRYPT_CERT_SIGNATURE 4
+#define X509_V_ERR_UNABLE_TO_DECRYPT_CRL_SIGNATURE 5
+#define X509_V_ERR_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY 6
+#define X509_V_ERR_CERT_SIGNATURE_FAILURE 7
+#define X509_V_ERR_CRL_SIGNATURE_FAILURE 8
+#define X509_V_ERR_CERT_NOT_YET_VALID 9
+#define X509_V_ERR_CERT_HAS_EXPIRED 10
+#define X509_V_ERR_CRL_NOT_YET_VALID 11
+#define X509_V_ERR_CRL_HAS_EXPIRED 12
+#define X509_V_ERR_ERROR_IN_CERT_NOT_BEFORE_FIELD 13
+#define X509_V_ERR_ERROR_IN_CERT_NOT_AFTER_FIELD 14
+#define X509_V_ERR_ERROR_IN_CRL_LAST_UPDATE_FIELD 15
+#define X509_V_ERR_ERROR_IN_CRL_NEXT_UPDATE_FIELD 16
+#define X509_V_ERR_OUT_OF_MEM 17
+#define X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT 18
+#define X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN 19
+#define X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY 20
+#define X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE 21
+#define X509_V_ERR_CERT_CHAIN_TOO_LONG 22
+#define X509_V_ERR_CERT_REVOKED 23
+#define X509_V_ERR_NO_ISSUER_PUBLIC_KEY 24
+#define X509_V_ERR_PATH_LENGTH_EXCEEDED 25
+#define X509_V_ERR_INVALID_PURPOSE 26
+#define X509_V_ERR_CERT_UNTRUSTED 27
+#define X509_V_ERR_CERT_REJECTED 28
+
+/* These are 'informational' when looking for issuer cert */
+#define X509_V_ERR_SUBJECT_ISSUER_MISMATCH 29
+#define X509_V_ERR_AKID_SKID_MISMATCH 30
+#define X509_V_ERR_AKID_ISSUER_SERIAL_MISMATCH 31
+#define X509_V_ERR_KEYUSAGE_NO_CERTSIGN 32
+#define X509_V_ERR_UNABLE_TO_GET_CRL_ISSUER 33
+#define X509_V_ERR_UNHANDLED_CRITICAL_EXTENSION 34
+#define X509_V_ERR_KEYUSAGE_NO_CRL_SIGN 35
+#define X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION 36
+#define X509_V_ERR_INVALID_NON_CA 37
+#define X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED 38
+#define X509_V_ERR_KEYUSAGE_NO_DIGITAL_SIGNATURE 39
+#define X509_V_ERR_PROXY_CERTIFICATES_NOT_ALLOWED 40
+#define X509_V_ERR_INVALID_EXTENSION 41
+#define X509_V_ERR_INVALID_POLICY_EXTENSION 42
+#define X509_V_ERR_NO_EXPLICIT_POLICY 43
+#define X509_V_ERR_DIFFERENT_CRL_SCOPE 44
+#define X509_V_ERR_UNSUPPORTED_EXTENSION_FEATURE 45
+#define X509_V_ERR_UNNESTED_RESOURCE 46
+#define X509_V_ERR_PERMITTED_VIOLATION 47
+#define X509_V_ERR_EXCLUDED_VIOLATION 48
+#define X509_V_ERR_SUBTREE_MINMAX 49
+/* The application is not happy */
+#define X509_V_ERR_APPLICATION_VERIFICATION 50
+#define X509_V_ERR_UNSUPPORTED_CONSTRAINT_TYPE 51
+#define X509_V_ERR_UNSUPPORTED_CONSTRAINT_SYNTAX 52
+#define X509_V_ERR_UNSUPPORTED_NAME_SYNTAX 53
+#define X509_V_ERR_CRL_PATH_VALIDATION_ERROR 54
+/* Another issuer check debug option */
+#define X509_V_ERR_PATH_LOOP 55
+/* Suite B mode algorithm violation */
+#define X509_V_ERR_SUITE_B_INVALID_VERSION 56
+#define X509_V_ERR_SUITE_B_INVALID_ALGORITHM 57
+#define X509_V_ERR_SUITE_B_INVALID_CURVE 58
+#define X509_V_ERR_SUITE_B_INVALID_SIGNATURE_ALGORITHM 59
+#define X509_V_ERR_SUITE_B_LOS_NOT_ALLOWED 60
+#define X509_V_ERR_SUITE_B_CANNOT_SIGN_P_384_WITH_P_256 61
+/* Host, email and IP check errors */
+#define X509_V_ERR_HOSTNAME_MISMATCH 62
+#define X509_V_ERR_EMAIL_MISMATCH 63
+#define X509_V_ERR_IP_ADDRESS_MISMATCH 64
+/* DANE TLSA errors */
+#define X509_V_ERR_DANE_NO_MATCH 65
+/* security level errors */
+#define X509_V_ERR_EE_KEY_TOO_SMALL 66
+#define X509_V_ERR_CA_KEY_TOO_SMALL 67
+#define X509_V_ERR_CA_MD_TOO_WEAK 68
+/* Caller error */
+#define X509_V_ERR_INVALID_CALL 69
+/* Issuer lookup error */
+#define X509_V_ERR_STORE_LOOKUP 70
+/* Certificate transparency */
+#define X509_V_ERR_NO_VALID_SCTS 71
+
+#define X509_V_ERR_PROXY_SUBJECT_NAME_VIOLATION 72
+/* OCSP status errors */
+#define X509_V_ERR_OCSP_VERIFY_NEEDED 73 /* Need OCSP verification */
+#define X509_V_ERR_OCSP_VERIFY_FAILED 74 /* Couldn't verify cert through OCSP */
+#define X509_V_ERR_OCSP_CERT_UNKNOWN 75 /* Certificate wasn't recognized by the OCSP responder */
+
+#define X509_V_ERR_UNSUPPORTED_SIGNATURE_ALGORITHM 76
+#define X509_V_ERR_SIGNATURE_ALGORITHM_MISMATCH 77
+
+/* Errors in case a check in X509_V_FLAG_X509_STRICT mode fails */
+#define X509_V_ERR_SIGNATURE_ALGORITHM_INCONSISTENCY 78
+#define X509_V_ERR_INVALID_CA 79
+#define X509_V_ERR_PATHLEN_INVALID_FOR_NON_CA 80
+#define X509_V_ERR_PATHLEN_WITHOUT_KU_KEY_CERT_SIGN 81
+#define X509_V_ERR_KU_KEY_CERT_SIGN_INVALID_FOR_NON_CA 82
+#define X509_V_ERR_ISSUER_NAME_EMPTY 83
+#define X509_V_ERR_SUBJECT_NAME_EMPTY 84
+#define X509_V_ERR_MISSING_AUTHORITY_KEY_IDENTIFIER 85
+#define X509_V_ERR_MISSING_SUBJECT_KEY_IDENTIFIER 86
+#define X509_V_ERR_EMPTY_SUBJECT_ALT_NAME 87
+#define X509_V_ERR_EMPTY_SUBJECT_SAN_NOT_CRITICAL 88
+#define X509_V_ERR_CA_BCONS_NOT_CRITICAL 89
+#define X509_V_ERR_AUTHORITY_KEY_IDENTIFIER_CRITICAL 90
+#define X509_V_ERR_SUBJECT_KEY_IDENTIFIER_CRITICAL 91
+#define X509_V_ERR_CA_CERT_MISSING_KEY_USAGE 92
+#define X509_V_ERR_EXTENSIONS_REQUIRE_VERSION_3 93
+#define X509_V_ERR_EC_KEY_EXPLICIT_PARAMS 94
+#define X509_V_ERR_RPK_UNTRUSTED 95
+
+/* Certificate verify flags */
+#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+#define X509_V_FLAG_CB_ISSUER_CHECK 0x0 /* Deprecated */
+#endif
+/* Use check time instead of current time */
+#define X509_V_FLAG_USE_CHECK_TIME 0x2
+/* Lookup CRLs */
+#define X509_V_FLAG_CRL_CHECK 0x4
+/* Lookup CRLs for whole chain */
+#define X509_V_FLAG_CRL_CHECK_ALL 0x8
+/* Ignore unhandled critical extensions */
+#define X509_V_FLAG_IGNORE_CRITICAL 0x10
+/* Disable workarounds for broken certificates */
+#define X509_V_FLAG_X509_STRICT 0x20
+/* Enable proxy certificate validation */
+#define X509_V_FLAG_ALLOW_PROXY_CERTS 0x40
+/* Enable policy checking */
+#define X509_V_FLAG_POLICY_CHECK 0x80
+/* Policy variable require-explicit-policy */
+#define X509_V_FLAG_EXPLICIT_POLICY 0x100
+/* Policy variable inhibit-any-policy */
+#define X509_V_FLAG_INHIBIT_ANY 0x200
+/* Policy variable inhibit-policy-mapping */
+#define X509_V_FLAG_INHIBIT_MAP 0x400
+/* Notify callback that policy is OK */
+#define X509_V_FLAG_NOTIFY_POLICY 0x800
+/* Extended CRL features such as indirect CRLs, alternate CRL signing keys */
+#define X509_V_FLAG_EXTENDED_CRL_SUPPORT 0x1000
+/* Delta CRL support */
+#define X509_V_FLAG_USE_DELTAS 0x2000
+/* Check self-signed CA signature */
+#define X509_V_FLAG_CHECK_SS_SIGNATURE 0x4000
+/* Use trusted store first */
+#define X509_V_FLAG_TRUSTED_FIRST 0x8000
+/* Suite B 128 bit only mode: not normally used */
+#define X509_V_FLAG_SUITEB_128_LOS_ONLY 0x10000
+/* Suite B 192 bit only mode */
+#define X509_V_FLAG_SUITEB_192_LOS 0x20000
+/* Suite B 128 bit mode allowing 192 bit algorithms */
+#define X509_V_FLAG_SUITEB_128_LOS 0x30000
+/* Allow partial chains if at least one certificate is in trusted store */
+#define X509_V_FLAG_PARTIAL_CHAIN 0x80000
+/*
+ * If the initial chain is not trusted, do not attempt to build an alternative
+ * chain. Alternate chain checking was introduced in 1.1.0. Setting this flag
+ * will force the behaviour to match that of previous versions.
+ */
+#define X509_V_FLAG_NO_ALT_CHAINS 0x100000
+/* Do not check certificate/CRL validity against current time */
+#define X509_V_FLAG_NO_CHECK_TIME 0x200000
+
+#define X509_VP_FLAG_DEFAULT 0x1
+#define X509_VP_FLAG_OVERWRITE 0x2
+#define X509_VP_FLAG_RESET_FLAGS 0x4
+#define X509_VP_FLAG_LOCKED 0x8
+#define X509_VP_FLAG_ONCE 0x10
+
+/* Internal use: mask of policy related options */
+#define X509_V_FLAG_POLICY_MASK (X509_V_FLAG_POLICY_CHECK \
+    | X509_V_FLAG_EXPLICIT_POLICY                         \
+    | X509_V_FLAG_INHIBIT_ANY                             \
+    | X509_V_FLAG_INHIBIT_MAP)
+
+/**
+ * @brief Find the first X509_OBJECT in a stack whose subject matches @p name and type.
+ * @param h Stack of cached X509_OBJECT entries (typically from an X509_STORE).
+ * @param type X509_LU_X509 or X509_LU_CRL selecting certificate vs CRL objects.
+ * @param name Subject (or CRL issuer) name to match.
+ * @return Zero-based index of the first match, or -1 if none.
+ */
+int X509_OBJECT_idx_by_subject(STACK_OF(X509_OBJECT) *h, X509_LOOKUP_TYPE type,
+    const X509_NAME *name);
+/**
+ * @brief Find the first X509_OBJECT in @p h matching @p type and subject @p name.
+ * @param h Stack of X509_OBJECT entries to search.
+ * @param type X509_LU_X509 or X509_LU_CRL selecting certificate vs CRL.
+ * @param name Subject (for certs) or issuer (for CRLs) name to match.
+ * @return Matching X509_OBJECT from @p h (do not free), or NULL if none.
+ */
+X509_OBJECT *X509_OBJECT_retrieve_by_subject(STACK_OF(X509_OBJECT) *h,
+    X509_LOOKUP_TYPE type,
+    const X509_NAME *name);
+/**
+ * @brief Find an X509_OBJECT in @p h that matches the type and identity of @p x.
+ * @param h Stack of store objects to search.
+ * @param x Probe object describing the desired certificate or CRL.
+ * @return Matching X509_OBJECT from @p h, or NULL if not found.
+ */
+X509_OBJECT *X509_OBJECT_retrieve_match(STACK_OF(X509_OBJECT) *h,
+    X509_OBJECT *x);
+/**
+ * @brief Increment the reference count on the certificate or CRL held by an X509_OBJECT.
+ * @param a Object whose contained X509 or X509_CRL is retained.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_OBJECT_up_ref_count(X509_OBJECT *a);
+/**
+ * @brief Allocate an empty X509_OBJECT container for a certificate or CRL.
+ * @return New X509_OBJECT, or NULL on allocation failure.
+ */
+X509_OBJECT *X509_OBJECT_new(void);
+/**
+ * @brief Free an X509_OBJECT and release any referenced certificate or CRL.
+ * @param a Object to free; NULL is ignored.
+ */
+void X509_OBJECT_free(X509_OBJECT *a);
+/**
+ * @brief Return whether an X509_OBJECT holds a certificate, CRL, or nothing.
+ * @param a Object to query.
+ * @return X509_LU_X509, X509_LU_CRL, or X509_LU_NONE.
+ */
+X509_LOOKUP_TYPE X509_OBJECT_get_type(const X509_OBJECT *a);
+/**
+ * @brief Return the certificate stored in an X509_OBJECT, if any.
+ * @param a Object to query.
+ * @return Internal X509 pointer (do not free), or NULL if @p a does not hold a certificate.
+ */
+X509 *X509_OBJECT_get0_X509(const X509_OBJECT *a);
+/**
+ * @brief Store a certificate in an X509_OBJECT, taking a reference to @p obj.
+ * @param a Object that will hold type X509_LU_X509.
+ * @param obj Certificate to reference; its reference count is incremented on success.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_OBJECT_set1_X509(X509_OBJECT *a, X509 *obj);
+/**
+ * @brief Return the CRL stored in an X509_OBJECT, if any.
+ * @param a Object to query.
+ * @return Internal X509_CRL pointer (do not free), or NULL if @p a does not hold a CRL.
+ */
+X509_CRL *X509_OBJECT_get0_X509_CRL(const X509_OBJECT *a);
+/**
+ * @brief Store a CRL in an X509_OBJECT, taking a reference to @p obj.
+ * @param a Object that will hold type X509_LU_CRL.
+ * @param obj CRL to reference; its reference count is incremented on success.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_OBJECT_set1_X509_CRL(X509_OBJECT *a, X509_CRL *obj);
+/**
+ * @brief Allocate a new X.509 certificate store for trusted certificates and CRLs.
+ * @return New X509_STORE with reference count 1, or NULL on allocation failure.
+ */
+X509_STORE *X509_STORE_new(void);
+/**
+ * @brief Free an X509_STORE and release its references to certificates, CRLs, and lookups.
+ * @param xs Store to free; NULL is ignored.
+ */
+void X509_STORE_free(X509_STORE *xs);
+/**
+ * @brief Acquire a write lock on an X509_STORE for thread-safe mutation.
+ * @param xs Store to lock.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_lock(X509_STORE *xs);
+/**
+ * @brief Release a write lock previously taken with X509_STORE_lock().
+ * @param xs Store whose lock is released.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_unlock(X509_STORE *xs);
+/**
+ * @brief Increment the reference count on an X509_STORE.
+ * @param xs Certificate store to retain.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_up_ref(X509_STORE *xs);
+/**
+ * @brief Return the internal cache of certificates and CRLs held by a store.
+ * @param xs Certificate store to query.
+ * @return Internal STACK_OF(X509_OBJECT) (do not free or modify casually), or NULL if unavailable.
+ */
+STACK_OF(X509_OBJECT) *X509_STORE_get0_objects(const X509_STORE *xs);
+/**
+ * @brief Return a deep-copied snapshot of every object cached in an X509_STORE.
+ * @param xs Store whose certificate/CRL cache is copied (locked for the duration of the copy).
+ * @return New STACK_OF(X509_OBJECT) that the caller frees with sk_X509_OBJECT_pop_free(..., X509_OBJECT_free), or NULL on error.
+ */
+STACK_OF(X509_OBJECT) *X509_STORE_get1_objects(X509_STORE *xs);
+/**
+ * @brief Return a new stack of every X.509 certificate currently cached in a store.
+ * @param xs Store whose certificate cache is copied.
+ * @return New STACK_OF(X509) that the caller frees (for example with OSSL_STACK_OF_X509_free), or NULL on error.
+ */
+STACK_OF(X509) *X509_STORE_get1_all_certs(X509_STORE *xs);
+/**
+ * @brief Return certificates from the store whose subject name matches @p nm.
+ * @param xs Verification / lookup context whose store is queried.
+ * @param nm Subject name to match.
+ * @return New stack of matching certificates (refcount +1 each), or NULL; free with sk_X509_pop_free().
+ */
+STACK_OF(X509) *X509_STORE_CTX_get1_certs(X509_STORE_CTX *xs,
+    const X509_NAME *nm);
+/**
+ * @brief Retrieve CRLs from the store behind @p st whose issuer matches @p nm.
+ * @param st Verification context whose associated X509_STORE is queried.
+ * @param nm Issuer name to look up.
+ * @return Newly allocated STACK_OF(X509_CRL) with up-reffed CRLs (caller frees), or NULL on failure.
+ */
+STACK_OF(X509_CRL) *X509_STORE_CTX_get1_crls(const X509_STORE_CTX *st,
+    const X509_NAME *nm);
+/**
+ * @brief Set verification behaviour flags on an X509_STORE (OR of X509_V_FLAG_*).
+ * @param xs Store whose default verify flags are replaced.
+ * @param flags Flag bits applied to new X509_STORE_CTX instances from this store.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_set_flags(X509_STORE *xs, unsigned long flags);
+/**
+ * @brief Set the default certificate purpose applied when verifying with this store.
+ * @param xs Store whose verification parameters are updated.
+ * @param purpose Purpose identifier (see X509_PURPOSE_*).
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_set_purpose(X509_STORE *xs, int purpose);
+/**
+ * @brief Set the default trust setting applied when verifying with this store.
+ * @param xs Store whose verification parameters are updated.
+ * @param trust Trust identifier (see X509_TRUST_*).
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_set_trust(X509_STORE *xs, int trust);
+/**
+ * @brief Copy verification parameters from @p pm onto a certificate store.
+ * @param xs Store whose default X509_VERIFY_PARAM is replaced/updated.
+ * @param pm Source parameters to copy; must not be NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_set1_param(X509_STORE *xs, const X509_VERIFY_PARAM *pm);
+/**
+ * @brief Return the verification parameters associated with a certificate store.
+ * @param xs Store to query.
+ * @return Internal X509_VERIFY_PARAM pointer (do not free), or NULL if unset.
+ */
+X509_VERIFY_PARAM *X509_STORE_get0_param(const X509_STORE *xs);
+
+/**
+ * @brief Install the chain-verify callback used by store contexts created from @p xs.
+ * @param xs Certificate store to configure.
+ * @param verify Function that verifies chain signatures and validity periods; NULL selects the default.
+ */
+void X509_STORE_set_verify(X509_STORE *xs, X509_STORE_CTX_verify_fn verify);
+#define X509_STORE_set_verify_func(ctx, func) \
+    X509_STORE_set_verify((ctx), (func))
+/**
+ * @brief Override the default chain-verify function on a verification context.
+ * @param ctx Store context whose verify callback is replaced.
+ * @param verify Function that verifies chain signatures and expiration times; must return 1 on success or 0 on failure.
+ */
+void X509_STORE_CTX_set_verify(X509_STORE_CTX *ctx,
+    X509_STORE_CTX_verify_fn verify);
+/**
+ * @brief Return the chain-verify callback installed on a certificate store.
+ * @param xs Certificate store to query.
+ * @return Function pointer previously set with X509_STORE_set_verify(), or NULL for the default.
+ */
+X509_STORE_CTX_verify_fn X509_STORE_get_verify(const X509_STORE *xs);
+/**
+ * @brief Install the verify-result callback inherited by contexts created from this store.
+ * @param xs Certificate store to configure.
+ * @param verify_cb Callback invoked for each verification error/result, or NULL to clear.
+ */
+void X509_STORE_set_verify_cb(X509_STORE *xs,
+    X509_STORE_CTX_verify_cb verify_cb);
+#define X509_STORE_set_verify_cb_func(ctx, func) \
+    X509_STORE_set_verify_cb((ctx), (func))
+/**
+ * @brief Return the verify-result callback installed on a certificate store.
+ * @param xs Store to query.
+ * @return Function pointer previously set with X509_STORE_set_verify_cb(), or NULL if unset.
+ */
+X509_STORE_CTX_verify_cb X509_STORE_get_verify_cb(const X509_STORE *xs);
+/**
+ * @brief Set the get-issuer callback used by store contexts created from @p xs.
+ * @param xs Certificate store to configure.
+ * @param get_issuer Callback that locates issuer certificates, or NULL for the default.
+ */
+void X509_STORE_set_get_issuer(X509_STORE *xs,
+    X509_STORE_CTX_get_issuer_fn get_issuer);
+/**
+ * @brief Return the get-issuer callback currently installed on a certificate store.
+ * @param xs Store to query.
+ * @return Function pointer previously set with X509_STORE_set_get_issuer(), or NULL for the default.
+ */
+X509_STORE_CTX_get_issuer_fn X509_STORE_get_get_issuer(const X509_STORE *xs);
+/**
+ * @brief Install the check-issued callback used by verifications from this store.
+ * @param xs Store whose check-issued function pointer is replaced.
+ * @param check_issued Callback that returns 1 if @c x was issued by @c issuer, or 0 on failure; NULL selects the default.
+ */
+void X509_STORE_set_check_issued(X509_STORE *xs,
+    X509_STORE_CTX_check_issued_fn check_issued);
+/**
+ * @brief Return the check-issued callback installed on a certificate store.
+ * @param s Store to query.
+ * @return Function pointer previously set with X509_STORE_set_check_issued(), or NULL for the default.
+ */
+X509_STORE_CTX_check_issued_fn X509_STORE_get_check_issued(const X509_STORE *s);
+/**
+ * @brief Install the certificate-revocation check callback used by verifications from this store.
+ * @param xs Store whose revocation-check function pointer is replaced.
+ * @param check_revocation Callback invoked to determine whether certificates in a chain are revoked, or NULL for the default.
+ */
+void X509_STORE_set_check_revocation(X509_STORE *xs,
+    X509_STORE_CTX_check_revocation_fn check_revocation);
+/**
+ * @brief Return the certificate-revocation check callback installed on a store.
+ * @param xs Certificate store to query.
+ * @return check_revocation callback, or NULL if the default is used.
+ */
+X509_STORE_CTX_check_revocation_fn
+X509_STORE_get_check_revocation(const X509_STORE *xs);
+/**
+ * @brief Install the CRL-retrieval callback inherited by contexts created from this store.
+ * @param xs Certificate store to configure.
+ * @param get_crl Function that locates a CRL for a given certificate, or NULL for the default.
+ */
+void X509_STORE_set_get_crl(X509_STORE *xs,
+    X509_STORE_CTX_get_crl_fn get_crl);
+/**
+ * @brief Return the get-CRL callback installed on a certificate store.
+ * @param xs Store to query.
+ * @return Function pointer previously set with X509_STORE_set_get_crl(), or NULL for the default.
+ */
+X509_STORE_CTX_get_crl_fn X509_STORE_get_get_crl(const X509_STORE *xs);
+/**
+ * @brief Install a callback that verifies CRLs for a certificate store.
+ * @param xs Store whose CRL-check callback is set.
+ * @param check_crl Callback used to validate CRLs, or NULL for the default.
+ */
+void X509_STORE_set_check_crl(X509_STORE *xs,
+    X509_STORE_CTX_check_crl_fn check_crl);
+/**
+ * @brief Return the CRL-check callback installed on a certificate store.
+ * @param xs Store to query.
+ * @return Callback used to verify CRLs, or NULL if the default is used.
+ */
+X509_STORE_CTX_check_crl_fn X509_STORE_get_check_crl(const X509_STORE *xs);
+/**
+ * @brief Install the cert-against-CRL check callback used by verifications from this store.
+ * @param xs Store whose cert/CRL check function pointer is replaced.
+ * @param cert_crl Callback that checks whether a certificate is listed on a CRL, or NULL for the default.
+ */
+void X509_STORE_set_cert_crl(X509_STORE *xs,
+    X509_STORE_CTX_cert_crl_fn cert_crl);
+/**
+ * @brief Return the cert-against-CRL check callback installed on a store.
+ * @param xs Certificate store to query.
+ * @return Function pointer previously set with X509_STORE_set_cert_crl(), or NULL for the default.
+ */
+X509_STORE_CTX_cert_crl_fn X509_STORE_get_cert_crl(const X509_STORE *xs);
+/**
+ * @brief Install the certificate-policy check callback used by verifications from this store.
+ * @param xs Store whose policy-check function pointer is replaced.
+ * @param check_policy Callback that evaluates certificate policies, or NULL for the default.
+ */
+void X509_STORE_set_check_policy(X509_STORE *xs,
+    X509_STORE_CTX_check_policy_fn check_policy);
+/**
+ * @brief Return the certificate-policy check callback installed on a store.
+ * @param s Certificate store to query.
+ * @return Function pointer previously set with X509_STORE_set_check_policy(), or NULL for the default.
+ */
+X509_STORE_CTX_check_policy_fn X509_STORE_get_check_policy(const X509_STORE *s);
+/**
+ * @brief Install the certificate-by-name lookup callback used by verifications from this store.
+ * @param xs Store whose certificate lookup function pointer is replaced.
+ * @param lookup_certs Callback that returns a stack of matching certificates for a name, or NULL on failure; NULL selects the default.
+ */
+void X509_STORE_set_lookup_certs(X509_STORE *xs,
+    X509_STORE_CTX_lookup_certs_fn lookup_certs);
+/**
+ * @brief Return the certificate-by-name lookup callback installed on an X509_STORE.
+ * @param s Store to query.
+ * @return Lookup function previously set with X509_STORE_set_lookup_certs(), or the default implementation.
+ */
+X509_STORE_CTX_lookup_certs_fn X509_STORE_get_lookup_certs(const X509_STORE *s);
+/**
+ * @brief Install the CRL-by-name lookup callback used by verifications from this store.
+ * @param xs Store whose CRL lookup function pointer is replaced.
+ * @param lookup_crls Callback that returns a stack of matching CRLs for name @c nm, or NULL on failure; NULL selects the default.
+ */
+void X509_STORE_set_lookup_crls(X509_STORE *xs,
+    X509_STORE_CTX_lookup_crls_fn lookup_crls);
+#define X509_STORE_set_lookup_crls_cb(ctx, func) \
+    X509_STORE_set_lookup_crls((ctx), (func))
+/**
+ * @brief Return the CRL-lookup callback installed on a certificate store.
+ * @param xs Store to query.
+ * @return Callback used to find CRLs by issuer name, or NULL if the default is used.
+ */
+X509_STORE_CTX_lookup_crls_fn X509_STORE_get_lookup_crls(const X509_STORE *xs);
+/**
+ * @brief Install a cleanup callback inherited by X509_STORE_CTX objects from this store.
+ * @param xs Store whose cleanup callback is set.
+ * @param cleanup Callback invoked when a store context is cleaned up, or NULL to clear.
+ */
+void X509_STORE_set_cleanup(X509_STORE *xs,
+    X509_STORE_CTX_cleanup_fn cleanup);
+/**
+ * @brief Return the cleanup callback installed on X509_STORE @p xs.
+ * @param xs Certificate store to query.
+ * @return Cleanup function pointer, or NULL if none is set.
+ */
+X509_STORE_CTX_cleanup_fn X509_STORE_get_cleanup(const X509_STORE *xs);
+
+#define X509_STORE_get_ex_new_index(l, p, newf, dupf, freef) \
+    CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_X509_STORE, l, p, newf, dupf, freef)
+/**
+ * @brief Store application ex_data on an X509_STORE at index @p idx.
+ * @param xs Certificate store to update.
+ * @param idx Index from X509_STORE_get_ex_new_index() / CRYPTO_get_ex_new_index().
+ * @param data Pointer to store.
+ * @return 1 on success, or 0 on error.
+ */
+int X509_STORE_set_ex_data(X509_STORE *xs, int idx, void *data);
+/**
+ * @brief Retrieve application data previously stored on an X509_STORE.
+ * @param xs Store to query.
+ * @param idx Index from CRYPTO_get_ex_new_index() for X509_STORE.
+ * @return Stored pointer, or NULL if unset.
+ */
+void *X509_STORE_get_ex_data(const X509_STORE *xs, int idx);
+
+/**
+ * @brief Allocate an empty X509_STORE_CTX using an explicit library context.
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query for provider selection, or NULL.
+ * @return New verification context, or NULL on allocation failure.
+ *
+ * Call X509_STORE_CTX_init() (or X509_STORE_CTX_init_rpk()) before verifying.
+ */
+X509_STORE_CTX *X509_STORE_CTX_new_ex(OSSL_LIB_CTX *libctx, const char *propq);
+/**
+ * @brief Allocate an empty X509_STORE_CTX using the default library context.
+ * @return New verification context, or NULL on allocation failure.
+ *
+ * Call X509_STORE_CTX_init() (or X509_STORE_CTX_init_rpk()) before verifying.
+ */
+X509_STORE_CTX *X509_STORE_CTX_new(void);
+
+/**
+ * @brief Find a candidate issuer certificate for @p x using the store context.
+ * @param issuer Receives an up-referenced issuer certificate on success.
+ * @param ctx Verification context providing the trusted store and callbacks.
+ * @param x Certificate whose issuer is sought.
+ * @return 1 if an issuer was found, 0 if not, or a negative value on error.
+ */
+int X509_STORE_CTX_get1_issuer(X509 **issuer, X509_STORE_CTX *ctx, X509 *x);
+
+/**
+ * @brief Free an X509_STORE_CTX and release resources it owns.
+ * @param ctx Verification context to free, or NULL (no-op).
+ */
+void X509_STORE_CTX_free(X509_STORE_CTX *ctx);
+/**
+ * @brief Initialize a verification context for validating @p target against @p trust_store.
+ * @param ctx Store context to initialize (must already be allocated).
+ * @param trust_store Trusted certificate store, or NULL.
+ * @param target End-entity certificate to verify, or NULL when using raw public keys later.
+ * @param untrusted Optional stack of untrusted intermediates, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_CTX_init(X509_STORE_CTX *ctx, X509_STORE *trust_store,
+    X509 *target, STACK_OF(X509) *untrusted);
+/**
+ * @brief Initialise a verification context to validate raw public key @p rpk.
+ * @param ctx Store context to initialise.
+ * @param trust_store Trust store used for verification, or NULL.
+ * @param rpk Raw public key being verified (as an EVP_PKEY).
+ * @return 1 on success, or 0 on error.
+ */
+int X509_STORE_CTX_init_rpk(X509_STORE_CTX *ctx, X509_STORE *trust_store,
+    EVP_PKEY *rpk);
+/**
+ * @brief Use a stack of certificates as the trusted set for a verification context.
+ * @param ctx Store context whose trusted certificates are replaced.
+ * @param sk Stack of trusted X509 certificates; ownership is transferred to @p ctx (do not free).
+ *
+ * Useful when trust anchors are supplied as an explicit list instead of via an X509_STORE.
+ */
+void X509_STORE_CTX_set0_trusted_stack(X509_STORE_CTX *ctx, STACK_OF(X509) *sk);
+/**
+ * @brief Release verification state inside @p ctx so it can be re-initialised or freed.
+ * @param ctx Store context to clean; safe on a freshly zeroed or already-clean context.
+ */
+void X509_STORE_CTX_cleanup(X509_STORE_CTX *ctx);
+
+/**
+ * @brief Return the X509_STORE associated with a verification context.
+ * @param ctx Store context to query.
+ * @return The trust store used by @p ctx.
+ */
+X509_STORE *X509_STORE_CTX_get0_store(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return an internal pointer to the certificate being verified.
+ * @param ctx Verification store context to query.
+ * @return Internal X509 pointer (do not free), or NULL if a raw public key is being verified.
+ */
+X509 *X509_STORE_CTX_get0_cert(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return the raw public key being verified, if any.
+ * @param ctx Verification store context to query.
+ * @return Internal EVP_PKEY pointer (do not free), or NULL when verifying a certificate instead.
+ */
+EVP_PKEY *X509_STORE_CTX_get0_rpk(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return the stack of untrusted certificates associated with a verification context.
+ * @param ctx Store context to query.
+ * @return Internal STACK_OF(X509) pointer (do not free the stack itself), or NULL if unset.
+ */
+STACK_OF(X509) *X509_STORE_CTX_get0_untrusted(const X509_STORE_CTX *ctx);
+/**
+ * @brief Set the untrusted intermediate certificate stack used during chain building.
+ * @param ctx Verification context to update.
+ * @param sk Stack of untrusted certificates; ownership transfers to @p ctx (may be NULL).
+ */
+void X509_STORE_CTX_set0_untrusted(X509_STORE_CTX *ctx, STACK_OF(X509) *sk);
+/**
+ * @brief Install a verify callback on a store context (overrides the store default).
+ * @param ctx Verification context to update.
+ * @param verify Callback invoked for each certificate check; may be NULL.
+ */
+void X509_STORE_CTX_set_verify_cb(X509_STORE_CTX *ctx,
+    X509_STORE_CTX_verify_cb verify);
+/**
+ * @brief Return the verify-result callback installed on a store context.
+ * @param ctx Store context to query.
+ * @return Verify callback pointer, or NULL if unset.
+ */
+X509_STORE_CTX_verify_cb X509_STORE_CTX_get_verify_cb(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return the chain-verification callback installed on a store context.
+ * @param ctx Store context to query.
+ * @return Verify callback pointer, or NULL if the default should be used.
+ */
+X509_STORE_CTX_verify_fn X509_STORE_CTX_get_verify(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return the get_issuer callback currently installed on a verification context.
+ * @param ctx Store context to query.
+ * @return Function used to locate an issuer certificate, or NULL if unset.
+ */
+X509_STORE_CTX_get_issuer_fn X509_STORE_CTX_get_get_issuer(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return the check_issued callback currently installed on a verification context.
+ * @param ctx Store context to query.
+ * @return Function pointer cached from the corresponding X509_STORE, or NULL if unset.
+ */
+X509_STORE_CTX_check_issued_fn X509_STORE_CTX_get_check_issued(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return the revocation-checking callback installed on a verification context.
+ * @param ctx Verification context to query.
+ * @return Function pointer used to check revocation, or NULL if unset.
+ */
+X509_STORE_CTX_check_revocation_fn X509_STORE_CTX_get_check_revocation(const X509_STORE_CTX *ctx);
+/**
+ * @brief Override the get-CRL callback on a verification context.
+ * @param ctx Store context whose get_crl function is replaced.
+ * @param get_crl Callback that locates a CRL for a certificate, or NULL for the default.
+ */
+void X509_STORE_CTX_set_get_crl(X509_STORE_CTX *ctx,
+    X509_STORE_CTX_get_crl_fn get_crl);
+/**
+ * @brief Return the get_crl callback currently installed on a verification context.
+ * @param ctx Store context to query.
+ * @return Function pointer cached from the associated X509_STORE (or set on @p ctx), or NULL for the default.
+ */
+X509_STORE_CTX_get_crl_fn X509_STORE_CTX_get_get_crl(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return the check_crl callback currently installed on a verification context.
+ * @param ctx Store context to query.
+ * @return Function used to validate a CRL, or NULL if unset.
+ */
+X509_STORE_CTX_check_crl_fn X509_STORE_CTX_get_check_crl(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return the cert-against-CRL check callback installed on a store context.
+ * @param ctx Store context to query.
+ * @return Function pointer cached from the corresponding X509_STORE, or NULL if unset.
+ */
+X509_STORE_CTX_cert_crl_fn X509_STORE_CTX_get_cert_crl(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return the certificate-policy check callback installed on a store context.
+ * @param ctx Store context to query.
+ * @return Function pointer cached from the corresponding X509_STORE, or NULL if unset.
+ */
+X509_STORE_CTX_check_policy_fn X509_STORE_CTX_get_check_policy(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return the lookup_certs callback currently installed on a verification context.
+ * @param ctx Store context to query.
+ * @return Function pointer cached from the corresponding X509_STORE, or NULL if unset.
+ */
+X509_STORE_CTX_lookup_certs_fn X509_STORE_CTX_get_lookup_certs(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return the CRL-lookup callback installed on a store context.
+ * @param ctx Store context to query.
+ * @return Function pointer cached from the corresponding X509_STORE, or NULL if unset.
+ */
+X509_STORE_CTX_lookup_crls_fn X509_STORE_CTX_get_lookup_crls(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return the cleanup callback installed on a store context.
+ * @param ctx Store context to query.
+ * @return Function pointer cached from the corresponding X509_STORE, or NULL if unset.
+ */
+X509_STORE_CTX_cleanup_fn X509_STORE_CTX_get_cleanup(const X509_STORE_CTX *ctx);
+
+#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+#define X509_STORE_CTX_get_chain X509_STORE_CTX_get0_chain
+#define X509_STORE_CTX_set_chain X509_STORE_CTX_set0_untrusted
+#define X509_STORE_CTX_trusted_stack X509_STORE_CTX_set0_trusted_stack
+#define X509_STORE_get_by_subject X509_STORE_CTX_get_by_subject
+#define X509_STORE_get1_certs X509_STORE_CTX_get1_certs
+#define X509_STORE_get1_crls X509_STORE_CTX_get1_crls
+/* the following macro is misspelled; use X509_STORE_get1_certs instead */
+#define X509_STORE_get1_cert X509_STORE_CTX_get1_certs
+/* the following macro is misspelled; use X509_STORE_get1_crls instead */
+#define X509_STORE_get1_crl X509_STORE_CTX_get1_crls
+#endif
+
+/**
+ * @brief Attach a new X509_LOOKUP of method @p m to a certificate store.
+ * @param xs Store that will own the returned lookup.
+ * @param m Lookup method such as X509_LOOKUP_file() or X509_LOOKUP_hash_dir().
+ * @return New X509_LOOKUP bound to @p xs, or NULL on error.
+ */
+X509_LOOKUP *X509_STORE_add_lookup(X509_STORE *xs, X509_LOOKUP_METHOD *m);
+/**
+ * @brief Return the built-in lookup method that loads certificates and CRLs from a hashed directory.
+ * @return Pointer to the static X509_LOOKUP_METHOD for hash-dir lookups.
+ */
+X509_LOOKUP_METHOD *X509_LOOKUP_hash_dir(void);
+/**
+ * @brief Return the built-in lookup method that loads certificates and CRLs from PEM/DER files.
+ * @return Pointer to the static X509_LOOKUP_METHOD for file lookups.
+ */
+X509_LOOKUP_METHOD *X509_LOOKUP_file(void);
+/**
+ * @brief Return the X509_LOOKUP_METHOD that loads certificates/CRLs via OSSL_STORE URIs.
+ * @return Pointer to the store-based lookup method.
+ */
+X509_LOOKUP_METHOD *X509_LOOKUP_store(void);
+
+/**
+ * @brief Control-command callback for an X509_LOOKUP_METHOD.
+ * @param ctx Lookup object receiving the command.
+ * @param cmd Control command such as X509_L_FILE_LOAD.
+ * @param argc String argument for @p cmd, or NULL.
+ * @param argl Integer argument for @p cmd.
+ * @param ret Optional address receiving a result string, or NULL.
+ * @return Positive value on success, or <=0 on failure (command-specific).
+ */
+typedef int (*X509_LOOKUP_ctrl_fn)(X509_LOOKUP *ctx, int cmd, const char *argc,
+    long argl, char **ret);
+/**
+ * @brief Extended control callback for an X509_LOOKUP_METHOD (with library context).
+ * @param ctx Lookup object receiving the command.
+ * @param cmd Control command such as X509_L_FILE_LOAD.
+ * @param argc String argument for @p cmd, or NULL.
+ * @param argl Integer argument for @p cmd.
+ * @param ret Optional address receiving a result string, or NULL.
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query for algorithm fetches, or NULL.
+ * @return Command-specific positive value on success, or non-positive on failure.
+ */
+typedef int (*X509_LOOKUP_ctrl_ex_fn)(
+    X509_LOOKUP *ctx, int cmd, const char *argc, long argl, char **ret,
+    OSSL_LIB_CTX *libctx, const char *propq);
+
+/**
+ * @brief Callback type that looks up a certificate or CRL by subject name.
+ * @param ctx Lookup instance to query.
+ * @param type X509_LU_X509 or X509_LU_CRL selecting the object kind.
+ * @param name Subject name to match.
+ * @param ret Receives the found object on success.
+ * @return 1 on success, or 0 on failure / not found.
+ */
+typedef int (*X509_LOOKUP_get_by_subject_fn)(X509_LOOKUP *ctx,
+    X509_LOOKUP_TYPE type,
+    const X509_NAME *name,
+    X509_OBJECT *ret);
+/**
+ * @brief Callback type that looks up a certificate or CRL by subject name, with provider selection.
+ * @param ctx Lookup instance to query.
+ * @param type X509_LU_X509 or X509_LU_CRL selecting the object kind.
+ * @param name Subject name to match.
+ * @param ret Receives the found object on success.
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query for provider selection, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+typedef int (*X509_LOOKUP_get_by_subject_ex_fn)(X509_LOOKUP *ctx,
+    X509_LOOKUP_TYPE type,
+    const X509_NAME *name,
+    X509_OBJECT *ret,
+    OSSL_LIB_CTX *libctx,
+    const char *propq);
+/**
+ * @brief Callback type that looks up a certificate by issuer name and serial number.
+ * @param ctx Lookup instance to query.
+ * @param type Object kind (typically X509_LU_X509).
+ * @param name Issuer distinguished name.
+ * @param serial Certificate serial number.
+ * @param ret Receives the found object on success.
+ * @return 1 on success, or 0 on failure / not found.
+ */
+typedef int (*X509_LOOKUP_get_by_issuer_serial_fn)(X509_LOOKUP *ctx,
+    X509_LOOKUP_TYPE type,
+    const X509_NAME *name,
+    const ASN1_INTEGER *serial,
+    X509_OBJECT *ret);
+/**
+ * @brief Callback type that looks up a certificate or CRL by fingerprint.
+ * @param ctx Lookup instance to query.
+ * @param type X509_LU_X509 or X509_LU_CRL selecting the object kind.
+ * @param bytes Fingerprint octets to match.
+ * @param len Length of @p bytes.
+ * @param ret Receives the found object on success.
+ * @return 1 on success, or 0 on failure / not found.
+ */
+typedef int (*X509_LOOKUP_get_by_fingerprint_fn)(X509_LOOKUP *ctx,
+    X509_LOOKUP_TYPE type,
+    const unsigned char *bytes,
+    int len,
+    X509_OBJECT *ret);
+/**
+ * @brief Callback type that looks up a certificate or CRL by alias / friendly name.
+ * @param ctx Lookup instance to query.
+ * @param type X509_LU_X509 or X509_LU_CRL selecting the object kind.
+ * @param str Alias bytes to match.
+ * @param len Length of @p str in bytes.
+ * @param ret Receives the found object on success.
+ * @return 1 on success, or 0 on failure / not found.
+ */
+typedef int (*X509_LOOKUP_get_by_alias_fn)(X509_LOOKUP *ctx,
+    X509_LOOKUP_TYPE type,
+    const char *str,
+    int len,
+    X509_OBJECT *ret);
+
+/**
+ * @brief Allocate a new custom X509_LOOKUP_METHOD with the given method name.
+ * @param name Short name stored on the method (for diagnostics); duplicated internally.
+ * @return New X509_LOOKUP_METHOD, or NULL on error; free with X509_LOOKUP_meth_free().
+ */
+X509_LOOKUP_METHOD *X509_LOOKUP_meth_new(const char *name);
+/**
+ * @brief Free an X509_LOOKUP_METHOD previously created with X509_LOOKUP_meth_new().
+ * @param method Method object to free, or NULL.
+ */
+void X509_LOOKUP_meth_free(X509_LOOKUP_METHOD *method);
+
+/**
+ * @brief Set the per-LOOKUP instance constructor callback on an X509_LOOKUP_METHOD.
+ * @param method Lookup method table to update.
+ * @param new_item Callback that allocates method-specific state for a new X509_LOOKUP, or NULL to clear.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_LOOKUP_meth_set_new_item(X509_LOOKUP_METHOD *method,
+    int (*new_item)(X509_LOOKUP *ctx));
+/**
+ * @brief Return the new-item callback from an X509_LOOKUP_METHOD.
+ * @param method Lookup method to query.
+ * @return Function pointer that allocates per-lookup state, or NULL if unset.
+ */
+int (*X509_LOOKUP_meth_get_new_item(const X509_LOOKUP_METHOD *method))(X509_LOOKUP *ctx);
+
+/**
+ * @brief Set the method callback that frees a lookup context's method-specific state.
+ * @param method Lookup method table to update.
+ * @param free_fn Callback invoked from X509_LOOKUP_free(), or NULL to clear.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_LOOKUP_meth_set_free(X509_LOOKUP_METHOD *method,
+    void (*free_fn)(X509_LOOKUP *ctx));
+/**
+ * @brief Return the free callback registered on an X509_LOOKUP_METHOD.
+ * @param method Lookup method to query.
+ * @return Function that frees per-lookup method state, or NULL if unset.
+ */
+void (*X509_LOOKUP_meth_get_free(const X509_LOOKUP_METHOD *method))(X509_LOOKUP *ctx);
+
+/**
+ * @brief Set the initialization callback on an X509_LOOKUP_METHOD.
+ * @param method Lookup method table to update.
+ * @param init Callback invoked when an X509_LOOKUP using @p method is initialized, or NULL to clear.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_LOOKUP_meth_set_init(X509_LOOKUP_METHOD *method,
+    int (*init)(X509_LOOKUP *ctx));
+/**
+ * @brief Return the initialization callback registered on an X509_LOOKUP_METHOD.
+ * @param method Lookup method to query.
+ * @return Init function previously set with X509_LOOKUP_meth_set_init(), or NULL if unset.
+ */
+int (*X509_LOOKUP_meth_get_init(const X509_LOOKUP_METHOD *method))(X509_LOOKUP *ctx);
+
+/**
+ * @brief Set the shutdown callback for a custom X509_LOOKUP_METHOD.
+ * @param method Lookup method to update.
+ * @param shutdown Function that tears down method-specific state previously initialized by the init callback.
+ * @return 1 on success.
+ */
+int X509_LOOKUP_meth_set_shutdown(X509_LOOKUP_METHOD *method,
+    int (*shutdown)(X509_LOOKUP *ctx));
+/**
+ * @brief Return the shutdown callback registered on an X509_LOOKUP_METHOD.
+ * @param method Lookup method to query.
+ * @return Shutdown function previously set with X509_LOOKUP_meth_set_shutdown(), or NULL if unset.
+ */
+int (*X509_LOOKUP_meth_get_shutdown(const X509_LOOKUP_METHOD *method))(X509_LOOKUP *ctx);
+
+/**
+ * @brief Install the control callback on an X509_LOOKUP_METHOD.
+ * @param method Lookup method to update.
+ * @param ctrl_fn Callback implementing X509_LOOKUP_ctrl()-style commands.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_LOOKUP_meth_set_ctrl(X509_LOOKUP_METHOD *method,
+    X509_LOOKUP_ctrl_fn ctrl_fn);
+/**
+ * @brief Return the control callback registered on an X509_LOOKUP_METHOD.
+ * @param method Lookup method to query.
+ * @return Ctrl function previously set with X509_LOOKUP_meth_set_ctrl(), or NULL if unset.
+ */
+X509_LOOKUP_ctrl_fn X509_LOOKUP_meth_get_ctrl(const X509_LOOKUP_METHOD *method);
+
+/**
+ * @brief Set the get-by-subject callback on an X509_LOOKUP_METHOD.
+ * @param method Lookup method table to update.
+ * @param fn Callback that finds objects by subject name, or NULL to clear.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_LOOKUP_meth_set_get_by_subject(X509_LOOKUP_METHOD *method,
+    X509_LOOKUP_get_by_subject_fn fn);
+/**
+ * @brief Return the get-by-subject callback from an X509_LOOKUP_METHOD.
+ * @param method Lookup method to query.
+ * @return Function pointer previously set with X509_LOOKUP_meth_set_get_by_subject(), or NULL.
+ */
+X509_LOOKUP_get_by_subject_fn X509_LOOKUP_meth_get_get_by_subject(
+    const X509_LOOKUP_METHOD *method);
+
+/**
+ * @brief Set the get-by-issuer-and-serial callback on an X509_LOOKUP_METHOD.
+ * @param method Lookup method table to update.
+ * @param fn Callback that finds objects by issuer name and serial, or NULL to clear.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_LOOKUP_meth_set_get_by_issuer_serial(X509_LOOKUP_METHOD *method,
+    X509_LOOKUP_get_by_issuer_serial_fn fn);
+/**
+ * @brief Return the get-by-issuer-and-serial callback from an X509_LOOKUP_METHOD.
+ * @param method Lookup method to query.
+ * @return Function pointer previously set with X509_LOOKUP_meth_set_get_by_issuer_serial(), or NULL.
+ */
+X509_LOOKUP_get_by_issuer_serial_fn X509_LOOKUP_meth_get_get_by_issuer_serial(
+    const X509_LOOKUP_METHOD *method);
+
+/**
+ * @brief Set the get-by-fingerprint callback on an X509_LOOKUP_METHOD.
+ * @param method Lookup method table to update.
+ * @param fn Callback that finds an X509_OBJECT by fingerprint, or NULL to clear.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_LOOKUP_meth_set_get_by_fingerprint(X509_LOOKUP_METHOD *method,
+    X509_LOOKUP_get_by_fingerprint_fn fn);
+/**
+ * @brief Return the get-by-fingerprint function pointer installed on a lookup method.
+ * @param method Lookup method to query.
+ * @return Function pointer previously set with X509_LOOKUP_meth_set_get_by_fingerprint(), or NULL.
+ */
+X509_LOOKUP_get_by_fingerprint_fn X509_LOOKUP_meth_get_get_by_fingerprint(
+    const X509_LOOKUP_METHOD *method);
+
+/**
+ * @brief Set the get-by-alias callback on an X509_LOOKUP_METHOD.
+ * @param method Lookup method table to update.
+ * @param fn Callback that finds an X509_OBJECT by alias string, or NULL to clear.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_LOOKUP_meth_set_get_by_alias(X509_LOOKUP_METHOD *method,
+    X509_LOOKUP_get_by_alias_fn fn);
+/**
+ * @brief Return the get-by-alias callback from an X509_LOOKUP_METHOD.
+ * @param method Lookup method to query.
+ * @return Function pointer previously set with X509_LOOKUP_meth_set_get_by_alias(), or NULL.
+ */
+X509_LOOKUP_get_by_alias_fn X509_LOOKUP_meth_get_get_by_alias(
+    const X509_LOOKUP_METHOD *method);
+
+/**
+ * @brief Add a certificate to an X509_STORE's trusted-certificate cache.
+ * @param xs Store that will retain @p x.
+ * @param x Certificate to add; the store increments its reference count on success.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_add_cert(X509_STORE *xs, X509 *x);
+/**
+ * @brief Add a CRL to an X509_STORE's cache.
+ * @param xs Store that will retain @p x.
+ * @param x CRL to add; the store increments its reference count on success.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_add_crl(X509_STORE *xs, X509_CRL *x);
+
+/**
+ * @brief Look up a certificate or CRL by subject name via the store of @p vs.
+ * @param vs Store context providing the X509_STORE and lookup state.
+ * @param type X509_LU_X509 or X509_LU_CRL.
+ * @param name Subject (or issuer for CRLs) name to match.
+ * @param ret Destination object that receives a reference to the match.
+ * @return 1 on success, or 0 if not found / on error.
+ */
+int X509_STORE_CTX_get_by_subject(const X509_STORE_CTX *vs,
+    X509_LOOKUP_TYPE type,
+    const X509_NAME *name, X509_OBJECT *ret);
+/**
+ * @brief Look up a certificate or CRL by subject name and return a new X509_OBJECT wrapper.
+ * @param vs Store context providing the X509_STORE and lookup state.
+ * @param type X509_LU_X509 or X509_LU_CRL.
+ * @param name Subject (or issuer for CRLs) name to match.
+ * @return Newly allocated X509_OBJECT holding a reference to the match, or NULL if not found / on error; free with X509_OBJECT_free().
+ */
+X509_OBJECT *X509_STORE_CTX_get_obj_by_subject(X509_STORE_CTX *vs,
+    X509_LOOKUP_TYPE type,
+    const X509_NAME *name);
+
+/**
+ * @brief Invoke the control method of an X509_LOOKUP (no explicit library context).
+ * @param ctx Lookup object receiving the command.
+ * @param cmd Control command such as X509_L_FILE_LOAD.
+ * @param argc String argument for @p cmd, or NULL.
+ * @param argl Integer argument for @p cmd.
+ * @param ret Optional address receiving a result string, or NULL.
+ * @return Positive value on success, or <=0 on failure (command-specific).
+ */
+int X509_LOOKUP_ctrl(X509_LOOKUP *ctx, int cmd, const char *argc,
+    long argl, char **ret);
+/**
+ * @brief Invoke the control method of an X509_LOOKUP with an explicit library context.
+ * @param ctx Lookup object receiving the command.
+ * @param cmd Control command such as X509_L_FILE_LOAD.
+ * @param argc String argument for @p cmd, or NULL.
+ * @param argl Integer argument for @p cmd.
+ * @param ret Optional address receiving a result string, or NULL.
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query string, or NULL.
+ * @return Positive value on success, or <=0 on failure (command-specific).
+ */
+int X509_LOOKUP_ctrl_ex(X509_LOOKUP *ctx, int cmd, const char *argc, long argl,
+    char **ret, OSSL_LIB_CTX *libctx, const char *propq);
+
+/**
+ * @brief Load certificates from @p file into the store behind @p ctx.
+ * @param ctx Lookup object associated with the destination X509_STORE.
+ * @param file Path to a certificate file.
+ * @param type File format such as X509_FILETYPE_PEM or X509_FILETYPE_ASN1.
+ * @return Number of certificates loaded, or 0 on failure.
+ */
+int X509_load_cert_file(X509_LOOKUP *ctx, const char *file, int type);
+/**
+ * @brief Load certificates from @p file into the store behind @p ctx with an explicit libctx.
+ * @param ctx Lookup object associated with the destination X509_STORE.
+ * @param file Path to a certificate file.
+ * @param type File format such as X509_FILETYPE_PEM or X509_FILETYPE_ASN1.
+ * @param libctx Library context for decoding, or NULL for the default.
+ * @param propq Property query string, or NULL.
+ * @return Number of certificates loaded, or 0 on failure.
+ */
+int X509_load_cert_file_ex(X509_LOOKUP *ctx, const char *file, int type,
+    OSSL_LIB_CTX *libctx, const char *propq);
+/**
+ * @brief Load CRLs from @p file into the store behind @p ctx.
+ * @param ctx Lookup object associated with the destination X509_STORE.
+ * @param file Path to a CRL file.
+ * @param type File format such as X509_FILETYPE_PEM or X509_FILETYPE_ASN1.
+ * @return Number of CRLs loaded, or 0 on failure.
+ */
+int X509_load_crl_file(X509_LOOKUP *ctx, const char *file, int type);
+/**
+ * @brief Load certificates and CRLs from @p file into the store associated with a lookup.
+ * @param ctx Lookup whose associated X509_STORE receives the objects.
+ * @param file Path to a PEM file (or ASN.1 when @p type is FILETYPE_ASN1).
+ * @param type FILETYPE_PEM, FILETYPE_ASN1, or FILETYPE_DEFAULT.
+ * @return Number of objects loaded, or 0 on failure.
+ */
+int X509_load_cert_crl_file(X509_LOOKUP *ctx, const char *file, int type);
+/**
+ * @brief Load certificates and CRLs from a PEM @p file with an explicit library context.
+ * @param ctx Lookup object associated with the destination X509_STORE.
+ * @param file Path to a PEM file that may contain certificates and CRLs.
+ * @param type File format; typically X509_FILETYPE_PEM for mixed content.
+ * @param libctx Library context for decoding, or NULL for the default.
+ * @param propq Property query string, or NULL.
+ * @return Number of objects loaded, or 0 on failure.
+ */
+int X509_load_cert_crl_file_ex(X509_LOOKUP *ctx, const char *file, int type,
+    OSSL_LIB_CTX *libctx, const char *propq);
+
+/**
+ * @brief Create a new X509_LOOKUP using the given lookup method.
+ * @param method Lookup method that defines how certificates and CRLs are found.
+ * @return New X509_LOOKUP, or NULL on error.
+ */
+X509_LOOKUP *X509_LOOKUP_new(X509_LOOKUP_METHOD *method);
+/**
+ * @brief Free an X509_LOOKUP and its method-specific state.
+ * @param ctx Lookup to free, or NULL (no-op).
+ */
+void X509_LOOKUP_free(X509_LOOKUP *ctx);
+/**
+ * @brief Initialize an X509_LOOKUP by invoking its method's init callback.
+ * @param ctx Lookup object to initialize.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_LOOKUP_init(X509_LOOKUP *ctx);
+/**
+ * @brief Look up a certificate or CRL by subject name via a lookup method.
+ * @param ctx Lookup instance to query.
+ * @param type X509_LU_X509 or X509_LU_CRL selecting the object kind.
+ * @param name Subject name to match.
+ * @param ret Receives the found object on success.
+ * @return 1 on success, or 0 on failure / not found.
+ */
+int X509_LOOKUP_by_subject(X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
+    const X509_NAME *name, X509_OBJECT *ret);
+/**
+ * @brief Look up a certificate or CRL by subject name with an explicit library context.
+ * @param ctx Lookup to query.
+ * @param type X509_LU_X509 or X509_LU_CRL selecting the object kind.
+ * @param name Subject (or CRL issuer) name to match.
+ * @param ret Destination X509_OBJECT that receives the result on success.
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query string, or NULL.
+ * @return 1 on success, or 0 on failure / not found.
+ */
+int X509_LOOKUP_by_subject_ex(X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
+    const X509_NAME *name, X509_OBJECT *ret,
+    OSSL_LIB_CTX *libctx, const char *propq);
+/**
+ * @brief Look up a certificate in a lookup method by issuer name and serial number.
+ * @param ctx Lookup instance to query.
+ * @param type Object kind (typically X509_LU_X509).
+ * @param name Issuer distinguished name.
+ * @param serial Certificate serial number.
+ * @param ret Receives the found object on success (cached in the store; do not free casually).
+ * @return 1 if found, or 0 on failure / not found.
+ */
+int X509_LOOKUP_by_issuer_serial(X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
+    const X509_NAME *name,
+    const ASN1_INTEGER *serial,
+    X509_OBJECT *ret);
+/**
+ * @brief Look up a certificate or CRL in a lookup method by fingerprint.
+ * @param ctx Lookup instance to query.
+ * @param type X509_LU_X509 or X509_LU_CRL selecting the object kind.
+ * @param bytes Fingerprint octets to match.
+ * @param len Length of @p bytes.
+ * @param ret Receives the found object on success (cached in the store; do not free casually).
+ * @return 1 if found, or 0 on failure / not found.
+ */
+int X509_LOOKUP_by_fingerprint(X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
+    const unsigned char *bytes, int len,
+    X509_OBJECT *ret);
+/**
+ * @brief Look up a certificate or CRL by alias / friendly name through a lookup method.
+ * @param ctx Lookup method instance.
+ * @param type X509_LU_X509 or X509_LU_CRL.
+ * @param str Alias bytes.
+ * @param len Length of @p str.
+ * @param ret Destination object that receives a reference to the match.
+ * @return 1 on success, or 0 if not found / on error.
+ */
+int X509_LOOKUP_by_alias(X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
+    const char *str, int len, X509_OBJECT *ret);
+/**
+ * @brief Attach method-specific opaque data to an X509_LOOKUP.
+ * @param ctx Lookup object that stores @p data for its method callbacks.
+ * @param data Pointer owned/interpreted by the lookup method.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_LOOKUP_set_method_data(X509_LOOKUP *ctx, void *data);
+/**
+ * @brief Return the method-specific opaque data attached to an X509_LOOKUP.
+ * @param ctx Lookup object to query.
+ * @return Pointer previously set with X509_LOOKUP_set_method_data(), or NULL if unset.
+ */
+void *X509_LOOKUP_get_method_data(const X509_LOOKUP *ctx);
+/**
+ * @brief Return the X509_STORE that owns a lookup object.
+ * @param ctx Lookup to query.
+ * @return Owning store pointer (do not free via this reference), or NULL if unset.
+ */
+X509_STORE *X509_LOOKUP_get_store(const X509_LOOKUP *ctx);
+/**
+ * @brief Shut down a lookup object, releasing method-specific resources via its shutdown callback.
+ * @param ctx Lookup to shut down.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_LOOKUP_shutdown(X509_LOOKUP *ctx);
+
+/**
+ * @brief Load trusted certificates from a PEM/DER file into a store.
+ * @param xs Certificate store to update.
+ * @param file Path to a file containing one or more certificates.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_load_file(X509_STORE *xs, const char *file);
+/**
+ * @brief Load trusted certificates from every file in a hashed directory into a store.
+ * @param xs Certificate store to update.
+ * @param path Directory of certificate files named in the OpenSSL c_rehash layout.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_load_path(X509_STORE *xs, const char *path);
+/**
+ * @brief Load trusted certificates from an OSSL_STORE URI into a store.
+ * @param xs Certificate store to update.
+ * @param store URI understood by OSSL_STORE (for example a file: or pkcs11: URI).
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_load_store(X509_STORE *xs, const char *store);
+/**
+ * @brief Load trusted certificates from a PEM file and/or a hashed certificate directory.
+ * @param s Store that receives the loaded trust anchors.
+ * @param file Optional PEM file of certificates, or NULL.
+ * @param dir Optional directory of hashed certificate files, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_load_locations(X509_STORE *s, const char *file, const char *dir);
+/**
+ * @brief Load the default system CA file and directory into certificate store @p xs.
+ * @param xs Certificate store to update.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_set_default_paths(X509_STORE *xs);
+
+/**
+ * @brief Load trusted certificates from a PEM/DER file into a store, with provider selection.
+ * @param xs Certificate store to update.
+ * @param file Path to a file containing one or more certificates.
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query for provider selection, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_load_file_ex(X509_STORE *xs, const char *file,
+    OSSL_LIB_CTX *libctx, const char *propq);
+/**
+ * @brief Load trusted certificates from an OSSL_STORE URI, with provider selection.
+ * @param xs Certificate store to update.
+ * @param store URI understood by OSSL_STORE.
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query for provider selection, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_load_store_ex(X509_STORE *xs, const char *store,
+    OSSL_LIB_CTX *libctx, const char *propq);
+/**
+ * @brief Load trusted certificates from @p file and/or hashed @p dir into a store.
+ * @param xs Destination X509_STORE.
+ * @param file Optional PEM/bundle file of trusted certs, or NULL.
+ * @param dir Optional directory of hashed cert files, or NULL.
+ * @param libctx Library context for loading, or NULL for the default.
+ * @param propq Property query for provider fetches, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_load_locations_ex(X509_STORE *xs,
+    const char *file, const char *dir,
+    OSSL_LIB_CTX *libctx, const char *propq);
+/**
+ * @brief Load the default CA file, directory, and store into @p xs, with provider selection.
+ * @param xs Certificate store whose default trust locations are configured.
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query for provider selection, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_set_default_paths_ex(X509_STORE *xs,
+    OSSL_LIB_CTX *libctx, const char *propq);
+
+#define X509_STORE_CTX_get_ex_new_index(l, p, newf, dupf, freef) \
+    CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_X509_STORE_CTX, l, p, newf, dupf, freef)
+/**
+ * @brief Store application ex_data on a verification context at index @p idx.
+ * @param ctx Store context.
+ * @param idx Index from X509_STORE_CTX_get_ex_new_index().
+ * @param data Pointer to store.
+ * @return 1 on success, or 0 on error.
+ */
+int X509_STORE_CTX_set_ex_data(X509_STORE_CTX *ctx, int idx, void *data);
+/**
+ * @brief Retrieve application-specific ex_data previously stored on a verification context.
+ * @param ctx Store context to query.
+ * @param idx Index obtained from X509_STORE_CTX_get_ex_new_index() (0 is used for app_data).
+ * @return Pointer previously set with X509_STORE_CTX_set_ex_data(), or NULL if unset.
+ */
+void *X509_STORE_CTX_get_ex_data(const X509_STORE_CTX *ctx, int idx);
+/**
+ * @brief Return the verification error code stored in a context.
+ * @param ctx Verification store context to query (typically after X509_verify_cert() or inside a verify callback).
+ * @return X509_V_OK or an X509_V_ERR_* error code.
+ */
+int X509_STORE_CTX_get_error(const X509_STORE_CTX *ctx);
+/**
+ * @brief Set the current verification error code on a store context.
+ * @param ctx Verification context to update.
+ * @param s X509_V_OK or an X509_V_ERR_* error code.
+ */
+void X509_STORE_CTX_set_error(X509_STORE_CTX *ctx, int s);
+/**
+ * @brief Return the certificate-chain depth at which the current verification error occurred.
+ * @param ctx Store context after verification or inside a verify callback.
+ * @return Nonnegative depth (0 = end-entity certificate, 1 = its issuer, and so on).
+ */
+int X509_STORE_CTX_get_error_depth(const X509_STORE_CTX *ctx);
+/**
+ * @brief Set the certificate-chain depth associated with the current verification error.
+ * @param ctx Verification context to update.
+ * @param depth Depth of the certificate related to the error (0 = end-entity).
+ */
+void X509_STORE_CTX_set_error_depth(X509_STORE_CTX *ctx, int depth);
+/**
+ * @brief Return the certificate currently being examined during verification.
+ * @param ctx Verification context after an error or during a verify callback.
+ * @return Current certificate (do not free), or NULL if none is set.
+ */
+X509 *X509_STORE_CTX_get_current_cert(const X509_STORE_CTX *ctx);
+/**
+ * @brief Set the certificate in @p ctx that caused the current verification error.
+ * @param ctx Verification store context to update.
+ * @param x Certificate that caused the error; remains owned by the caller and is not intended to remain valid for long.
+ *
+ * A verify callback may examine it while handling each error; call X509_up_ref() if the certificate must outlive the callback.
+ */
+void X509_STORE_CTX_set_current_cert(X509_STORE_CTX *ctx, X509 *x);
+/**
+ * @brief Return the issuer certificate currently being considered during chain building.
+ * @param ctx Verification store context mid-verification (or after an error).
+ * @return Internal X509 pointer (do not free), or NULL if none is set.
+ */
+X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return the CRL currently being considered during revocation checking.
+ * @param ctx Verification store context mid-verification (or after an error).
+ * @return Internal X509_CRL pointer (do not free), or NULL if none is set.
+ */
+X509_CRL *X509_STORE_CTX_get0_current_crl(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return the parent store context when @p ctx is used for a nested check (for example CRL).
+ * @param ctx Child verification context.
+ * @return Parent X509_STORE_CTX, or NULL if @p ctx is top-level.
+ */
+X509_STORE_CTX *X509_STORE_CTX_get0_parent_ctx(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return the verified certificate chain built for @p ctx without transferring ownership.
+ * @param ctx Store context after successful (or partial) chain building.
+ * @return Internal STACK_OF(X509) (leaf first), or NULL if none; do not free.
+ */
+STACK_OF(X509) *X509_STORE_CTX_get0_chain(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return a new reference to the verified certificate chain built for @p ctx.
+ * @param ctx Store context after successful (or partial) chain building.
+ * @return New STACK_OF(X509) with up-reffed certificates; free with OSSL_STACK_OF_X509_free(), or NULL if none.
+ */
+STACK_OF(X509) *X509_STORE_CTX_get1_chain(const X509_STORE_CTX *ctx);
+/**
+ * @brief Set the end-entity certificate that @p ctx will verify.
+ * @param ctx Verification context to update.
+ * @param target Certificate to validate (not freed by the context).
+ */
+void X509_STORE_CTX_set_cert(X509_STORE_CTX *ctx, X509 *target);
+/**
+ * @brief Set a raw public key as the verification target, transferring ownership of @p target.
+ * @param ctx Verification context to update.
+ * @param target Public key to validate in lieu of an end-entity certificate; may be NULL to clear.
+ */
+void X509_STORE_CTX_set0_rpk(X509_STORE_CTX *ctx, EVP_PKEY *target);
+/**
+ * @brief Transfer ownership of a verified certificate chain into a store context.
+ * @param c Verification context whose chain is replaced.
+ * @param sk Stack of X509 certificates (leaf first); ownership transfers to @p c.
+ */
+void X509_STORE_CTX_set0_verified_chain(X509_STORE_CTX *c, STACK_OF(X509) *sk);
+/**
+ * @brief Provide an additional CRL stack for revocation checks on @p ctx.
+ * @param ctx Verification context to update.
+ * @param sk Stack of CRLs; ownership transfers to @p ctx (may be NULL).
+ */
+void X509_STORE_CTX_set0_crls(X509_STORE_CTX *ctx, STACK_OF(X509_CRL) *sk);
+/**
+ * @brief Set the intended certificate purpose for a verification context.
+ * @param ctx Store context whose verify parameters are updated.
+ * @param purpose Purpose id such as X509_PURPOSE_SSL_CLIENT or X509_PURPOSE_SSL_SERVER.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_CTX_set_purpose(X509_STORE_CTX *ctx, int purpose);
+/**
+ * @brief Set the trust setting used when verifying with a store context.
+ * @param ctx Store context whose verify parameters are updated.
+ * @param trust Trust identifier (see X509_TRUST_*).
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_CTX_set_trust(X509_STORE_CTX *ctx, int trust);
+/**
+ * @brief Inherit purpose and trust onto a store context, falling back to defaults when unset.
+ * @param ctx Store context whose X509_VERIFY_PARAM is updated.
+ * @param def_purpose Default purpose used when @p purpose is 0 / unset.
+ * @param purpose Desired purpose id (X509_PURPOSE_*), or 0 to keep/inherit.
+ * @param trust Desired trust id (X509_TRUST_*), or 0 to derive from purpose.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_STORE_CTX_purpose_inherit(X509_STORE_CTX *ctx, int def_purpose,
+    int purpose, int trust);
+/**
+ * @brief OR additional X509_V_FLAG_* verification flags into @p ctx.
+ * @param ctx Store context.
+ * @param flags Flag bits to set (combined with any flags already present).
+ */
+void X509_STORE_CTX_set_flags(X509_STORE_CTX *ctx, unsigned long flags);
+/**
+ * @brief Override the validation time used when checking certificate/CRL validity on @p ctx.
+ * @param ctx Verification context to update.
+ * @param flags Reserved; pass 0.
+ * @param t Time instant used instead of the current time for notBefore/notAfter checks.
+ */
+void X509_STORE_CTX_set_time(X509_STORE_CTX *ctx, unsigned long flags,
+    time_t t);
+/**
+ * @brief Set the CRL reason bitmask associated with the current revocation check on @p ctx.
+ * @param ctx Verification context being updated.
+ * @param current_reasons Bitmask of CRL reason flags (see CRLDP / reason codes) for the active check.
+ */
+void X509_STORE_CTX_set_current_reasons(X509_STORE_CTX *ctx,
+    unsigned int current_reasons);
+
+/**
+ * @brief Return the policy tree built during verification of @p ctx (borrowed).
+ * @param ctx Store context after a verification attempt with policy checking enabled.
+ * @return Internal X509_POLICY_TREE pointer, or NULL if none was built.
+ */
+X509_POLICY_TREE *X509_STORE_CTX_get0_policy_tree(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return whether an explicit certificate policy was required/found during verification.
+ * @param ctx Verification context after policy processing.
+ * @return Non-zero if explicit policy applies, or 0 otherwise.
+ */
+int X509_STORE_CTX_get_explicit_policy(const X509_STORE_CTX *ctx);
+/**
+ * @brief Return how many certificates at the start of the chain were untrusted.
+ * @param ctx Verification context after chain building.
+ * @return Count of untrusted certificates leading the constructed chain.
+ */
+int X509_STORE_CTX_get_num_untrusted(const X509_STORE_CTX *ctx);
+
+/**
+ * @brief Return the verification parameters associated with a store context.
+ * @param ctx Verification context to query.
+ * @return Internal X509_VERIFY_PARAM pointer (do not free), or NULL if unset.
+ */
+X509_VERIFY_PARAM *X509_STORE_CTX_get0_param(const X509_STORE_CTX *ctx);
+/**
+ * @brief Transfer ownership of verification parameters to a store context.
+ * @param ctx Verification context that takes ownership of @p param.
+ * @param param Parameters to install; any previous parameters are freed.
+ */
+void X509_STORE_CTX_set0_param(X509_STORE_CTX *ctx, X509_VERIFY_PARAM *param);
+/**
+ * @brief Apply a named built-in X509_VERIFY_PARAM set to a store context.
+ * @param ctx Verification context whose parameters are updated.
+ * @param name Parameter set name such as "default", "ssl_client", or "ssl_server".
+ * @return 1 on success, or 0 if @p name is unknown or copy fails.
+ */
+int X509_STORE_CTX_set_default(X509_STORE_CTX *ctx, const char *name);
+
+/*
+ * Bridge opacity barrier between libcrypt and libssl, also needed to support
+ * offline testing in test/danetest.c
+ */
+/**
+ * @brief Attach DANE authentication state to a certificate verification context.
+ * @param ctx Store context used for chain verification (for example during TLS).
+ * @param dane DANE state from SSL_get0_dane(); ownership remains with the SSL object.
+ */
+void X509_STORE_CTX_set0_dane(X509_STORE_CTX *ctx, SSL_DANE *dane);
+#define DANE_FLAG_NO_DANE_EE_NAMECHECKS (1L << 0)
+
+/* X509_VERIFY_PARAM functions */
+
+/**
+ * @brief Allocate a new certificate-verification parameter object with default settings.
+ * @return New X509_VERIFY_PARAM, or NULL on allocation failure; free with X509_VERIFY_PARAM_free().
+ */
+X509_VERIFY_PARAM *X509_VERIFY_PARAM_new(void);
+/**
+ * @brief Free an X509_VERIFY_PARAM and any associated host/email/IP data.
+ * @param param Parameters to free; NULL is ignored.
+ */
+void X509_VERIFY_PARAM_free(X509_VERIFY_PARAM *param);
+/**
+ * @brief Copy unset fields from @p from into @p to according to inheritance flags.
+ * @param to Destination parameters that receive values only where not already set.
+ * @param from Source parameters providing defaults to inherit.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_VERIFY_PARAM_inherit(X509_VERIFY_PARAM *to,
+    const X509_VERIFY_PARAM *from);
+/**
+ * @brief Copy all verification settings from @p from into @p to.
+ * @param to Destination parameters overwritten with a deep copy of @p from.
+ * @param from Source parameters to copy.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_VERIFY_PARAM_set1(X509_VERIFY_PARAM *to,
+    const X509_VERIFY_PARAM *from);
+/**
+ * @brief Set the name of an X509_VERIFY_PARAM (used when inheriting named defaults).
+ * @param param Parameters to update.
+ * @param name NUL-terminated name string copied into @p param.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_VERIFY_PARAM_set1_name(X509_VERIFY_PARAM *param, const char *name);
+/**
+ * @brief OR additional X509_V_FLAG_* bits into verification parameters.
+ * @param param Parameters to update.
+ * @param flags Flag bits to set.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_VERIFY_PARAM_set_flags(X509_VERIFY_PARAM *param,
+    unsigned long flags);
+/**
+ * @brief Clear X509_V_FLAG_* bits from verification parameters.
+ * @param param Parameters to update.
+ * @param flags Flag bits to clear.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_VERIFY_PARAM_clear_flags(X509_VERIFY_PARAM *param,
+    unsigned long flags);
+/**
+ * @brief Return the verification flag mask stored in @p param.
+ * @param param Verification parameters to query.
+ * @return X509_V_FLAG_* bits currently set.
+ */
+unsigned long X509_VERIFY_PARAM_get_flags(const X509_VERIFY_PARAM *param);
+/**
+ * @brief Set the certificate purpose checked during verification.
+ * @param param Verification parameters to update.
+ * @param purpose Purpose identifier (see X509_PURPOSE_*).
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_VERIFY_PARAM_set_purpose(X509_VERIFY_PARAM *param, int purpose);
+/**
+ * @brief Set the trust setting used when verifying certificates with @p param.
+ * @param param Verification parameters to update.
+ * @param trust Trust identifier (see X509_TRUST_*).
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_VERIFY_PARAM_set_trust(X509_VERIFY_PARAM *param, int trust);
+/**
+ * @brief Set the maximum depth of untrusted CA certificates allowed above the leaf.
+ * @param param Verification parameters to update.
+ * @param depth Maximum number of untrusted intermediate CAs (0 = leaf only / peer cert alone).
+ */
+void X509_VERIFY_PARAM_set_depth(X509_VERIFY_PARAM *param, int depth);
+/**
+ * @brief Set the authentication security level required during verification.
+ * @param param Verification parameters to update.
+ * @param auth_level Security level (same scale as SSL_CTX_set_security_level); -1 clears / disables the check.
+ */
+void X509_VERIFY_PARAM_set_auth_level(X509_VERIFY_PARAM *param, int auth_level);
+/**
+ * @brief Return the verification time stored in a parameter set.
+ * @param param Verification parameters to query.
+ * @return time_t used as "now" for validity checks (see X509_VERIFY_PARAM_set_time).
+ */
+time_t X509_VERIFY_PARAM_get_time(const X509_VERIFY_PARAM *param);
+/**
+ * @brief Set the verification reference time used as "now" for validity checks.
+ * @param param Verification parameters to update.
+ * @param t Absolute time used instead of the current clock.
+ */
+void X509_VERIFY_PARAM_set_time(X509_VERIFY_PARAM *param, time_t t);
+/**
+ * @brief Append a certificate policy OID to a verification parameter set (takes ownership).
+ * @param param Verification parameters to update.
+ * @param policy Policy OID to add; ownership transfers to @p param on success.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_VERIFY_PARAM_add0_policy(X509_VERIFY_PARAM *param,
+    ASN1_OBJECT *policy);
+/**
+ * @brief Replace the user certificate-policy OID set on verification parameters.
+ * @param param Verification parameters to update.
+ * @param policies Stack of policy OIDs to copy, or NULL to clear the set.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_VERIFY_PARAM_set1_policies(X509_VERIFY_PARAM *param,
+    STACK_OF(ASN1_OBJECT) *policies);
+
+/**
+ * @brief Set inheritance flags controlling which fields copy from @p param to others.
+ * @param param Verification parameters to update.
+ * @param flags X509_VP_FLAG_* inheritance mask.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_VERIFY_PARAM_set_inh_flags(X509_VERIFY_PARAM *param,
+    uint32_t flags);
+/**
+ * @brief Return the inheritance-control flags stored in @p param.
+ * @param param Verification parameters to query.
+ * @return Bitmask of X509_VP_FLAG_* inheritance flags.
+ */
+uint32_t X509_VERIFY_PARAM_get_inh_flags(const X509_VERIFY_PARAM *param);
+
+/**
+ * @brief Return an expected hostname previously set for name checks.
+ * @param param Verification parameters to query.
+ * @param idx Zero-based index into the host list.
+ * @return Internal host string (do not free), or NULL if @p idx is out of range.
+ */
+char *X509_VERIFY_PARAM_get0_host(X509_VERIFY_PARAM *param, int idx);
+/**
+ * @brief Set the expected DNS/IP hostname for name checks, clearing any previous hosts.
+ * @param param Verification parameters to update.
+ * @param name Hostname or IP literal to expect (copied); NULL clears the list.
+ * @param namelen Length of @p name in bytes (0 means NUL-terminated).
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_VERIFY_PARAM_set1_host(X509_VERIFY_PARAM *param,
+    const char *name, size_t namelen);
+/**
+ * @brief Append an expected DNS/IP hostname for name checks without clearing existing hosts.
+ * @param param Verification parameters to update.
+ * @param name Hostname or IP literal to expect (copied).
+ * @param namelen Length of @p name in bytes (0 means NUL-terminated).
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_VERIFY_PARAM_add1_host(X509_VERIFY_PARAM *param,
+    const char *name, size_t namelen);
+/**
+ * @brief Set hostname-checking flags used with X509_VERIFY_PARAM_set1_host().
+ * @param param Verification parameters to update.
+ * @param flags X509_CHECK_FLAG_* bits controlling name matching.
+ */
+void X509_VERIFY_PARAM_set_hostflags(X509_VERIFY_PARAM *param,
+    unsigned int flags);
+/**
+ * @brief Return the hostname-checking flags stored in verification parameters.
+ * @param param Verification parameters to query.
+ * @return X509_CHECK_FLAG_* bits previously set with X509_VERIFY_PARAM_set_hostflags().
+ */
+unsigned int X509_VERIFY_PARAM_get_hostflags(const X509_VERIFY_PARAM *param);
+char *X509_VERIFY_PARAM_get0_peername(const X509_VERIFY_PARAM *param);
+/**
+ * @brief Move the peername string from @p from onto @p to, clearing the source.
+ * @param to Destination parameters that receive ownership of the peername.
+ * @param from Source parameters, or NULL to clear and free @p to's peername only.
+ */
+void X509_VERIFY_PARAM_move_peername(X509_VERIFY_PARAM *to, X509_VERIFY_PARAM *from);
+/**
+ * @brief Return the expected RFC822 email address set on verification parameters.
+ * @param param Verification parameters to query.
+ * @return Internal email string (do not free), or NULL if unset.
+ */
+char *X509_VERIFY_PARAM_get0_email(X509_VERIFY_PARAM *param);
+/**
+ * @brief Set the expected RFC822 mailbox for certificate name checks.
+ * @param param Verification parameters to update.
+ * @param email Email address bytes (need not be NUL-terminated if @p emaillen is set).
+ * @param emaillen Length of @p email in bytes, or 0 to use strlen(@p email).
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_VERIFY_PARAM_set1_email(X509_VERIFY_PARAM *param,
+    const char *email, size_t emaillen);
+/**
+ * @brief Return a newly allocated ASCII form of the expected IP address for name checks.
+ * @param param Verification parameters to query.
+ * @return Heap string such as "192.0.2.1" or an IPv6 textual address (free with OPENSSL_free()), or NULL if unset.
+ */
+char *X509_VERIFY_PARAM_get1_ip_asc(X509_VERIFY_PARAM *param);
+/**
+ * @brief Set the expected IP address for certificate name checks (binary form).
+ * @param param Verification parameters to update.
+ * @param ip IPv4 (4 bytes) or IPv6 (16 bytes) address in network byte order.
+ * @param iplen Length of @p ip in bytes (4 or 16).
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_VERIFY_PARAM_set1_ip(X509_VERIFY_PARAM *param,
+    const unsigned char *ip, size_t iplen);
+/**
+ * @brief Set the expected IP address from a NUL-terminated ASCII string.
+ * @param param Verification parameters to update.
+ * @param ipasc Dotted-decimal IPv4 or colon-separated IPv6 address (IPv6 "::" compression supported).
+ * @return 1 on success, or 0 on failure.
+ *
+ * When set, certificate verification automatically invokes X509_check_ip().
+ */
+int X509_VERIFY_PARAM_set1_ip_asc(X509_VERIFY_PARAM *param,
+    const char *ipasc);
+
+/**
+ * @brief Return the maximum certificate-chain depth allowed by verification parameters.
+ * @param param Verification parameters to query.
+ * @return Current verification depth limit.
+ */
+int X509_VERIFY_PARAM_get_depth(const X509_VERIFY_PARAM *param);
+/**
+ * @brief Return the authentication security level required by verification parameters.
+ * @param param Verification parameters to query.
+ * @return Security level previously set with X509_VERIFY_PARAM_set_auth_level(), or -1 if unset.
+ */
+int X509_VERIFY_PARAM_get_auth_level(const X509_VERIFY_PARAM *param);
+/**
+ * @brief Return the name associated with an X509_VERIFY_PARAM object.
+ * @param param Verification parameters to query.
+ * @return Internal name string (do not free), or NULL if unnamed.
+ */
+const char *X509_VERIFY_PARAM_get0_name(const X509_VERIFY_PARAM *param);
+
+/**
+ * @brief Register @p param in the global named X509_VERIFY_PARAM table (takes ownership).
+ * @param param Named parameter object to add; freed on table cleanup or replacement of the same name.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_VERIFY_PARAM_add0_table(X509_VERIFY_PARAM *param);
+/**
+ * @brief Return how many named entries are in the global X509_VERIFY_PARAM table.
+ * @return Count of built-in and dynamically registered named parameter sets.
+ */
+int X509_VERIFY_PARAM_get_count(void);
+/**
+ * @brief Return a built-in X509_VERIFY_PARAM by table index.
+ * @param id Zero-based index into the built-in verify-parameter table (see X509_VERIFY_PARAM_get_count()).
+ * @return Internal const X509_VERIFY_PARAM pointer (do not free), or NULL if @p id is out of range.
+ */
+const X509_VERIFY_PARAM *X509_VERIFY_PARAM_get0(int id);
+/**
+ * @brief Look up a built-in named X509_VERIFY_PARAM by name.
+ * @param name Parameter set name such as "default", "pkcs7", or "smime_sign".
+ * @return Pointer to the named parameter object, or NULL if unknown; do not free.
+ */
+const X509_VERIFY_PARAM *X509_VERIFY_PARAM_lookup(const char *name);
+/**
+ * @brief Free the global table of named X509_VERIFY_PARAM entries.
+ */
+void X509_VERIFY_PARAM_table_cleanup(void);
+
+/* Non positive return values are errors */
+#define X509_PCY_TREE_FAILURE -2 /* Failure to satisfy explicit policy */
+#define X509_PCY_TREE_INVALID -1 /* Inconsistent or invalid extensions */
+#define X509_PCY_TREE_INTERNAL 0 /* Internal error, most likely malloc */
+
+/*
+ * Positive return values form a bit mask, all but the first are internal to
+ * the library and don't appear in results from X509_policy_check().
+ */
+#define X509_PCY_TREE_VALID 1 /* The policy tree is valid */
+#define X509_PCY_TREE_EMPTY 2 /* The policy tree is empty */
+#define X509_PCY_TREE_EXPLICIT 4 /* Explicit policy required */
+
+/**
+ * @brief Build an X.509 certificate policy tree for a chain and optional user policy OIDs.
+ * @param ptree On success, set to a newly allocated policy tree; free with X509_policy_tree_free.
+ * @param pexplicit_policy Set to nonzero when an explicit policy is required by the chain.
+ * @param certs Certificate chain ordered end-entity first.
+ * @param policy_oids Optional user-initial-policy-set of ASN1_OBJECT OIDs, or NULL.
+ * @param flags Policy evaluation flags (for example X509_V_FLAG_POLICY_CHECK related bits).
+ * @return Positive X509_PCY_TREE_* bitmask on success, or a negative value on failure.
+ */
+int X509_policy_check(X509_POLICY_TREE **ptree, int *pexplicit_policy,
+    STACK_OF(X509) *certs,
+    STACK_OF(ASN1_OBJECT) *policy_oids, unsigned int flags);
+
+/**
+ * @brief Free a certificate policy tree allocated by X509_policy_check().
+ * @param tree Policy tree to free, or NULL (no-op).
+ */
+void X509_policy_tree_free(X509_POLICY_TREE *tree);
+
+/**
+ * @brief Return how many levels a certificate policy tree contains.
+ * @param tree Policy tree from X509_policy_check().
+ * @return Number of levels (typically one per certificate in the chain), or 0 if @p tree is NULL.
+ */
+int X509_policy_tree_level_count(const X509_POLICY_TREE *tree);
+/**
+ * @brief Return a level of a certificate policy tree by index.
+ * @param tree Policy tree from X509_policy_check().
+ * @param i Level index from 0 to X509_policy_tree_level_count(@p tree) - 1.
+ * @return Internal X509_POLICY_LEVEL pointer (do not free), or NULL if @p i is out of range.
+ */
+X509_POLICY_LEVEL *X509_policy_tree_get0_level(const X509_POLICY_TREE *tree,
+    int i);
+
+/**
+ * @brief Return the authority-constrained policy set (valid policy nodes) of a policy tree.
+ * @param tree Policy tree from X509_policy_check().
+ * @return Internal STACK_OF(X509_POLICY_NODE) (do not free), or NULL if empty / unavailable.
+ */
+STACK_OF(X509_POLICY_NODE)
+*X509_policy_tree_get0_policies(const X509_POLICY_TREE *tree);
+
+/**
+ * @brief Return the user-policy nodes from a certificate policy tree.
+ * @param tree Policy tree produced by policy evaluation.
+ * @return Internal STACK_OF(X509_POLICY_NODE) of user policies (do not free), or NULL if none.
+ */
+STACK_OF(X509_POLICY_NODE)
+*X509_policy_tree_get0_user_policies(const X509_POLICY_TREE *tree);
+
+/**
+ * @brief Return how many policy nodes are present at a policy-tree level.
+ * @param level Policy level from X509_policy_tree_get0_level().
+ * @return Number of nodes in @p level.
+ */
+int X509_policy_level_node_count(X509_POLICY_LEVEL *level);
+
+/**
+ * @brief Return a policy node at index @p i within a policy-tree level.
+ * @param level Policy level from X509_policy_tree_get0_level().
+ * @param i Node index from 0 to X509_policy_level_node_count(@p level) - 1.
+ * @return Internal X509_POLICY_NODE pointer (do not free), or NULL if out of range.
+ */
+X509_POLICY_NODE *X509_policy_level_get0_node(const X509_POLICY_LEVEL *level,
+    int i);
+
+/**
+ * @brief Return the policy OID associated with a certificate policy tree node.
+ * @param node Policy node to query.
+ * @return Internal ASN1_OBJECT pointer for the policy OID; do not free.
+ */
+const ASN1_OBJECT *X509_policy_node_get0_policy(const X509_POLICY_NODE *node);
+
+/**
+ * @brief Return the policy qualifiers associated with a policy-tree node.
+ * @param node Policy node to query.
+ * @return Internal STACK_OF(POLICYQUALINFO) (do not free), or NULL if none.
+ */
+STACK_OF(POLICYQUALINFO)
+*X509_policy_node_get0_qualifiers(const X509_POLICY_NODE *node);
+/**
+ * @brief Return the parent policy-tree node of @p node, if any.
+ * @param node Policy node to query.
+ * @return Internal parent X509_POLICY_NODE pointer (do not free), or NULL for a root node.
+ */
+const X509_POLICY_NODE *X509_policy_node_get0_parent(const X509_POLICY_NODE *node);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

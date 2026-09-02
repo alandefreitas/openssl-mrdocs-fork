@@ -1,0 +1,713 @@
+/*
+ * {- join("\n * ", @autowarntext) -}
+ *
+ * Copyright 2016-2020 The OpenSSL Project Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License 2.0 (the "License").  You may not use
+ * this file except in compliance with the License.  You can obtain a copy
+ * in the file LICENSE in the source distribution or at
+ * https://www.openssl.org/source/license.html
+ */
+
+/* clang-format off */
+{-
+use OpenSSL::stackhash qw(generate_stack_macros);
+-}
+/* clang-format on */
+
+#ifndef OPENSSL_CT_H
+#define OPENSSL_CT_H
+#pragma once
+
+#include <openssl/macros.h>
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#define HEADER_CT_H
+#endif
+
+#include <openssl/opensslconf.h>
+
+#ifndef OPENSSL_NO_CT
+#include <openssl/types.h>
+#include <openssl/safestack.h>
+#include <openssl/x509.h>
+#include <openssl/cterr.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Minimum RSA key size, from RFC6962 */
+#define SCT_MIN_RSA_BITS 2048
+
+/* All hashes are SHA256 in v1 of Certificate Transparency */
+#define CT_V1_HASHLEN SHA256_DIGEST_LENGTH
+
+/* clang-format off */
+{-
+    generate_stack_macros("SCT");
+-}
+/**
+ * @brief Opaque STACK_OF(CTLOG) container type.
+ */
+struct stack_st_CTLOG;
+{-
+    generate_stack_macros("CTLOG");
+-}
+/* clang-format on */
+
+/**
+ * @brief Certificate Transparency log entry type for an SCT.
+ */
+typedef enum {
+    /** Log entry type has not been set. */
+    CT_LOG_ENTRY_TYPE_NOT_SET = -1,
+    /** SCT covers an X.509 certificate. */
+    CT_LOG_ENTRY_TYPE_X509 = 0,
+    /** SCT covers a precertificate. */
+    CT_LOG_ENTRY_TYPE_PRECERT = 1
+} ct_log_entry_type_t;
+
+/**
+ * @brief Version of a Signed Certificate Timestamp.
+ */
+typedef enum {
+    /** SCT version has not been set. */
+    SCT_VERSION_NOT_SET = -1,
+    /** Certificate Transparency v1 SCT. */
+    SCT_VERSION_V1 = 0
+} sct_version_t;
+
+/**
+ * @brief Origin of a Signed Certificate Timestamp.
+ */
+typedef enum {
+    /** SCT source is unknown or unset. */
+    SCT_SOURCE_UNKNOWN,
+    /** SCT was delivered in a TLS extension. */
+    SCT_SOURCE_TLS_EXTENSION,
+    /** SCT was delivered in an X.509v3 certificate extension. */
+    SCT_SOURCE_X509V3_EXTENSION,
+    /** SCT was delivered in an OCSP stapled response. */
+    SCT_SOURCE_OCSP_STAPLED_RESPONSE
+} sct_source_t;
+
+/**
+ * @brief Result of validating a Signed Certificate Timestamp.
+ */
+typedef enum {
+    /** Validation has not been attempted. */
+    SCT_VALIDATION_STATUS_NOT_SET,
+    /** SCT refers to a log that is not trusted. */
+    SCT_VALIDATION_STATUS_UNKNOWN_LOG,
+    /** SCT signature and contents validated successfully. */
+    SCT_VALIDATION_STATUS_VALID,
+    /** SCT failed validation. */
+    SCT_VALIDATION_STATUS_INVALID,
+    /** SCT has not been verified yet. */
+    SCT_VALIDATION_STATUS_UNVERIFIED,
+    /** SCT uses an unrecognized version. */
+    SCT_VALIDATION_STATUS_UNKNOWN_VERSION
+} sct_validation_status_t;
+
+/*--------------------------------------------*/
+/* CT policy evaluation context functions     */
+/*--------------------------------------------*/
+
+/**
+ * Create a new, empty CT policy evaluation context for @p libctx / @p propq.
+ * The caller must free it with CT_POLICY_EVAL_CTX_free().
+ * @param libctx Library context, or NULL for the default.
+ * @param propq Property query string, or NULL.
+ * @return A new context, or NULL on error.
+ */
+CT_POLICY_EVAL_CTX *CT_POLICY_EVAL_CTX_new_ex(OSSL_LIB_CTX *libctx,
+    const char *propq);
+
+/**
+ * @brief Create an empty CT policy evaluation context with the default library context.
+ * @return New context, or NULL on error; free with CT_POLICY_EVAL_CTX_free().
+ */
+CT_POLICY_EVAL_CTX *CT_POLICY_EVAL_CTX_new(void);
+
+/**
+ * @brief Delete a policy evaluation context and anything it owns.
+ * @param ctx Policy evaluation context to free, or NULL.
+ */
+void CT_POLICY_EVAL_CTX_free(CT_POLICY_EVAL_CTX *ctx);
+
+/**
+ * @brief Return the peer certificate associated with SCTs in a policy context.
+ * @param ctx Policy evaluation context to query.
+ * @return Certificate the SCTs were issued for, or NULL if unset.
+ */
+X509 *CT_POLICY_EVAL_CTX_get0_cert(const CT_POLICY_EVAL_CTX *ctx);
+
+/*
+ * Sets the certificate associated with the received SCTs.
+ * Increments the reference count of cert.
+ * Returns 1 on success, 0 otherwise.
+ */
+/**
+ * @brief Set the certificate that the SCTs in a policy context were issued for.
+ * @param ctx Policy evaluation context to update.
+ * @param cert Certificate associated with the SCTs; a reference is taken.
+ * @return 1 on success, or 0 on error.
+ */
+int CT_POLICY_EVAL_CTX_set1_cert(CT_POLICY_EVAL_CTX *ctx, X509 *cert);
+
+/**
+ * @brief Get the issuer of the certificate associated with the received SCTs.
+ * @param ctx Policy evaluation context to query.
+ * @return Issuer certificate, or NULL if unset.
+ */
+X509 *CT_POLICY_EVAL_CTX_get0_issuer(const CT_POLICY_EVAL_CTX *ctx);
+
+/*
+ * Sets the issuer of the certificate associated with the received SCTs.
+ * Increments the reference count of issuer.
+ * Returns 1 on success, 0 otherwise.
+ */
+/**
+ * @brief Set the issuer certificate used when validating precertificate SCTs.
+ * @param ctx Policy evaluation context to update.
+ * @param issuer Issuer certificate; a reference is taken (caller retains ownership).
+ * @return 1 on success, or 0 on error.
+ */
+int CT_POLICY_EVAL_CTX_set1_issuer(CT_POLICY_EVAL_CTX *ctx, X509 *issuer);
+
+/* Gets the CT logs that are trusted sources of SCTs */
+/**
+ * @brief Return the CT log store used when evaluating SCTs in this context.
+ * @param ctx Policy evaluation context to query.
+ * @return Shared CTLOG_STORE pointer, or NULL if none has been set.
+ */
+const CTLOG_STORE *CT_POLICY_EVAL_CTX_get0_log_store(const CT_POLICY_EVAL_CTX *ctx);
+
+/**
+ * @brief Set the shared CT log store used when evaluating SCTs.
+ * @param ctx Policy evaluation context to update.
+ * @param log_store Log store that must outlive @p ctx.
+ */
+void CT_POLICY_EVAL_CTX_set_shared_CTLOG_STORE(CT_POLICY_EVAL_CTX *ctx,
+    CTLOG_STORE *log_store);
+
+/**
+ * @brief Get the evaluation time used when checking whether an SCT is in the future.
+ * @param ctx Policy evaluation context to query.
+ * @return Time in milliseconds since the Unix epoch.
+ */
+uint64_t CT_POLICY_EVAL_CTX_get_time(const CT_POLICY_EVAL_CTX *ctx);
+
+/*
+ * Sets the time to evaluate SCTs against, in milliseconds since the Unix epoch.
+ * If an SCT's timestamp is after this time, it will be interpreted as having
+ * been issued in the future. RFC6962 states that "TLS clients MUST reject SCTs
+ * whose timestamp is in the future", so an SCT will not validate in this case.
+ */
+/**
+ * @brief Set the time used when evaluating SCT timestamps in a policy context.
+ * @param ctx Policy evaluation context to update.
+ * @param time_in_ms Time since the Unix epoch in milliseconds.
+ */
+void CT_POLICY_EVAL_CTX_set_time(CT_POLICY_EVAL_CTX *ctx, uint64_t time_in_ms);
+
+/*-----------------*/
+/* SCT functions   */
+/*-----------------*/
+
+/**
+ * Create a new, blank Signed Certificate Timestamp.
+ * The caller must free it with SCT_free().
+ * @return A new SCT, or NULL on error.
+ */
+SCT *SCT_new(void);
+
+/*
+ * Creates a new SCT from some base64-encoded strings.
+ * The caller is responsible for calling SCT_free when finished with the SCT.
+ */
+/**
+ * @brief Create an SCT from base64-encoded log id, extensions, and signature fields.
+ * @param version SCT version byte (typically SCT_VERSION_V1).
+ * @param logid_base64 Base64-encoded CT log ID.
+ * @param entry_type Log entry type (X.509 certificate or precertificate).
+ * @param timestamp SCT timestamp in milliseconds since the Unix epoch.
+ * @param extensions_base64 Base64-encoded SCT extensions, or empty/NULL for none.
+ * @param signature_base64 Base64-encoded SCT signature.
+ * @return New SCT, or NULL on error; free with SCT_free.
+ */
+SCT *SCT_new_from_base64(unsigned char version,
+    const char *logid_base64,
+    ct_log_entry_type_t entry_type,
+    uint64_t timestamp,
+    const char *extensions_base64,
+    const char *signature_base64);
+
+/**
+ * @brief Free an SCT and its underlying data.
+ * @param sct SCT to free, or NULL.
+ */
+void SCT_free(SCT *sct);
+
+/**
+ * @brief Free a stack of SCTs and the SCTs themselves.
+ * @param a Stack of SCTs to free, or NULL.
+ */
+void SCT_LIST_free(STACK_OF(SCT) *a);
+
+/**
+ * @brief Get the Certificate Transparency version of an SCT.
+ * @param sct SCT to query.
+ * @return SCT version, or SCT_VERSION_NOT_SET if unset.
+ */
+sct_version_t SCT_get_version(const SCT *sct);
+
+/**
+ * @brief Set the Certificate Transparency version of an SCT.
+ * @param sct SCT to update.
+ * @param version SCT version to set; only SCT_VERSION_V1 is currently supported.
+ * @return 1 if @p version is supported, or 0 otherwise.
+ */
+__owur int SCT_set_version(SCT *sct, sct_version_t version);
+
+/**
+ * @brief Get the log entry type of an SCT.
+ * @param sct SCT to query.
+ * @return Log entry type stored in the SCT.
+ */
+ct_log_entry_type_t SCT_get_log_entry_type(const SCT *sct);
+
+/**
+ * @brief Set the log entry type of an SCT.
+ * @param sct SCT to update.
+ * @param entry_type Log entry type to store.
+ * @return 1 on success, or 0 on error.
+ */
+__owur int SCT_set_log_entry_type(SCT *sct, ct_log_entry_type_t entry_type);
+
+/**
+ * @brief Get the log ID that an SCT came from.
+ * @param sct SCT to query.
+ * @param log_id Receives a pointer to the log ID; ownership remains with the SCT.
+ * @return Length of the log ID in bytes.
+ */
+size_t SCT_get0_log_id(const SCT *sct, unsigned char **log_id);
+
+/*
+ * Set the log ID of an SCT to point directly to the *log_id specified.
+ * The SCT takes ownership of the specified pointer.
+ * Returns 1 on success, 0 otherwise.
+ */
+/**
+ * @brief Set the CT log ID on an SCT, transferring ownership of @p log_id.
+ * @param sct SCT whose log_id field is replaced.
+ * @param log_id Log ID bytes that @p sct will own (freed by SCT_free); may be NULL when @p log_id_len is 0.
+ * @param log_id_len Length of @p log_id in bytes (typically CT_V1_HASHLEN for v1).
+ * @return 1 on success, or 0 on failure.
+ */
+__owur int SCT_set0_log_id(SCT *sct, unsigned char *log_id, size_t log_id_len);
+
+/*
+ * Set the log ID of an SCT.
+ * This makes a copy of the log_id.
+ * Returns 1 on success, 0 otherwise.
+ */
+/**
+ * @brief Set the CT log ID on an SCT by copying @p log_id.
+ * @param sct SCT to update.
+ * @param log_id Log ID bytes to copy.
+ * @param log_id_len Length of @p log_id in bytes.
+ * @return 1 on success, or 0 on error.
+ */
+__owur int SCT_set1_log_id(SCT *sct, const unsigned char *log_id,
+    size_t log_id_len);
+
+/**
+ * @brief Get the timestamp of an SCT.
+ * @param sct SCT to query.
+ * @return Timestamp as milliseconds since the Unix epoch.
+ */
+uint64_t SCT_get_timestamp(const SCT *sct);
+
+/**
+ * @brief Set the timestamp of an SCT.
+ * @param sct SCT to update.
+ * @param timestamp Time in milliseconds since the Unix epoch.
+ */
+void SCT_set_timestamp(SCT *sct, uint64_t timestamp);
+
+/*
+ * Return the NID for the signature used by the SCT.
+ * For CT v1, this will be either NID_sha256WithRSAEncryption or
+ * NID_ecdsa_with_SHA256 (or NID_undef if incorrect/unset).
+ */
+/**
+ * @brief Return the NID of the signature algorithm used by an SCT.
+ * @param sct SCT to query.
+ * @return An NID such as NID_sha256WithRSAEncryption or NID_ecdsa_with_SHA256, or NID_undef.
+ */
+int SCT_get_signature_nid(const SCT *sct);
+
+/**
+ * @brief Set the signature algorithm NID used by an SCT.
+ * @param sct Signed Certificate Timestamp to update.
+ * @param nid For CT v1, NID_sha256WithRSAEncryption or NID_ecdsa_with_SHA256.
+ * @return 1 on success, or 0 on failure.
+ */
+__owur int SCT_set_signature_nid(SCT *sct, int nid);
+
+/*
+ * Set *ext to point to the extension data for the SCT. ext must not be NULL.
+ * The SCT retains ownership of this pointer.
+ * Returns length of the data pointed to.
+ */
+/**
+ * @brief Return a pointer to the extension data embedded in an SCT.
+ * @param sct Signed Certificate Timestamp to query.
+ * @param ext Non-NULL destination for an internal pointer to the extension bytes (do not free).
+ * @return Length of the extension data in bytes.
+ */
+size_t SCT_get0_extensions(const SCT *sct, unsigned char **ext);
+
+/**
+ * @brief Set SCT extensions by taking ownership of the given buffer.
+ * @param sct SCT to update.
+ * @param ext Extension data; the SCT takes ownership.
+ * @param ext_len Length of @p ext in bytes.
+ */
+void SCT_set0_extensions(SCT *sct, unsigned char *ext, size_t ext_len);
+
+/*
+ * Set the extensions of an SCT.
+ * This takes a copy of the ext.
+ * Returns 1 on success, 0 otherwise.
+ */
+/**
+ * @brief Set the SCT extensions field by copying @p ext.
+ * @param sct SCT to update.
+ * @param ext Extension bytes to copy, or NULL when @p ext_len is 0.
+ * @param ext_len Length of @p ext in bytes.
+ * @return 1 on success, or 0 on error.
+ */
+__owur int SCT_set1_extensions(SCT *sct, const unsigned char *ext,
+    size_t ext_len);
+
+/**
+ * @brief Get a pointer to the signature bytes of an SCT.
+ * @param sct SCT to query.
+ * @param sig Receives a pointer to the signature; ownership remains with the SCT.
+ * @return Length of the signature in bytes.
+ */
+size_t SCT_get0_signature(const SCT *sct, unsigned char **sig);
+
+/**
+ * @brief Set the SCT signature by taking ownership of the given buffer.
+ * @param sct SCT to update.
+ * @param sig Signature bytes; the SCT takes ownership.
+ * @param sig_len Length of @p sig in bytes.
+ */
+void SCT_set0_signature(SCT *sct, unsigned char *sig, size_t sig_len);
+
+/*
+ * Set the signature of an SCT to be a copy of the *sig specified.
+ * Returns 1 on success, 0 otherwise.
+ */
+/**
+ * @brief Set the SCT signature by copying @p sig.
+ * @param sct SCT to update.
+ * @param sig Signature bytes to copy.
+ * @param sig_len Length of @p sig in bytes.
+ * @return 1 on success, or 0 on error.
+ */
+__owur int SCT_set1_signature(SCT *sct, const unsigned char *sig,
+    size_t sig_len);
+
+/**
+ * @brief Get the origin of an SCT (TLS extension, OCSP response, and so on).
+ * @param sct SCT to query.
+ * @return Source of the SCT.
+ */
+sct_source_t SCT_get_source(const SCT *sct);
+
+/*
+ * Set the origin of this SCT, e.g. TLS extension, OCSP response, etc.
+ * Returns 1 on success, 0 otherwise.
+ */
+/**
+ * @brief Record where an SCT was obtained (TLS extension, OCSP, X.509 extension, etc.).
+ * @param sct SCT to update.
+ * @param source Origin tag from sct_source_t.
+ * @return 1 on success, or 0 on error.
+ */
+__owur int SCT_set_source(SCT *sct, sct_source_t source);
+
+/**
+ * @brief Get a text description of an SCT's validation status.
+ * @param sct SCT to query.
+ * @return Static string describing the validation status.
+ */
+const char *SCT_validation_status_string(const SCT *sct);
+
+/**
+ * @brief Pretty-print a single Signed Certificate Timestamp to a BIO.
+ * @param sct SCT to print.
+ * @param out Destination BIO.
+ * @param indent Number of leading spaces for each line.
+ * @param logs Optional CT log store used to resolve the log name, or NULL.
+ */
+void SCT_print(const SCT *sct, BIO *out, int indent, const CTLOG_STORE *logs);
+
+/*
+ * Pretty-prints an |sct_list| to |out|.
+ * It will be indented by the number of spaces specified by |indent|.
+ * SCTs will be delimited by |separator|.
+ * If |logs| is not NULL, it will be used to lookup the CT log that each SCT
+ * came from, so that the log names can be printed.
+ */
+/**
+ * @brief Pretty-print a stack of SCTs to a BIO, optionally resolving log names.
+ * @param sct_list Stack of Signed Certificate Timestamps to print.
+ * @param out Destination BIO.
+ * @param indent Number of leading spaces for each SCT.
+ * @param separator Text inserted between consecutive SCTs.
+ * @param logs Optional CT log store used to look up log names, or NULL.
+ */
+void SCT_LIST_print(const STACK_OF(SCT) *sct_list, BIO *out, int indent,
+    const char *separator, const CTLOG_STORE *logs);
+
+/**
+ * @brief Get the last validation result stored on an SCT.
+ * @param sct SCT to query.
+ * @return Last status, or SCT_VALIDATION_STATUS_NOT_SET if not validated yet.
+ */
+sct_validation_status_t SCT_get_validation_status(const SCT *sct);
+
+/**
+ * @brief Validate an SCT against a policy evaluation context.
+ * @param sct SCT to validate; its validation_status field is updated.
+ * @param ctx Policy evaluation context.
+ * @return 1 if valid and the signature verifies, 0 if invalid or unverifiable, or -1 on error.
+ */
+__owur int SCT_validate(SCT *sct, const CT_POLICY_EVAL_CTX *ctx);
+
+/**
+ * @brief Validate a list of SCTs against a policy evaluation context.
+ * @param scts Stack of SCTs to validate; each validation_status field is updated.
+ * @param ctx Policy evaluation context.
+ * @return 1 if all are valid and verify, 0 if any is invalid or unverifiable, or a negative value on error.
+ */
+__owur int SCT_LIST_validate(const STACK_OF(SCT) *scts,
+    CT_POLICY_EVAL_CTX *ctx);
+
+/*---------------------------------*/
+/* SCT parsing and serialization   */
+/*---------------------------------*/
+
+/**
+ * Serialize a stack of SCTs to TLS format and return the encoded length.
+ * @param a Non-NULL stack of SCTs to encode.
+ * @param pp Optional output pointer: NULL to measure only; `*pp == NULL` to
+ *           allocate a buffer the caller must free; otherwise write into `*pp`.
+ * @return Byte count written (or that would be written) on success, or a
+ *         negative value on error.
+ */
+__owur int i2o_SCT_LIST(const STACK_OF(SCT) *a, unsigned char **pp);
+
+/*
+ * Convert TLS format SCT list to a stack of SCTs.
+ * If "a" or "*a" is NULL, a new stack will be created that the caller is
+ * responsible for freeing (by calling SCT_LIST_free).
+ * "**pp" and "*pp" must not be NULL.
+ * Upon success, "*pp" will point to after the last bytes read, and a stack
+ * will be returned.
+ * Upon failure, a NULL pointer will be returned, and the position of "*pp" is
+ * not defined.
+ */
+/**
+ * @brief Decode a TLS-format (not DER) list of SCTs from @p pp.
+ * @param a Optional destination stack pointer updated to the result, or NULL.
+ * @param pp Address of a pointer to the TLS-encoded SCT list; advanced past the data.
+ * @param len Number of bytes available at *@p pp.
+ * @return Stack of SCTs, or NULL on error.
+ */
+STACK_OF(SCT) *o2i_SCT_LIST(STACK_OF(SCT) **a, const unsigned char **pp,
+    size_t len);
+
+/**
+ * @brief Serialize a stack of SCTs to DER and return the encoded length.
+ * @param a Non-NULL stack of SCTs to encode.
+ * @param pp Optional output pointer: NULL to measure only; points to NULL to allocate; otherwise a buffer to write into.
+ * @return Number of bytes written (or that would be written) on success, or a negative value on error.
+ */
+__owur int i2d_SCT_LIST(const STACK_OF(SCT) *a, unsigned char **pp);
+
+/**
+ * @brief Decode a DER-encoded list of Signed Certificate Timestamps.
+ * @param a Optional destination: NULL or *@p a NULL allocates a new stack the caller must free with SCT_LIST_free(); otherwise replaces *@p a.
+ * @param pp Address of a pointer to the DER input; advanced past the decoded value on success.
+ * @param len Number of bytes available at *@p pp.
+ * @return Stack of SCT values, or NULL on failure (position of *@p pp is then undefined).
+ */
+STACK_OF(SCT) *d2i_SCT_LIST(STACK_OF(SCT) **a, const unsigned char **pp,
+    long len);
+
+/**
+ * @brief Serialize an SCT to TLS format.
+ * @param sct SCT to serialize.
+ * @param out Optional output pointer: NULL to measure only; points to NULL to allocate; otherwise a buffer to write into.
+ * @return Length of the TLS-format SCT on success, or a negative value on error.
+ */
+__owur int i2o_SCT(const SCT *sct, unsigned char **out);
+
+/**
+ * @brief Decode a single Signed Certificate Timestamp from TLS wire format (RFC 6962).
+ * @param psct Optional; receives the parsed SCT. If it points to a non-NULL SCT, that SCT is freed first.
+ * @param in Address of a pointer to the TLS-format SCT; advanced past the SCT on success.
+ * @param len Length of the SCT data available at *@p in.
+ * @return Parsed SCT, or NULL on error. Unsupported versions populate only the raw @c sct / @c sct_len fields.
+ */
+SCT *o2i_SCT(SCT **psct, const unsigned char **in, size_t len);
+
+/*--------------------*/
+/* CT log functions   */
+/*--------------------*/
+
+/**
+ * Create a CT log for @p public_key and @p name using @p libctx / @p propq.
+ * Takes ownership of @p public_key and copies @p name.
+ * Free with CTLOG_free().
+ * @param public_key Log public key (ownership transferred).
+ * @param name Log name to copy.
+ * @param libctx Library context, or NULL for the default.
+ * @param propq Property query string, or NULL.
+ * @return A new CTLOG, or NULL if allocation fails or the key cannot be
+ *         converted to DER.
+ */
+CTLOG *CTLOG_new_ex(EVP_PKEY *public_key, const char *name, OSSL_LIB_CTX *libctx,
+    const char *propq);
+
+/*
+ * The same as CTLOG_new_ex except that the default library context and
+ * property query string are used.
+ */
+/**
+ * @brief Create a CT log with a public key and name using the default library context.
+ * @param public_key Log public key; ownership is transferred to the CTLOG.
+ * @param name Human-readable name copied into the log (helps identify the log).
+ * @return New CTLOG, or NULL on allocation or DER-conversion failure; free with CTLOG_free().
+ */
+CTLOG *CTLOG_new(EVP_PKEY *public_key, const char *name);
+
+/**
+ * @brief Create a CT log from a base64-encoded SubjectPublicKeyInfo DER key.
+ * @param ct_log Receives the new CT log on success; free with CTLOG_free().
+ * @param pkey_base64 Base64-encoded SubjectPublicKeyInfo DER.
+ * @param name Human-readable name for the log.
+ * @param libctx Library context to associate with the log.
+ * @param propq Property query string, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int CTLOG_new_from_base64_ex(CTLOG **ct_log, const char *pkey_base64,
+    const char *name, OSSL_LIB_CTX *libctx,
+    const char *propq);
+
+/**
+ * @brief Create a CT log from a base64-encoded key using the default library context.
+ * @param ct_log Receives the new CT log on success; free with CTLOG_free().
+ * @param pkey_base64 Base64-encoded SubjectPublicKeyInfo DER.
+ * @param name Human-readable name for the log.
+ * @return 1 on success, or 0 on failure.
+ */
+int CTLOG_new_from_base64(CTLOG **ct_log,
+    const char *pkey_base64, const char *name);
+
+/*
+ * Deletes a CT log instance and its fields.
+ */
+/**
+ * @brief Free a Certificate Transparency log entry and its owned fields.
+ * @param log Log to free, or NULL.
+ */
+void CTLOG_free(CTLOG *log);
+
+/**
+ * @brief Get the name of a CT log.
+ * @param log CT log to query.
+ * @return Log name string.
+ */
+const char *CTLOG_get0_name(const CTLOG *log);
+/**
+ * @brief Get the ID of a CT log.
+ * @param log CT log to query.
+ * @param log_id Receives a pointer to the log ID; ownership remains with the log.
+ * @param log_id_len Receives the length of the log ID in bytes.
+ */
+void CTLOG_get0_log_id(const CTLOG *log, const uint8_t **log_id,
+    size_t *log_id_len);
+/**
+ * @brief Get the public key of a CT log.
+ * @param log CT log to query.
+ * @return Public key, owned by the log.
+ */
+EVP_PKEY *CTLOG_get0_public_key(const CTLOG *log);
+
+/*--------------------------*/
+/* CT log store functions   */
+/*--------------------------*/
+
+/**
+ * Create a new CT log store associated with @p libctx / @p propq.
+ * Free with CTLOG_STORE_free().
+ * @param libctx Library context, or NULL for the default.
+ * @param propq Property query string, or NULL.
+ * @return A new CTLOG_STORE, or NULL on error.
+ */
+CTLOG_STORE *CTLOG_STORE_new_ex(OSSL_LIB_CTX *libctx, const char *propq);
+
+/*
+ * Same as CTLOG_STORE_new_ex except that the default libctx and
+ * property query string are used.
+ * Should be deleted by the caller using CTLOG_STORE_free when no longer needed.
+ */
+/**
+ * @brief Allocate an empty CT log store.
+ * @return New CTLOG_STORE, or NULL on allocation failure; free with CTLOG_STORE_free.
+ */
+CTLOG_STORE *CTLOG_STORE_new(void);
+
+/**
+ * @brief Free a CT log store and the CT log instances it holds.
+ * @param store Log store to free, or NULL.
+ */
+void CTLOG_STORE_free(CTLOG_STORE *store);
+
+/**
+ * @brief Find a CT log in a store by log ID.
+ * @param store Log store to search.
+ * @param log_id Log ID to match.
+ * @param log_id_len Length of @p log_id in bytes.
+ * @return Matching CT log, or NULL if none is found.
+ */
+const CTLOG *CTLOG_STORE_get0_log_by_id(const CTLOG_STORE *store,
+    const uint8_t *log_id,
+    size_t log_id_len);
+
+/**
+ * @brief Load a CT log list into a store from a file.
+ * @param store Log store to populate.
+ * @param file Path to a CT log list file.
+ * @return 1 on success, or 0 on failure.
+ */
+__owur int CTLOG_STORE_load_file(CTLOG_STORE *store, const char *file);
+
+/**
+ * @brief Load the default CT log list into a store.
+ * @param store Log store to populate.
+ * @return 1 on success, or 0 on failure.
+ */
+__owur int CTLOG_STORE_load_default_file(CTLOG_STORE *store);
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+#endif

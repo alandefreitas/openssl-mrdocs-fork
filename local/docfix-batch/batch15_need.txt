@@ -1,0 +1,346 @@
+NEED x509.h:3684 PKCS5_pbe2_set
+X509_ALGOR *PKCS5_pbe2_set(const EVP_CIPHER *cipher, int iter,
+    unsigned char *salt, int saltlen);
+---
+NEED x509.h:3488 EVP_PKEY_add1_attr_by_NID
+int EVP_PKEY_add1_attr_by_NID(EVP_PKEY *key,
+    int nid, int type,
+    const unsigned char *bytes, int len);
+---
+NEED x509.h:3328 X509at_get_attr_count
+int X509at_get_attr_count(const STACK_OF(X509_ATTRIBUTE) *x);
+---
+NEED x509.h:3274 X509_REVOKED_get_ext_d2i
+void *X509_REVOKED_get_ext_d2i(const X509_REVOKED *x, int nid, int *crit,
+    int *idx);
+---
+NEED x509.h:3272 X509_REVOKED_delete_ext
+X509_EXTENSION *X509_REVOKED_delete_ext(X509_REVOKED *x, int loc);
+---
+NEED x509.h:3211 X509_get_ext_by_critical
+int X509_get_ext_by_critical(const X509 *x, int crit, int lastpos);
+---
+NEED x509.h:3052 X509_NAME_add_entry_by_OBJ
+int X509_NAME_add_entry_by_OBJ(X509_NAME *name, const ASN1_OBJECT *obj, int type,
+    const unsigned char *bytes, int len, int loc,
+    int set);
+---
+NEED x509.h:2824 X509_issuer_and_serial_cmp
+int X509_issuer_and_serial_cmp(const X509 *a, const X509 *b);
+---
+NEED x509.h:2780 X509_REVOKED_get0_serialNumber
+const ASN1_INTEGER *X509_REVOKED_get0_serialNumber(const X509_REVOKED *x);
+---
+NEED x509.h:2636 X509_REQ_get_extensions
+STACK_OF(X509_EXTENSION) *X509_REQ_get_extensions(X509_REQ *req);
+---
+NEED x509.h:2625 X509_REQ_extension_nid
+int X509_REQ_extension_nid(int nid);
+---
+NEED x509.h:2580 X509_REQ_set_subject_name
+int X509_REQ_set_subject_name(X509_REQ *req, const X509_NAME *name);
+---
+NEED x509.h:2579 X509_REQ_get_subject_name
+X509_NAME *X509_REQ_get_subject_name(const X509_REQ *req);
+---
+NEED x509.h:2381 ASN1_item_verify_ctx
+int ASN1_item_verify_ctx(const ASN1_ITEM *it, const X509_ALGOR *alg,
+    const ASN1_BIT_STRING *signature, const void *data,
+    EVP_MD_CTX *ctx);
+---
+NEED x509.h:2046 X509_keyid_set1
+int X509_keyid_set1(X509 *x, const unsigned char *id, int len);
+---
+NEED x509.h:1920 X509_new_ex
+X509 *X509_new_ex(OSSL_LIB_CTX *libctx, const char *propq);
+---
+NEED x509.h:1332 X509_get_default_cert_dir_env
+const char *X509_get_default_cert_dir_env(void);
+---
+NEED x509.h:1319 X509_gmtime_adj
+ASN1_TIME *X509_gmtime_adj(ASN1_TIME *s, long adj);
+---
+NEED x509.h:1291 X509_cmp_current_time
+int X509_cmp_current_time(const ASN1_TIME *s);
+---
+NEED x509.h:1282 X509_NAME_dup
+DECLARE_ASN1_DUP_FUNCTION(X509_NAME)
+---
+NEED x509.h:1250 X509_ALGOR_set0
+int X509_ALGOR_set0(X509_ALGOR *alg, ASN1_OBJECT *aobj, int ptype,
+    void *pval);
+---
+NEED x509.h:1249 X509_REVOKED_dup
+DECLARE_ASN1_DUP_FUNCTION(X509_REVOKED)
+---
+NEED x509.h:1218 X509_ALGOR_dup
+DECLARE_ASN1_DUP_FUNCTION(X509_ALGOR)
+---
+NEED x509.h:1193 i2d_PUBKEY_bio
+int i2d_PUBKEY_bio(BIO *bp, const EVP_PKEY *pkey);
+---
+NEED x509.h:1137 d2i_PKCS8_bio
+X509_SIG *d2i_PKCS8_bio(BIO *bp, X509_SIG **p8);
+---
+NEED x509.h:1119 i2d_EC_PUBKEY_bio
+OSSL_DEPRECATEDIN_3_0 int i2d_EC_PUBKEY_bio(BIO *bp, const EC_KEY *eckey);
+---
+NEED x509.h:1093 d2i_DSAPrivateKey_bio
+OSSL_DEPRECATEDIN_3_0 DSA *d2i_DSAPrivateKey_bio(BIO *bp, DSA **dsa);
+---
+NEED x509.h:1061 i2d_RSAPublicKey_bio
+OSSL_DEPRECATEDIN_3_0 int i2d_RSAPublicKey_bio(BIO *bp, const RSA *rsa);
+---
+NEED x509.h:1053 i2d_RSAPrivateKey_bio
+OSSL_DEPRECATEDIN_3_0 int i2d_RSAPrivateKey_bio(BIO *bp, const RSA *rsa);
+---
+NEED x509.h:1012 d2i_PUBKEY_fp
+EVP_PKEY *d2i_PUBKEY_fp(FILE *fp, EVP_PKEY **a);
+---
+NEED x509.h:986 d2i_PrivateKey_ex_fp
+EVP_PKEY *d2i_PrivateKey_ex_fp(FILE *fp, EVP_PKEY **a, OSSL_LIB_CTX *libctx,
+    const char *propq);
+---
+NEED x509.h:947 d2i_PKCS8_fp
+X509_SIG *d2i_PKCS8_fp(FILE *fp, X509_SIG **p8);
+---
+NEED x509.h:944 i2d_ECPrivateKey_fp
+OSSL_DEPRECATEDIN_3_0 int i2d_ECPrivateKey_fp(FILE *fp, const EC_KEY *eckey);
+---
+NEED x509.h:941 d2i_EC_PUBKEY_fp
+OSSL_DEPRECATEDIN_3_0 EC_KEY *d2i_EC_PUBKEY_fp(FILE *fp, EC_KEY **eckey);
+---
+NEED x509.h:923 d2i_DSAPrivateKey_fp
+OSSL_DEPRECATEDIN_3_0 DSA *d2i_DSAPrivateKey_fp(FILE *fp, DSA **dsa);
+---
+NEED x509.h:898 d2i_RSA_PUBKEY_fp
+OSSL_DEPRECATEDIN_3_0 RSA *d2i_RSA_PUBKEY_fp(FILE *fp, RSA **rsa);
+---
+NEED x509.h:868 i2d_X509_REQ_fp
+int i2d_X509_REQ_fp(FILE *fp, const X509_REQ *req);
+---
+NEED x509.h:853 d2i_X509_CRL_fp
+X509_CRL *d2i_X509_CRL_fp(FILE *fp, X509_CRL **crl);
+---
+NEED x509.h:809 X509_NAME_digest
+int X509_NAME_digest(const X509_NAME *data, const EVP_MD *type,
+    unsigned char *md, unsigned int *len);
+---
+NEED x509.h:750 X509_CRL_sign_ctx
+int X509_CRL_sign_ctx(X509_CRL *x, EVP_MD_CTX *ctx);
+---
+NEED x509.h:697 NETSCAPE_SPKI_set_pubkey
+int NETSCAPE_SPKI_set_pubkey(NETSCAPE_SPKI *x, EVP_PKEY *pkey);
+---
+NEED x509.h:689 NETSCAPE_SPKI_b64_decode
+NETSCAPE_SPKI *NETSCAPE_SPKI_b64_decode(const char *str, int len);
+---
+NEED x509.h:680 X509_CRL_verify
+int X509_CRL_verify(X509_CRL *a, EVP_PKEY *r);
+---
+NEED x509.h:679 X509_REQ_verify
+int X509_REQ_verify(X509_REQ *a, EVP_PKEY *r);
+---
+NEED x509.h:646 X509_verify_cert_error_string
+const char *X509_verify_cert_error_string(long n);
+---
+NEED x509.h:644 X509_CRL_get_meth_data
+void *X509_CRL_get_meth_data(X509_CRL *crl);
+---
+NEED x509_vfy.h:1893 X509_policy_tree_level_count
+int X509_policy_tree_level_count(const X509_POLICY_TREE *tree);
+---
+NEED x509_vfy.h:1848 X509_VERIFY_PARAM_get_count
+int X509_VERIFY_PARAM_get_count(void);
+---
+NEED x509_vfy.h:1847 X509_VERIFY_PARAM_add0_table
+int X509_VERIFY_PARAM_add0_table(X509_VERIFY_PARAM *param);
+---
+NEED x509_vfy.h:1845 X509_VERIFY_PARAM_get0_name
+const char *X509_VERIFY_PARAM_get0_name(const X509_VERIFY_PARAM *param);
+---
+NEED x509_vfy.h:1844 X509_VERIFY_PARAM_get_auth_level
+int X509_VERIFY_PARAM_get_auth_level(const X509_VERIFY_PARAM *param);
+---
+NEED x509_vfy.h:1794 X509_VERIFY_PARAM_get_hostflags
+unsigned int X509_VERIFY_PARAM_get_hostflags(const X509_VERIFY_PARAM *param);
+---
+NEED x509_vfy.h:1785 X509_VERIFY_PARAM_add1_host
+int X509_VERIFY_PARAM_add1_host(X509_VERIFY_PARAM *param,
+    const char *name, size_t namelen);
+---
+NEED x509_vfy.h:1775 X509_VERIFY_PARAM_get0_host
+char *X509_VERIFY_PARAM_get0_host(X509_VERIFY_PARAM *param, int idx);
+---
+NEED x509_vfy.h:1757 X509_VERIFY_PARAM_set1_policies
+int X509_VERIFY_PARAM_set1_policies(X509_VERIFY_PARAM *param,
+    STACK_OF(ASN1_OBJECT) *policies);
+---
+NEED x509_vfy.h:1736 X509_VERIFY_PARAM_set_auth_level
+void X509_VERIFY_PARAM_set_auth_level(X509_VERIFY_PARAM *param, int auth_level);
+---
+NEED x509_vfy.h:1682 X509_VERIFY_PARAM_inherit
+int X509_VERIFY_PARAM_inherit(X509_VERIFY_PARAM *to,
+    const X509_VERIFY_PARAM *from);
+---
+NEED x509_vfy.h:1656 X509_STORE_CTX_set_default
+int X509_STORE_CTX_set_default(X509_STORE_CTX *ctx, const char *name);
+---
+NEED x509_vfy.h:1607 X509_STORE_CTX_purpose_inherit
+int X509_STORE_CTX_purpose_inherit(X509_STORE_CTX *ctx, int def_purpose,
+    int purpose, int trust);
+---
+NEED x509_vfy.h:1606 X509_STORE_CTX_set_trust
+int X509_STORE_CTX_set_trust(X509_STORE_CTX *ctx, int trust);
+---
+NEED x509_vfy.h:1584 X509_STORE_CTX_get1_chain
+STACK_OF(X509) *X509_STORE_CTX_get1_chain(const X509_STORE_CTX *ctx);
+---
+NEED x509_vfy.h:1500 X509_STORE_load_store_ex
+int X509_STORE_load_store_ex(X509_STORE *xs, const char *store,
+    OSSL_LIB_CTX *libctx, const char *propq);
+---
+NEED x509_vfy.h:1479 X509_STORE_load_store
+int X509_STORE_load_store(X509_STORE *xs, const char *store);
+---
+NEED x509_vfy.h:1471 X509_STORE_load_file
+int X509_STORE_load_file(X509_STORE *xs, const char *file);
+---
+NEED x509_vfy.h:1468 X509_LOOKUP_get_store
+X509_STORE *X509_LOOKUP_get_store(const X509_LOOKUP *ctx);
+---
+NEED x509_vfy.h:1467 X509_LOOKUP_get_method_data
+void *X509_LOOKUP_get_method_data(const X509_LOOKUP *ctx);
+---
+NEED x509_vfy.h:1442 X509_LOOKUP_by_issuer_serial
+int X509_LOOKUP_by_issuer_serial(X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
+    const X509_NAME *name,
+    const ASN1_INTEGER *serial,
+    X509_OBJECT *ret);
+---
+NEED x509_vfy.h:1287 X509_LOOKUP_meth_set_get_by_fingerprint
+int X509_LOOKUP_meth_set_get_by_fingerprint(X509_LOOKUP_METHOD *method,
+    X509_LOOKUP_get_by_fingerprint_fn fn);
+---
+NEED x509_vfy.h:1277 X509_LOOKUP_meth_set_get_by_issuer_serial
+int X509_LOOKUP_meth_set_get_by_issuer_serial(X509_LOOKUP_METHOD *method,
+    X509_LOOKUP_get_by_issuer_serial_fn fn);
+---
+NEED x509_vfy.h:1220 X509_LOOKUP_meth_get_free
+void (*X509_LOOKUP_meth_get_free(const X509_LOOKUP_METHOD *method))(X509_LOOKUP *ctx);
+---
+MISS x509_vfy.h X509_LOOKUP_get_by_fingerprint_fn
+NEED x509_vfy.h:1089 X509_STORE_add_lookup
+X509_LOOKUP *X509_STORE_add_lookup(X509_STORE *xs, X509_LOOKUP_METHOD *m);
+---
+NEED x509_vfy.h:1031 X509_STORE_CTX_set_get_crl
+void X509_STORE_CTX_set_get_crl(X509_STORE_CTX *ctx,
+    X509_STORE_CTX_get_crl_fn get_crl);
+---
+NEED x509_vfy.h:996 X509_STORE_CTX_get0_rpk
+EVP_PKEY *X509_STORE_CTX_get0_rpk(const X509_STORE_CTX *ctx);
+---
+NEED x509_vfy.h:932 X509_STORE_CTX_new_ex
+X509_STORE_CTX *X509_STORE_CTX_new_ex(OSSL_LIB_CTX *libctx, const char *propq);
+---
+NEED x509_vfy.h:923 X509_STORE_set_ex_data
+int X509_STORE_set_ex_data(X509_STORE *xs, int idx, void *data);
+---
+NEED x509_vfy.h:883 X509_STORE_get_check_policy
+X509_STORE_CTX_check_policy_fn X509_STORE_get_check_policy(const X509_STORE *s);
+---
+NEED x509_vfy.h:881 X509_STORE_set_check_policy
+void X509_STORE_set_check_policy(X509_STORE *xs,
+    X509_STORE_CTX_check_policy_fn check_policy);
+---
+NEED x509_vfy.h:880 X509_STORE_get_cert_crl
+X509_STORE_CTX_cert_crl_fn X509_STORE_get_cert_crl(const X509_STORE *xs);
+---
+NEED x509_vfy.h:878 X509_STORE_set_cert_crl
+void X509_STORE_set_cert_crl(X509_STORE *xs,
+    X509_STORE_CTX_cert_crl_fn cert_crl);
+---
+NEED x509_vfy.h:864 X509_STORE_get_get_crl
+X509_STORE_CTX_get_crl_fn X509_STORE_get_get_crl(const X509_STORE *xs);
+---
+NEED x509_vfy.h:847 X509_STORE_get_check_issued
+X509_STORE_CTX_check_issued_fn X509_STORE_get_check_issued(const X509_STORE *s);
+---
+NEED x509_vfy.h:826 X509_STORE_get_verify_cb
+X509_STORE_CTX_verify_cb X509_STORE_get_verify_cb(const X509_STORE *xs);
+---
+NEED x509_vfy.h:822 X509_STORE_set_verify_cb
+void X509_STORE_set_verify_cb(X509_STORE *xs,
+    X509_STORE_CTX_verify_cb verify_cb);
+---
+NEED x509_vfy.h:811 X509_STORE_set_verify
+void X509_STORE_set_verify(X509_STORE *xs, X509_STORE_CTX_verify_fn verify);
+---
+NEED x509_vfy.h:789 X509_STORE_set_purpose
+int X509_STORE_set_purpose(X509_STORE *xs, int purpose);
+---
+NEED x509_vfy.h:759 X509_STORE_get0_objects
+STACK_OF(X509_OBJECT) *X509_STORE_get0_objects(const X509_STORE *xs);
+---
+NEED x509_vfy.h:723 X509_OBJECT_get0_X509_CRL
+X509_CRL *X509_OBJECT_get0_X509_CRL(const X509_OBJECT *a);
+---
+NEED x509_vfy.h:721 X509_OBJECT_get0_X509
+X509 *X509_OBJECT_get0_X509(const X509_OBJECT *a);
+---
+NEED x509_vfy.h:709 X509_OBJECT_up_ref_count
+int X509_OBJECT_up_ref_count(X509_OBJECT *a);
+---
+NEED x509v3.h:3679 NAMING_AUTHORITY_set0_authorityText
+void NAMING_AUTHORITY_set0_authorityText(NAMING_AUTHORITY *n,
+    ASN1_STRING *namingAuthorityText);
+---
+NEED x509v3.h:3580 stack_st_PROFESSION_INFO
+SKM_DEFINE_STACK_OF_INTERNAL(PROFESSION_INFO, PROFESSION_INFO, PROFESSION_INFO)
+---
+NEED x509v3.h:3395 X509v3_asid_validate_resource_set
+int X509v3_asid_validate_resource_set(STACK_OF(X509) *chain,
+    ASIdentifiers *ext,
+    int allow_inheritance);
+---
+NEED x509v3.h:3286 X509v3_addr_add_inherit
+int X509v3_addr_add_inherit(IPAddrBlocks *addr,
+    const unsigned afi, const unsigned *safi);
+---
+NEED x509v3.h:2519 X509_get_extension_flags
+uint32_t X509_get_extension_flags(X509 *x);
+---
+NEED x509v3.h:2342 i2s_ASN1_ENUMERATED_TABLE
+char *i2s_ASN1_ENUMERATED_TABLE(X509V3_EXT_METHOD *meth,
+    const ASN1_ENUMERATED *aint);
+---
+NEED x509v3.h:2316 X509V3_add_value_bool
+int X509V3_add_value_bool(const char *name, int asn1_bool,
+    STACK_OF(CONF_VALUE) **extlist);
+---
+NEED x509v3.h:2277 X509V3_section_free
+void X509V3_section_free(X509V3_CTX *ctx, STACK_OF(CONF_VALUE) *section);
+---
+NEED x509v3.h:2147 X509V3_EXT_add_nconf_sk
+int X509V3_EXT_add_nconf_sk(CONF *conf, X509V3_CTX *ctx, const char *section,
+    STACK_OF(X509_EXTENSION) **sk);
+---
+NEED x509v3.h:1822 CRL_DIST_POINTS_new
+CRL_DIST_POINTS *CRL_DIST_POINTS_new(void);
+---
+NEED x509v3.h:1425 i2s_ASN1_IA5STRING
+char *i2s_ASN1_IA5STRING(X509V3_EXT_METHOD *method, ASN1_IA5STRING *ia5);
+---
+NEED x509v3.h:1274 SXNET_add_id_INTEGER
+int SXNET_add_id_INTEGER(SXNET **psx, ASN1_INTEGER *izone, const char *user,
+    int userlen);
+---
+NEED x509v3.h:572 stack_st_SXNETID
+SKM_DEFINE_STACK_OF_INTERNAL(SXNETID, SXNETID, SXNETID)
+---
+NEED pkcs7.h:75 digest_alg
+    X509_ALGOR *digest_alg;
+---
+NEED pkcs7.h:136 stack_st_PKCS7_RECIP_INFO
+SKM_DEFINE_STACK_OF_INTERNAL(PKCS7_RECIP_INFO, PKCS7_RECIP_INFO, PKCS7_RECIP_INFO)
+---

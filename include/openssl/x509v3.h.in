@@ -1,0 +1,3577 @@
+/*
+ * {- join("\n * ", @autowarntext) -}
+ *
+ * Copyright 1999-2023 The OpenSSL Project Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License 2.0 (the "License").  You may not use
+ * this file except in compliance with the License.  You can obtain a copy
+ * in the file LICENSE in the source distribution or at
+ * https://www.openssl.org/source/license.html
+ */
+
+/* clang-format off */
+{-
+use OpenSSL::stackhash qw(generate_stack_macros);
+-}
+/* clang-format on */
+
+#ifndef OPENSSL_X509V3_H
+#define OPENSSL_X509V3_H
+#pragma once
+
+#include <openssl/macros.h>
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#define HEADER_X509V3_H
+#endif
+
+#include <openssl/bio.h>
+#include <openssl/x509.h>
+#include <openssl/conf.h>
+#include <openssl/x509v3err.h>
+#ifndef OPENSSL_NO_STDIO
+#include <stdio.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Forward reference */
+struct v3_ext_method;
+struct v3_ext_ctx;
+
+/* Useful typedefs */
+
+/**
+ * @brief Callback that allocates a fresh extension-specific value for an X.509v3 method.
+ * @return Newly allocated extension value, or NULL on allocation failure.
+ */
+typedef void *(*X509V3_EXT_NEW)(void);
+/**
+ * @brief Free an X.509v3 extension-specific value allocated by the matching NEW/D2I/S2I handlers.
+ * @param ext Extension value to free, or NULL.
+ */
+typedef void (*X509V3_EXT_FREE)(void *ext);
+/**
+ * @brief Decode an X.509v3 extension value from DER.
+ * @param ext Optional existing extension value to reuse, or NULL to allocate.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Extension-specific value, or NULL on error.
+ */
+typedef void *(*X509V3_EXT_D2I)(void *ext, const unsigned char **in, long len);
+/**
+ * @brief Encode an X.509v3 extension value to DER.
+ * @param ext Extension-specific value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+typedef int (*X509V3_EXT_I2D)(const void *ext, unsigned char **out);
+/**
+ * @brief Convert an extension value to a stack of configuration name/value pairs.
+ * @param method Extension method describing the conversion.
+ * @param ext Extension-specific value to convert.
+ * @param extlist Existing stack to append to, or NULL to allocate a new one.
+ * @return Stack of CONF_VALUE entries, or NULL on error.
+ */
+typedef STACK_OF(CONF_VALUE) *(*X509V3_EXT_I2V)(const struct v3_ext_method *method, void *ext,
+    STACK_OF(CONF_VALUE) *extlist);
+/**
+ * @brief Parse configuration name/value pairs into an extension-specific value.
+ * @param method Extension method describing the conversion.
+ * @param ctx Extension context for the conversion.
+ * @param values Stack of CONF_VALUE entries describing the extension.
+ * @return Extension-specific value, or NULL on error.
+ */
+typedef void *(*X509V3_EXT_V2I)(const struct v3_ext_method *method,
+    struct v3_ext_ctx *ctx,
+    STACK_OF(CONF_VALUE) *values);
+/**
+ * @brief Convert an extension value to a configuration string.
+ * @param method Extension method describing the conversion.
+ * @param ext Extension-specific value to convert.
+ * @return Newly allocated string, or NULL on error.
+ */
+typedef char *(*X509V3_EXT_I2S)(const struct v3_ext_method *method,
+    void *ext);
+/**
+ * @brief Callback that parses a configuration string into an extension-specific structure.
+ * @param method Extension method describing the target type.
+ * @param ctx Extension configuration context (issuer/subject certificates, etc.).
+ * @param str Configuration value string to parse.
+ * @return Newly allocated extension value, or NULL on error.
+ */
+typedef void *(*X509V3_EXT_S2I)(const struct v3_ext_method *method,
+    struct v3_ext_ctx *ctx, const char *str);
+/**
+ * @brief Print an extension-specific value to a BIO.
+ * @param method Extension method describing the conversion.
+ * @param ext Extension-specific value to print.
+ * @param out Destination BIO.
+ * @param indent Number of leading spaces for each line.
+ * @return 1 on success, or 0 on failure.
+ */
+typedef int (*X509V3_EXT_I2R)(const struct v3_ext_method *method, void *ext,
+    BIO *out, int indent);
+/**
+ * @brief Parse a raw configuration string into an extension value.
+ * @param method Extension method describing the conversion.
+ * @param ctx Extension context for the conversion.
+ * @param str Raw configuration string to parse.
+ * @return Extension-specific value, or NULL on error.
+ */
+typedef void *(*X509V3_EXT_R2I)(const struct v3_ext_method *method,
+    struct v3_ext_ctx *ctx, const char *str);
+
+/* V3 extension structure */
+
+/**
+ * @brief Method table describing encode/decode/print behaviour for one X.509v3 extension NID.
+ */
+struct v3_ext_method {
+    /** NID of the extension OID this method implements. */
+    int ext_nid;
+    /** Flags such as X509V3_EXT_DYNAMIC, X509V3_EXT_CTX_DEP, or X509V3_EXT_MULTILINE. */
+    int ext_flags;
+    /* If this is set the following four fields are ignored */
+    /** ASN.1 item template used instead of the old-style d2i/i2d callbacks when set. */
+    ASN1_ITEM_EXP *it;
+    /* Old style ASN1 calls */
+    /** Allocate a new extension-specific value. */
+    X509V3_EXT_NEW ext_new;
+    /** Free an extension-specific value previously allocated by @c ext_new or @c d2i. */
+    X509V3_EXT_FREE ext_free;
+    /** Decode DER into an extension-specific value. */
+    X509V3_EXT_D2I d2i;
+    /** Encode an extension-specific value to DER. */
+    X509V3_EXT_I2D i2d;
+    /* The following pair is used for string extensions */
+    /** Convert an extension value to a configuration string. */
+    X509V3_EXT_I2S i2s;
+    /** Parse a configuration string into an extension value. */
+    X509V3_EXT_S2I s2i;
+    /* The following pair is used for multi-valued extensions */
+    /** Convert an extension value to a stack of CONF_VALUE name/value pairs. */
+    X509V3_EXT_I2V i2v;
+    /** Parse a stack of CONF_VALUE entries into an extension-specific value. */
+    X509V3_EXT_V2I v2i;
+    /* The following are used for raw extensions */
+    /** Print an extension value to a BIO. */
+    X509V3_EXT_I2R i2r;
+    /** Parse a raw configuration string into an extension value. */
+    X509V3_EXT_R2I r2i;
+    /** Extension-specific data pointer for method callbacks. */
+    void *usr_data;
+};
+
+/**
+ * @brief Callback table for reading configuration database sections used by X509v3 helpers.
+ */
+typedef struct X509V3_CONF_METHOD_st {
+    /** Look up a string value in section/name form from the configuration database. */
+    char *(*get_string)(void *db, const char *section, const char *value);
+    /** Load all name/value pairs from a named configuration section. */
+    STACK_OF(CONF_VALUE) *(*get_section)(void *db, const char *section);
+    /** Release a string previously returned by get_string for this database. */
+    void (*free_string)(void *db, char *string);
+    /** Release a section stack previously returned by get_section for this database. */
+    void (*free_section)(void *db, STACK_OF(CONF_VALUE) *section);
+} X509V3_CONF_METHOD;
+
+/* Context specific info for producing X509 v3 extensions*/
+struct v3_ext_ctx {
+#define X509V3_CTX_TEST 0x1
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#define CTX_TEST X509V3_CTX_TEST
+#endif
+#define X509V3_CTX_REPLACE 0x2
+    /** Context flags such as X509V3_CTX_TEST or X509V3_CTX_REPLACE. */
+    int flags;
+    /** Issuer certificate used when constructing context-dependent extensions. */
+    X509 *issuer_cert;
+    /** Subject certificate used when constructing context-dependent extensions. */
+    X509 *subject_cert;
+    /** Certificate request used when constructing request-related extensions. */
+    X509_REQ *subject_req;
+    /** CRL used when constructing CRL-related extensions. */
+    X509_CRL *crl;
+    /** Callbacks used to read configuration sections while building extensions. */
+    X509V3_CONF_METHOD *db_meth;
+    /** Configuration database handle passed to @c db_meth callbacks. */
+    void *db;
+    /** Issuer private key for signing constructed extensions. */
+    EVP_PKEY *issuer_pkey;
+    /* Maybe more here */
+};
+
+/**
+ * @brief Method table describing how an X.509v3 extension type is encoded and printed.
+ */
+typedef struct v3_ext_method X509V3_EXT_METHOD;
+
+/**
+ * @brief Opaque STACK_OF(X509V3_EXT_METHOD) container type.
+ */
+struct stack_st_X509V3_EXT_METHOD;
+/* clang-format off */
+{-
+    generate_stack_macros("X509V3_EXT_METHOD");
+-}
+/* clang-format on */
+
+/* ext_flags values */
+#define X509V3_EXT_DYNAMIC 0x1
+#define X509V3_EXT_CTX_DEP 0x2
+#define X509V3_EXT_MULTILINE 0x4
+
+/**
+ * @brief BIT_STRING_BITNAME entry describing a named ASN.1 ENUMERATED value (long name / short name / number).
+ */
+typedef BIT_STRING_BITNAME ENUMERATED_NAMES;
+
+/**
+ * @brief Basic Constraints extension: whether the subject is a CA and optional path length.
+ */
+typedef struct BASIC_CONSTRAINTS_st {
+    /** Non-zero if the subject may act as a certification authority. */
+    int ca;
+    /** Maximum number of intermediate CA certificates below this CA, or NULL if unlimited. */
+    ASN1_INTEGER *pathlen;
+} BASIC_CONSTRAINTS;
+
+/**
+ * @brief Private key usage period extension giving the interval when the key is valid.
+ */
+typedef struct PKEY_USAGE_PERIOD_st {
+    /** Start of the private key usage interval, or NULL if unset. */
+    ASN1_GENERALIZEDTIME *notBefore;
+    /** End of the private key usage interval, or NULL if unset. */
+    ASN1_GENERALIZEDTIME *notAfter;
+} PKEY_USAGE_PERIOD;
+
+/**
+ * @brief otherName form of a GeneralName: an OID typed value.
+ */
+typedef struct otherName_st {
+    /** Object identifier naming the otherName type. */
+    ASN1_OBJECT *type_id;
+    /** Type-specific value associated with @c type_id. */
+    ASN1_TYPE *value;
+} OTHERNAME;
+
+/**
+ * @brief EDI party name form of a GeneralName (nameAssigner optional, partyName required).
+ */
+typedef struct EDIPartyName_st {
+    /** Optional name assigner directory name string, or NULL if absent. */
+    ASN1_STRING *nameAssigner;
+    /** Party name identifying the EDI entity. */
+    ASN1_STRING *partyName;
+} EDIPARTYNAME;
+
+/**
+ * @brief X.509 GeneralName: one alternative name form selected by @c type.
+ */
+typedef struct GENERAL_NAME_st {
+#define GEN_OTHERNAME 0
+#define GEN_EMAIL 1
+#define GEN_DNS 2
+#define GEN_X400 3
+#define GEN_DIRNAME 4
+#define GEN_EDIPARTY 5
+#define GEN_URI 6
+#define GEN_IPADD 7
+#define GEN_RID 8
+    /** GEN_* discriminator selecting which @c d union arm is valid. */
+    int type;
+    /**
+     * @brief Union of GeneralName alternatives; the active arm matches @c type.
+     */
+    union {
+        /** Legacy generic pointer view of the selected name value. */
+        char *ptr;
+        /** otherName: OID-typed name value. */
+        OTHERNAME *otherName; /* otherName */
+        /** rfc822Name (email address) as an IA5String. */
+        ASN1_IA5STRING *rfc822Name;
+        /** dNSName as an IA5String. */
+        ASN1_IA5STRING *dNSName;
+        /** x400Address ORAddress value. */
+        ASN1_STRING *x400Address;
+        /** directoryName as an X.509 Name. */
+        X509_NAME *directoryName;
+        /** EDI party name. */
+        EDIPARTYNAME *ediPartyName;
+        /** uniformResourceIdentifier as an IA5String. */
+        ASN1_IA5STRING *uniformResourceIdentifier;
+        /** iPAddress as an OCTET STRING (network byte order). */
+        ASN1_OCTET_STRING *iPAddress;
+        /** registeredID as an object identifier. */
+        ASN1_OBJECT *registeredID;
+        /* Old names */
+        /** Alias for @c iPAddress. */
+        ASN1_OCTET_STRING *ip; /* iPAddress */
+        /** Alias for @c directoryName. */
+        X509_NAME *dirn; /* dirn */
+        /** Alias for IA5String forms (email, DNS, or URI). */
+        ASN1_IA5STRING *ia5; /* rfc822Name, dNSName,
+                              * uniformResourceIdentifier */
+        /** Alias for @c registeredID. */
+        ASN1_OBJECT *rid; /* registeredID */
+        /** Alias for @c x400Address stored as ASN1_TYPE. */
+        ASN1_TYPE *other; /* x400Address */
+    } d;
+} GENERAL_NAME;
+
+/**
+ * @brief AccessDescription: access method OID and GeneralName location (RFC 5280 AIA/SIA).
+ */
+typedef struct ACCESS_DESCRIPTION_st {
+    /** Access method OID (for example id-ad-ocsp or id-ad-caIssuers). */
+    ASN1_OBJECT *method;
+    /** Access location (URI, directory name, etc.) for @c method. */
+    GENERAL_NAME *location;
+} ACCESS_DESCRIPTION;
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(ACCESS_DESCRIPTION) container type.
+ */
+struct stack_st_ACCESS_DESCRIPTION;
+{-
+    generate_stack_macros("ACCESS_DESCRIPTION");
+-}
+/**
+ * @brief Opaque STACK_OF(GENERAL_NAME) container type.
+ */
+struct stack_st_GENERAL_NAME;
+{-
+    generate_stack_macros("GENERAL_NAME");
+-}
+/* clang-format on */
+
+/**
+ * @brief Authority Information Access extension: stack of ACCESS_DESCRIPTION entries.
+ */
+typedef STACK_OF(ACCESS_DESCRIPTION) AUTHORITY_INFO_ACCESS;
+/**
+ * @brief Extended Key Usage extension: stack of key-purpose object identifiers.
+ */
+typedef STACK_OF(ASN1_OBJECT) EXTENDED_KEY_USAGE;
+/**
+ * @brief TLS Feature extension: stack of TLS extension feature integers (RFC 7633).
+ */
+typedef STACK_OF(ASN1_INTEGER) TLS_FEATURE;
+/**
+ * @brief Stack of GeneralName values (SubjectAltName, IssuerAltName, distribution points, etc.).
+ */
+typedef STACK_OF(GENERAL_NAME) GENERAL_NAMES;
+
+/**
+ * @brief Opaque STACK_OF(GENERAL_NAMES) container type.
+ */
+struct stack_st_GENERAL_NAMES;
+/* clang-format off */
+{-
+    generate_stack_macros("GENERAL_NAMES");
+-}
+/* clang-format on */
+
+/**
+ * @brief Distribution point name: either a full GeneralNames set or a relative name.
+ */
+typedef struct DIST_POINT_NAME_st {
+    /** Discriminant selecting @c fullname (0) or @c relativename (1). */
+    int type;
+    /**
+     * @brief Union of distribution point name forms; the active arm matches @c type.
+     */
+    union {
+        /** Full distribution point name as a set of GeneralNames. */
+        GENERAL_NAMES *fullname;
+        /** Name relative to the CRL issuer, as a sequence of Name entries. */
+        STACK_OF(X509_NAME_ENTRY) *relativename;
+    } name;
+    /* If relativename then this contains the full distribution point name */
+    /** Issuer name used to expand a relative distribution point name. */
+    X509_NAME *dpname;
+} DIST_POINT_NAME;
+/* All existing reasons */
+#define CRLDP_ALL_REASONS 0x807f
+
+#define CRL_REASON_NONE -1
+#define CRL_REASON_UNSPECIFIED 0
+#define CRL_REASON_KEY_COMPROMISE 1
+#define CRL_REASON_CA_COMPROMISE 2
+#define CRL_REASON_AFFILIATION_CHANGED 3
+#define CRL_REASON_SUPERSEDED 4
+#define CRL_REASON_CESSATION_OF_OPERATION 5
+#define CRL_REASON_CERTIFICATE_HOLD 6
+#define CRL_REASON_REMOVE_FROM_CRL 8
+#define CRL_REASON_PRIVILEGE_WITHDRAWN 9
+#define CRL_REASON_AA_COMPROMISE 10
+
+/**
+ * @brief Single CRL distribution point from the cRLDistributionPoints extension.
+ */
+struct DIST_POINT_st {
+    /** Name of this distribution point, or NULL if omitted. */
+    DIST_POINT_NAME *distpoint;
+    /** Optional bit string of revocation reasons covered by this point. */
+    ASN1_BIT_STRING *reasons;
+    /** Optional names of the CRL issuer when it differs from the certificate issuer. */
+    GENERAL_NAMES *CRLissuer;
+    /** Cached reason flags derived from @c reasons for path validation. */
+    int dp_reasons;
+};
+
+/**
+ * @brief Opaque STACK_OF(DIST_POINT) container type.
+ */
+struct stack_st_DIST_POINT;
+/* clang-format off */
+{-
+    generate_stack_macros("DIST_POINT");
+-}
+/* clang-format on */
+
+/**
+ * @brief CRL Distribution Points extension: stack of DIST_POINT entries.
+ */
+typedef STACK_OF(DIST_POINT) CRL_DIST_POINTS;
+
+/**
+ * @brief Authority Key Identifier extension identifying the issuer's public key.
+ */
+struct AUTHORITY_KEYID_st {
+    /** Key identifier octet string, typically a hash of the issuer public key. */
+    ASN1_OCTET_STRING *keyid;
+    /** Optional issuer name(s) accompanying the authority key identifier. */
+    GENERAL_NAMES *issuer;
+    /** Optional serial number of the issuer certificate. */
+    ASN1_INTEGER *serial;
+};
+
+/* Strong extranet structures */
+
+/**
+ * @brief Strong Extranet (SXNET) zone and user identifier pair.
+ */
+typedef struct SXNET_ID_st {
+    /** Zone number identifying the SXNET administrative domain. */
+    ASN1_INTEGER *zone;
+    /** User identifier within @c zone. */
+    ASN1_OCTET_STRING *user;
+} SXNETID;
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(SXNETID) container type.
+ */
+struct stack_st_SXNETID;
+{-
+    generate_stack_macros("SXNETID");
+-}
+/* clang-format on */
+
+/**
+ * @brief Strong Extranet (SXNET) certificate extension value.
+ */
+typedef struct SXNET_st {
+    /** SXNET version number. */
+    ASN1_INTEGER *version;
+    /** Stack of zone/user identifier pairs. */
+    STACK_OF(SXNETID) *ids;
+} SXNET;
+
+/**
+ * @brief Issuer Signing Tool extension naming signing and CA tools and their certificates.
+ */
+typedef struct ISSUER_SIGN_TOOL_st {
+    /** Name of the signing tool used by the issuer. */
+    ASN1_UTF8STRING *signTool;
+    /** Name of the CA tool used by the issuer. */
+    ASN1_UTF8STRING *cATool;
+    /** Certificate identifying the signing tool. */
+    ASN1_UTF8STRING *signToolCert;
+    /** Certificate identifying the CA tool. */
+    ASN1_UTF8STRING *cAToolCert;
+} ISSUER_SIGN_TOOL;
+
+/**
+ * @brief Notice reference: organization name and notice numbers for a user notice qualifier.
+ */
+typedef struct NOTICEREF_st {
+    /** Organization that issued the referenced notice. */
+    ASN1_STRING *organization;
+    /** Notice numbers within that organization's notice set. */
+    STACK_OF(ASN1_INTEGER) *noticenos;
+} NOTICEREF;
+
+/**
+ * @brief User notice policy qualifier: optional notice reference and explicit text.
+ */
+typedef struct USERNOTICE_st {
+    /** Optional reference to an organization notice, or NULL if absent. */
+    NOTICEREF *noticeref;
+    /** Optional explicit notice text displayed to relying parties. */
+    ASN1_STRING *exptext;
+} USERNOTICE;
+
+/**
+ * @brief Certificate policy qualifier: CPS URI, user notice, or other typed value.
+ */
+typedef struct POLICYQUALINFO_st {
+    /** Object identifier naming the qualifier type (CPS, userNotice, or other). */
+    ASN1_OBJECT *pqualid;
+    /**
+     * @brief Qualifier value selected by @c pqualid.
+     */
+    union {
+        /** Certification Practice Statement URI when @c pqualid is id-qt-cps. */
+        ASN1_IA5STRING *cpsuri;
+        /** User notice when @c pqualid is id-qt-unotice. */
+        USERNOTICE *usernotice;
+        /** Other qualifier encoded as an ASN.1 ANY. */
+        ASN1_TYPE *other;
+    } d;
+} POLICYQUALINFO;
+
+/* clang-format off */
+{-
+    generate_stack_macros("POLICYQUALINFO");
+-}
+/* clang-format on */
+
+/**
+ * @brief Single certificate policy: policy OID plus optional qualifiers.
+ */
+typedef struct POLICYINFO_st {
+    /** Certificate policy object identifier. */
+    ASN1_OBJECT *policyid;
+    /** Optional stack of policy qualifiers, or NULL if none. */
+    STACK_OF(POLICYQUALINFO) *qualifiers;
+} POLICYINFO;
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(POLICYINFO) container type.
+ */
+struct stack_st_POLICYINFO;
+{-
+    generate_stack_macros("POLICYINFO");
+-}
+/* clang-format on */
+
+/**
+ * @brief Certificate Policies extension: stack of POLICYINFO entries.
+ */
+typedef STACK_OF(POLICYINFO) CERTIFICATEPOLICIES;
+
+/**
+ * @brief Mapping from an issuer domain policy OID to a subject domain policy OID.
+ */
+typedef struct POLICY_MAPPING_st {
+    /** Policy OID in the issuer's policy domain. */
+    ASN1_OBJECT *issuerDomainPolicy;
+    /** Equivalent policy OID in the subject's policy domain. */
+    ASN1_OBJECT *subjectDomainPolicy;
+} POLICY_MAPPING;
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(POLICY_MAPPING) container type.
+ */
+struct stack_st_POLICY_MAPPING;
+{-
+    generate_stack_macros("POLICY_MAPPING");
+-}
+/* clang-format on */
+
+/**
+ * @brief Stack of POLICY_MAPPING entries used by the policy-mappings certificate extension.
+ */
+typedef STACK_OF(POLICY_MAPPING) POLICY_MAPPINGS;
+
+/**
+ * @brief Name Constraints subtree: a base GeneralName with optional minimum/maximum.
+ */
+typedef struct GENERAL_SUBTREE_st {
+    /** Base name that defines this permitted or excluded subtree. */
+    GENERAL_NAME *base;
+    /** Minimum distance below @c base, or NULL for the default of zero. */
+    ASN1_INTEGER *minimum;
+    /** Maximum distance below @c base, or NULL if unbounded. */
+    ASN1_INTEGER *maximum;
+} GENERAL_SUBTREE;
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(GENERAL_SUBTREE) container type.
+ */
+struct stack_st_GENERAL_SUBTREE;
+{-
+    generate_stack_macros("GENERAL_SUBTREE");
+-}
+/* clang-format on */
+
+struct NAME_CONSTRAINTS_st {
+    /** Subtrees the certificate subject names must fall within, or NULL if unrestricted. */
+    STACK_OF(GENERAL_SUBTREE) *permittedSubtrees;
+    /** Subtrees the certificate subject names must not fall within, or NULL if none. */
+    STACK_OF(GENERAL_SUBTREE) *excludedSubtrees;
+};
+
+/**
+ * @brief Policy Constraints extension: requireExplicitPolicy and inhibitPolicyMapping skip counts.
+ */
+typedef struct POLICY_CONSTRAINTS_st {
+    /** Skip certificates before an explicit policy is required, or NULL if absent. */
+    ASN1_INTEGER *requireExplicitPolicy;
+    /** Skip certificates before policy mapping is inhibited, or NULL if absent. */
+    ASN1_INTEGER *inhibitPolicyMapping;
+} POLICY_CONSTRAINTS;
+
+/* Proxy certificate structures, see RFC 3820 */
+/**
+ * @brief Proxy certificate policy: language OID and optional policy octets (RFC 3820).
+ */
+typedef struct PROXY_POLICY_st {
+    /** OID identifying the proxy policy language. */
+    ASN1_OBJECT *policyLanguage;
+    /** Optional policy octets interpreted according to @c policyLanguage. */
+    ASN1_OCTET_STRING *policy;
+} PROXY_POLICY;
+
+/**
+ * @brief Proxy Certificate Information extension (RFC 3820): path length and proxy policy.
+ */
+typedef struct PROXY_CERT_INFO_EXTENSION_st {
+    /** Maximum depth of proxy certificates below this one, or NULL if unlimited. */
+    ASN1_INTEGER *pcPathLengthConstraint;
+    /** Proxy policy language and optional policy value. */
+    PROXY_POLICY *proxyPolicy;
+} PROXY_CERT_INFO_EXTENSION;
+
+/**
+ * @brief Allocate a new PROXY_POLICY structure.
+ * @return New PROXY_POLICY, or NULL on allocation failure.
+ */
+PROXY_POLICY *PROXY_POLICY_new(void);
+/**
+ * @brief Free a PROXY_POLICY structure and its OID/policy octets.
+ * @param a Policy object to free, or NULL.
+ */
+void PROXY_POLICY_free(PROXY_POLICY *a);
+/**
+ * @brief Decode a PROXY_POLICY from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded PROXY_POLICY, or NULL on error.
+ */
+PROXY_POLICY *d2i_PROXY_POLICY(PROXY_POLICY **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a PROXY_POLICY to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_PROXY_POLICY(const PROXY_POLICY *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for PROXY_POLICY.
+ * @return Pointer to the static ASN1_ITEM for PROXY_POLICY.
+ */
+const ASN1_ITEM *PROXY_POLICY_it(void);
+/**
+ * @brief Allocate a new Proxy Certificate Information extension value.
+ * @return New PROXY_CERT_INFO_EXTENSION, or NULL on allocation failure.
+ */
+PROXY_CERT_INFO_EXTENSION *PROXY_CERT_INFO_EXTENSION_new(void);
+/**
+ * @brief Free a PROXY_CERT_INFO_EXTENSION structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void PROXY_CERT_INFO_EXTENSION_free(PROXY_CERT_INFO_EXTENSION *a);
+/**
+ * @brief Decode a PROXY_CERT_INFO_EXTENSION structure from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded PROXY_CERT_INFO_EXTENSION, or NULL on error.
+ */
+PROXY_CERT_INFO_EXTENSION *d2i_PROXY_CERT_INFO_EXTENSION(PROXY_CERT_INFO_EXTENSION **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a Proxy Certificate Information extension value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_PROXY_CERT_INFO_EXTENSION(const PROXY_CERT_INFO_EXTENSION *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for PROXY_CERT_INFO_EXTENSION.
+ * @return Pointer to the static ASN1_ITEM for PROXY_CERT_INFO_EXTENSION.
+ */
+const ASN1_ITEM *PROXY_CERT_INFO_EXTENSION_it(void);
+
+struct ISSUING_DIST_POINT_st {
+    /** Distribution point name for this issuingDistributionPoint, or NULL if omitted. */
+    DIST_POINT_NAME *distpoint;
+    /** ASN.1 BOOLEAN: when set, the CRL covers end-entity certificates only. */
+    int onlyuser;
+    /** ASN.1 BOOLEAN: when set, the CRL covers CA certificates only. */
+    int onlyCA;
+    /** Optional ReasonFlags bit string limiting which revocation reasons are covered. */
+    ASN1_BIT_STRING *onlysomereasons;
+    /** ASN.1 BOOLEAN: when set, certificate issuer may differ from the CRL issuer. */
+    int indirectCRL;
+    /** ASN.1 BOOLEAN: when set, the CRL covers attribute certificates only. */
+    int onlyattr;
+};
+
+/* Values in idp_flags field */
+/* IDP present */
+#define IDP_PRESENT 0x1
+/* IDP values inconsistent */
+#define IDP_INVALID 0x2
+/* onlyuser true */
+#define IDP_ONLYUSER 0x4
+/* onlyCA true */
+#define IDP_ONLYCA 0x8
+/* onlyattr true */
+#define IDP_ONLYATTR 0x10
+/* indirectCRL true */
+#define IDP_INDIRECT 0x20
+/* onlysomereasons present */
+#define IDP_REASONS 0x40
+
+#define X509V3_conf_err(val) ERR_add_error_data(6, \
+    "section:", (val)->section,                    \
+    ",name:", (val)->name, ",value:", (val)->value)
+
+#define X509V3_set_ctx_test(ctx) \
+    X509V3_set_ctx(ctx, NULL, NULL, NULL, NULL, X509V3_CTX_TEST)
+#define X509V3_set_ctx_nodb(ctx) (ctx)->db = NULL;
+
+#define EXT_BITSTRING(nid, table) { nid, 0, ASN1_ITEM_ref(ASN1_BIT_STRING), \
+    0, 0, 0, 0,                                                             \
+    0, 0,                                                                   \
+    (X509V3_EXT_I2V)i2v_ASN1_BIT_STRING,                                    \
+    (X509V3_EXT_V2I)v2i_ASN1_BIT_STRING,                                    \
+    NULL, NULL,                                                             \
+    table }
+
+#define EXT_IA5STRING(nid) { nid, 0, ASN1_ITEM_ref(ASN1_IA5STRING), \
+    0, 0, 0, 0,                                                     \
+    (X509V3_EXT_I2S)i2s_ASN1_IA5STRING,                             \
+    (X509V3_EXT_S2I)s2i_ASN1_IA5STRING,                             \
+    0, 0, 0, 0,                                                     \
+    NULL }
+
+#define EXT_UTF8STRING(nid) { nid, 0, ASN1_ITEM_ref(ASN1_UTF8STRING), \
+    0, 0, 0, 0,                                                       \
+    (X509V3_EXT_I2S)i2s_ASN1_UTF8STRING,                              \
+    (X509V3_EXT_S2I)s2i_ASN1_UTF8STRING,                              \
+    0, 0, 0, 0,                                                       \
+    NULL }
+
+/* clang-format off */
+# define EXT_END { -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+/* clang-format on */
+
+/* X509_PURPOSE stuff */
+
+#define EXFLAG_BCONS 0x1
+#define EXFLAG_KUSAGE 0x2
+#define EXFLAG_XKUSAGE 0x4
+#define EXFLAG_NSCERT 0x8
+
+#define EXFLAG_CA 0x10
+#define EXFLAG_SI 0x20 /* self-issued, maybe not self-signed */
+#define EXFLAG_V1 0x40
+#define EXFLAG_INVALID 0x80
+/* EXFLAG_SET is set to indicate that some values have been precomputed */
+#define EXFLAG_SET 0x100
+#define EXFLAG_CRITICAL 0x200
+#define EXFLAG_PROXY 0x400
+
+#define EXFLAG_INVALID_POLICY 0x800
+#define EXFLAG_FRESHEST 0x1000
+#define EXFLAG_SS 0x2000 /* cert is apparently self-signed */
+
+#define EXFLAG_BCONS_CRITICAL 0x10000
+#define EXFLAG_AKID_CRITICAL 0x20000
+#define EXFLAG_SKID_CRITICAL 0x40000
+#define EXFLAG_SAN_CRITICAL 0x80000
+#define EXFLAG_NO_FINGERPRINT 0x100000
+
+#define KU_DIGITAL_SIGNATURE 0x0080
+#define KU_NON_REPUDIATION 0x0040
+#define KU_KEY_ENCIPHERMENT 0x0020
+#define KU_DATA_ENCIPHERMENT 0x0010
+#define KU_KEY_AGREEMENT 0x0008
+#define KU_KEY_CERT_SIGN 0x0004
+#define KU_CRL_SIGN 0x0002
+#define KU_ENCIPHER_ONLY 0x0001
+#define KU_DECIPHER_ONLY 0x8000
+
+#define NS_SSL_CLIENT 0x80
+#define NS_SSL_SERVER 0x40
+#define NS_SMIME 0x20
+#define NS_OBJSIGN 0x10
+#define NS_SSL_CA 0x04
+#define NS_SMIME_CA 0x02
+#define NS_OBJSIGN_CA 0x01
+#define NS_ANY_CA (NS_SSL_CA | NS_SMIME_CA | NS_OBJSIGN_CA)
+
+#define XKU_SSL_SERVER 0x1
+#define XKU_SSL_CLIENT 0x2
+#define XKU_SMIME 0x4
+#define XKU_CODE_SIGN 0x8
+#define XKU_SGC 0x10 /* Netscape or MS Server-Gated Crypto */
+#define XKU_OCSP_SIGN 0x20
+#define XKU_TIMESTAMP 0x40
+#define XKU_DVCS 0x80
+#define XKU_ANYEKU 0x100
+
+#define X509_PURPOSE_DYNAMIC 0x1
+#define X509_PURPOSE_DYNAMIC_NAME 0x2
+
+/**
+ * @brief Certificate purpose entry used by X509_check_purpose and related helpers.
+ */
+typedef struct x509_purpose_st {
+    /** Purpose identifier (X509_PURPOSE_SSL_CLIENT, X509_PURPOSE_SSL_SERVER, …). */
+    int purpose;
+    /** Default trust ID associated with this purpose. */
+    int trust; /* Default trust ID */
+    /** Flags such as X509_PURPOSE_DYNAMIC or X509_PURPOSE_DYNAMIC_NAME. */
+    int flags;
+    /** Callback that evaluates whether a certificate satisfies this purpose. */
+    int (*check_purpose)(const struct x509_purpose_st *, const X509 *, int);
+    /** Long human-readable purpose name. */
+    char *name;
+    /** Short purpose name. */
+    char *sname;
+    /** Application-specific data attached to a dynamically registered purpose. */
+    void *usr_data;
+} X509_PURPOSE;
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(X509_PURPOSE) container type.
+ */
+struct stack_st_X509_PURPOSE;
+{-
+    generate_stack_macros("X509_PURPOSE");
+-}
+/* clang-format on */
+
+#define X509_PURPOSE_SSL_CLIENT 1
+#define X509_PURPOSE_SSL_SERVER 2
+#define X509_PURPOSE_NS_SSL_SERVER 3
+#define X509_PURPOSE_SMIME_SIGN 4
+#define X509_PURPOSE_SMIME_ENCRYPT 5
+#define X509_PURPOSE_CRL_SIGN 6
+#define X509_PURPOSE_ANY 7
+#define X509_PURPOSE_OCSP_HELPER 8
+#define X509_PURPOSE_TIMESTAMP_SIGN 9
+#define X509_PURPOSE_CODE_SIGN 10
+
+#define X509_PURPOSE_MIN 1
+#define X509_PURPOSE_MAX 10
+
+/* Flags for X509V3_EXT_print() */
+
+#define X509V3_EXT_UNKNOWN_MASK (0xfL << 16)
+/* Return error for unknown extensions */
+#define X509V3_EXT_DEFAULT 0
+/* Print error for unknown extensions */
+#define X509V3_EXT_ERROR_UNKNOWN (1L << 16)
+/* ASN1 parse unknown extensions */
+#define X509V3_EXT_PARSE_UNKNOWN (2L << 16)
+/* BIO_dump unknown extensions */
+#define X509V3_EXT_DUMP_UNKNOWN (3L << 16)
+
+/* Flags for X509V3_add1_i2d */
+
+#define X509V3_ADD_OP_MASK 0xfL
+#define X509V3_ADD_DEFAULT 0L
+#define X509V3_ADD_APPEND 1L
+#define X509V3_ADD_REPLACE 2L
+#define X509V3_ADD_REPLACE_EXISTING 3L
+#define X509V3_ADD_KEEP_EXISTING 4L
+#define X509V3_ADD_DELETE 5L
+#define X509V3_ADD_SILENT 0x10
+
+/**
+ * @brief Allocate a new Basic Constraints extension value.
+ * @return New BASIC_CONSTRAINTS, or NULL on allocation failure.
+ */
+BASIC_CONSTRAINTS *BASIC_CONSTRAINTS_new(void);
+/**
+ * @brief Free a BASIC_CONSTRAINTS structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void BASIC_CONSTRAINTS_free(BASIC_CONSTRAINTS *a);
+/**
+ * @brief Decode a Basic Constraints extension value from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded BASIC_CONSTRAINTS, or NULL on error.
+ */
+BASIC_CONSTRAINTS *d2i_BASIC_CONSTRAINTS(BASIC_CONSTRAINTS **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a Basic Constraints extension value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_BASIC_CONSTRAINTS(const BASIC_CONSTRAINTS *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for BASIC_CONSTRAINTS.
+ * @return Pointer to the static ASN1_ITEM for BASIC_CONSTRAINTS.
+ */
+const ASN1_ITEM *BASIC_CONSTRAINTS_it(void);
+
+/**
+ * @brief Allocate a new Strong Extranet (SXNET) extension value.
+ * @return New SXNET, or NULL on allocation failure.
+ */
+SXNET *SXNET_new(void);
+/**
+ * @brief Free an SXNET structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void SXNET_free(SXNET *a);
+/**
+ * @brief Decode an SXNET (Strong Extranet) value from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded SXNET, or NULL on error.
+ */
+SXNET *d2i_SXNET(SXNET **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an SXNET value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_SXNET(const SXNET *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for SXNET.
+ * @return Pointer to the static ASN1_ITEM for SXNET.
+ */
+const ASN1_ITEM *SXNET_it(void);
+/**
+ * @brief Allocate a new Strong Extranet (SXNET) identifier.
+ * @return New SXNETID, or NULL on allocation failure.
+ */
+SXNETID *SXNETID_new(void);
+/**
+ * @brief Free a Strong Extranet (SXNET) identifier and its contents.
+ * @param a Value to free, or NULL.
+ */
+void SXNETID_free(SXNETID *a);
+/**
+ * @brief Decode an SXNETID from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded SXNETID, or NULL on error.
+ */
+SXNETID *d2i_SXNETID(SXNETID **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an SXNETID value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_SXNETID(const SXNETID *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for SXNETID.
+ * @return Pointer to the static ASN1_ITEM for SXNETID.
+ */
+const ASN1_ITEM *SXNETID_it(void);
+
+/**
+ * @brief Allocate a new Issuer Signing Tool extension value.
+ * @return New ISSUER_SIGN_TOOL, or NULL on allocation failure.
+ */
+ISSUER_SIGN_TOOL *ISSUER_SIGN_TOOL_new(void);
+/**
+ * @brief Free an ISSUER_SIGN_TOOL structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ISSUER_SIGN_TOOL_free(ISSUER_SIGN_TOOL *a);
+/**
+ * @brief Decode an Issuer Signing Tool extension value from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ISSUER_SIGN_TOOL, or NULL on error.
+ */
+ISSUER_SIGN_TOOL *d2i_ISSUER_SIGN_TOOL(ISSUER_SIGN_TOOL **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ISSUER_SIGN_TOOL value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ISSUER_SIGN_TOOL(const ISSUER_SIGN_TOOL *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ISSUER_SIGN_TOOL.
+ * @return Pointer to the static ASN1_ITEM for ISSUER_SIGN_TOOL.
+ */
+const ASN1_ITEM *ISSUER_SIGN_TOOL_it(void);
+
+/**
+ * @brief Add a Strong Extranet zone/user id using an ASCII zone number.
+ * @param psx Address of an SXNET pointer; allocates a new SXNET when *@p psx is NULL.
+ * @param zone Zone identifier as a decimal ASCII integer string.
+ * @param user User identifier octets (not necessarily NUL-terminated when @p userlen >= 0).
+ * @param userlen Length of @p user in bytes, or -1 to use strlen(@p user); must be at most 64.
+ * @return 1 on success, or 0 on error.
+ */
+int SXNET_add_id_asc(SXNET **psx, const char *zone, const char *user, int userlen);
+/**
+ * @brief Add a Strong Extranet zone/user id using an unsigned long zone number.
+ * @param psx Address of an SXNET pointer; allocates a new SXNET when *@p psx is NULL.
+ * @param lzone Zone identifier as an unsigned long.
+ * @param user User identifier octets (not necessarily NUL-terminated when @p userlen >= 0).
+ * @param userlen Length of @p user in bytes, or -1 to use strlen(@p user); must be at most 64.
+ * @return 1 on success, or 0 on error.
+ */
+int SXNET_add_id_ulong(SXNET **psx, unsigned long lzone, const char *user,
+    int userlen);
+/**
+ * @brief Add a Strong Extranet zone/user id using an ASN.1 INTEGER zone number.
+ * @param psx Address of an SXNET pointer; allocates a new SXNET when *@p psx is NULL.
+ * @param izone Zone identifier; ownership transfers to the SXNET on success.
+ * @param user User identifier octets (not necessarily NUL-terminated when @p userlen >= 0).
+ * @param userlen Length of @p user in bytes, or -1 to use strlen(@p user); must be at most 64.
+ * @return 1 on success, or 0 on error.
+ */
+int SXNET_add_id_INTEGER(SXNET **psx, ASN1_INTEGER *izone, const char *user,
+    int userlen);
+
+/**
+ * @brief Look up the user id for a zone given as an ASCII decimal string.
+ * @param sx SXNET extension to search.
+ * @param zone Zone identifier as a decimal ASCII integer string.
+ * @return Pointer to the matching user OCTET STRING inside @p sx, or NULL if not found.
+ */
+ASN1_OCTET_STRING *SXNET_get_id_asc(SXNET *sx, const char *zone);
+/**
+ * @brief Look up the user id for a zone given as an unsigned long.
+ * @param sx SXNET extension to search.
+ * @param lzone Zone identifier as an unsigned long.
+ * @return Pointer to the matching user OCTET STRING inside @p sx, or NULL if not found.
+ */
+ASN1_OCTET_STRING *SXNET_get_id_ulong(SXNET *sx, unsigned long lzone);
+/**
+ * @brief Look up the user id for a zone given as an ASN.1 INTEGER.
+ * @param sx SXNET extension to search.
+ * @param zone Zone identifier to match.
+ * @return Pointer to the matching user OCTET STRING inside @p sx, or NULL if not found.
+ */
+ASN1_OCTET_STRING *SXNET_get_id_INTEGER(SXNET *sx, ASN1_INTEGER *zone);
+
+/**
+ * @brief Allocate a new Authority Key Identifier extension value.
+ * @return New AUTHORITY_KEYID, or NULL on allocation failure.
+ */
+AUTHORITY_KEYID *AUTHORITY_KEYID_new(void);
+/**
+ * @brief Free an AUTHORITY_KEYID structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void AUTHORITY_KEYID_free(AUTHORITY_KEYID *a);
+/**
+ * @brief Decode an Authority Key Identifier extension value from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded AUTHORITY_KEYID, or NULL on error.
+ */
+AUTHORITY_KEYID *d2i_AUTHORITY_KEYID(AUTHORITY_KEYID **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an Authority Key Identifier extension value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_AUTHORITY_KEYID(const AUTHORITY_KEYID *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for AUTHORITY_KEYID.
+ * @return Pointer to the static ASN1_ITEM for AUTHORITY_KEYID.
+ */
+const ASN1_ITEM *AUTHORITY_KEYID_it(void);
+
+/**
+ * @brief Allocate a new Private Key Usage Period extension value.
+ * @return New PKEY_USAGE_PERIOD, or NULL on allocation failure.
+ */
+PKEY_USAGE_PERIOD *PKEY_USAGE_PERIOD_new(void);
+/**
+ * @brief Free a PKEY_USAGE_PERIOD structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void PKEY_USAGE_PERIOD_free(PKEY_USAGE_PERIOD *a);
+/**
+ * @brief Decode a Private Key Usage Period extension value from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded PKEY_USAGE_PERIOD, or NULL on error.
+ */
+PKEY_USAGE_PERIOD *d2i_PKEY_USAGE_PERIOD(PKEY_USAGE_PERIOD **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a Private Key Usage Period extension value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_PKEY_USAGE_PERIOD(const PKEY_USAGE_PERIOD *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for PKEY_USAGE_PERIOD.
+ * @return Pointer to the static ASN1_ITEM for PKEY_USAGE_PERIOD.
+ */
+const ASN1_ITEM *PKEY_USAGE_PERIOD_it(void);
+
+/**
+ * @brief Allocate a new GeneralName value.
+ * @return New GENERAL_NAME, or NULL on allocation failure.
+ */
+GENERAL_NAME *GENERAL_NAME_new(void);
+/**
+ * @brief Free a GENERAL_NAME structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void GENERAL_NAME_free(GENERAL_NAME *a);
+/**
+ * @brief Decode a GeneralName from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded GENERAL_NAME, or NULL on error.
+ */
+GENERAL_NAME *d2i_GENERAL_NAME(GENERAL_NAME **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a GeneralName to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_GENERAL_NAME(const GENERAL_NAME *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for GENERAL_NAME.
+ * @return Pointer to the static ASN1_ITEM for GENERAL_NAME.
+ */
+const ASN1_ITEM *GENERAL_NAME_it(void);
+/**
+ * @brief Duplicate a GENERAL_NAME structure.
+ * @param a Value to copy.
+ * @return Newly allocated copy, or NULL on error.
+ */
+GENERAL_NAME *GENERAL_NAME_dup(const GENERAL_NAME *a);
+/**
+ * @brief Compare two GENERAL_NAME values for equality.
+ * @param a First name.
+ * @param b Second name.
+ * @return 0 if equal, or non-zero if they differ / on error.
+ */
+int GENERAL_NAME_cmp(GENERAL_NAME *a, GENERAL_NAME *b);
+
+/**
+ * @brief Build an ASN.1 BIT STRING from named bit configuration values.
+ * @param method Extension method whose @c usr_data lists BIT_STRING_BITNAME entries.
+ * @param ctx Extension construction context (unused by the default implementation).
+ * @param nval Stack of configuration names selecting bits to set.
+ * @return New ASN1_BIT_STRING with the selected bits set, or NULL on error.
+ */
+ASN1_BIT_STRING *v2i_ASN1_BIT_STRING(X509V3_EXT_METHOD *method,
+    X509V3_CTX *ctx,
+    STACK_OF(CONF_VALUE) *nval);
+/**
+ * @brief Convert an ASN1_BIT_STRING into named CONF_VALUE entries using @p method bit names.
+ * @param method Extension method whose @c usr_data lists BIT_STRING_BITNAME entries.
+ * @param bits Bit string to convert.
+ * @param extlist Existing stack to append to, or NULL to allocate a new one.
+ * @return Stack of CONF_VALUE entries, or NULL on error.
+ */
+STACK_OF(CONF_VALUE) *i2v_ASN1_BIT_STRING(X509V3_EXT_METHOD *method,
+    ASN1_BIT_STRING *bits,
+    STACK_OF(CONF_VALUE) *extlist);
+/**
+ * @brief Convert an ASN1_IA5STRING to a newly allocated C string.
+ * @param method Extension method (unused; may be NULL).
+ * @param ia5 IA5String value to convert.
+ * @return Newly allocated C string, or NULL on error; free with OPENSSL_free.
+ */
+char *i2s_ASN1_IA5STRING(X509V3_EXT_METHOD *method, ASN1_IA5STRING *ia5);
+/**
+ * @brief Parse a configuration string into an ASN.1 IA5String.
+ * @param method Extension method (unused by the default implementation).
+ * @param ctx Extension construction context (unused by the default implementation).
+ * @param str NUL-terminated string to copy into a new ASN1_IA5STRING.
+ * @return New ASN1_IA5STRING, or NULL on error.
+ */
+ASN1_IA5STRING *s2i_ASN1_IA5STRING(X509V3_EXT_METHOD *method,
+    X509V3_CTX *ctx, const char *str);
+/**
+ * @brief Convert an ASN1_UTF8STRING to a newly allocated C string.
+ * @param method Extension method (unused; may be NULL).
+ * @param utf8 UTF8String value to convert.
+ * @return Newly allocated C string, or NULL on error; free with OPENSSL_free.
+ */
+char *i2s_ASN1_UTF8STRING(X509V3_EXT_METHOD *method, ASN1_UTF8STRING *utf8);
+/**
+ * @brief Parse a configuration string into an ASN.1 UTF8String.
+ * @param method Extension method (unused by the default implementation).
+ * @param ctx Extension construction context (unused by the default implementation).
+ * @param str NUL-terminated UTF-8 string to copy into a new ASN1_UTF8STRING.
+ * @return New ASN1_UTF8STRING, or NULL on error.
+ */
+ASN1_UTF8STRING *s2i_ASN1_UTF8STRING(X509V3_EXT_METHOD *method,
+    X509V3_CTX *ctx, const char *str);
+
+/**
+ * @brief Append a GeneralName to a configuration name/value stack for extension printing.
+ * @param method Extension method (may be NULL).
+ * @param gen GeneralName to convert.
+ * @param ret Existing CONF_VALUE stack to append to, or NULL to allocate a new one.
+ * @return The resulting CONF_VALUE stack, or NULL on error.
+ */
+STACK_OF(CONF_VALUE) *i2v_GENERAL_NAME(X509V3_EXT_METHOD *method,
+    GENERAL_NAME *gen,
+    STACK_OF(CONF_VALUE) *ret);
+/**
+ * @brief Print a GeneralName to a BIO in human-readable form.
+ * @param out Destination BIO.
+ * @param gen GeneralName to print.
+ * @return 1 on success.
+ */
+int GENERAL_NAME_print(BIO *out, GENERAL_NAME *gen);
+
+/**
+ * @brief Allocate a new GeneralNames (SEQUENCE OF GeneralName) value.
+ * @return New GENERAL_NAMES, or NULL on allocation failure.
+ */
+GENERAL_NAMES *GENERAL_NAMES_new(void);
+/**
+ * @brief Free a GENERAL_NAMES structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void GENERAL_NAMES_free(GENERAL_NAMES *a);
+/**
+ * @brief Decode a GeneralNames value from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded GENERAL_NAMES, or NULL on error.
+ */
+GENERAL_NAMES *d2i_GENERAL_NAMES(GENERAL_NAMES **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a GeneralNames value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_GENERAL_NAMES(const GENERAL_NAMES *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for GENERAL_NAMES.
+ * @return Pointer to the static ASN1_ITEM for GENERAL_NAMES.
+ */
+const ASN1_ITEM *GENERAL_NAMES_it(void);
+
+/**
+ * @brief Convert a GeneralNames set into a configuration name/value stack.
+ * @param method Extension method (may be NULL).
+ * @param gen GeneralNames to convert.
+ * @param extlist Existing CONF_VALUE stack to append to, or NULL to allocate a new one.
+ * @return The resulting CONF_VALUE stack, or NULL on error.
+ */
+STACK_OF(CONF_VALUE) *i2v_GENERAL_NAMES(X509V3_EXT_METHOD *method,
+    GENERAL_NAMES *gen,
+    STACK_OF(CONF_VALUE) *extlist);
+/**
+ * @brief Parse configuration name/value pairs into a GeneralNames set.
+ * @param method Extension method describing how each name form is parsed.
+ * @param ctx Extension construction context.
+ * @param nval Stack of configuration entries, one GeneralName each.
+ * @return New GENERAL_NAMES, or NULL on error.
+ */
+GENERAL_NAMES *v2i_GENERAL_NAMES(const X509V3_EXT_METHOD *method,
+    X509V3_CTX *ctx, STACK_OF(CONF_VALUE) *nval);
+
+/**
+ * @brief Allocate a new otherName GeneralName payload.
+ * @return New OTHERNAME, or NULL on allocation failure.
+ */
+OTHERNAME *OTHERNAME_new(void);
+/**
+ * @brief Free an OTHERNAME structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void OTHERNAME_free(OTHERNAME *a);
+/**
+ * @brief Decode an otherName value from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded OTHERNAME, or NULL on error.
+ */
+OTHERNAME *d2i_OTHERNAME(OTHERNAME **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an otherName value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_OTHERNAME(const OTHERNAME *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for OTHERNAME.
+ * @return Pointer to the static ASN1_ITEM for OTHERNAME.
+ */
+const ASN1_ITEM *OTHERNAME_it(void);
+/**
+ * @brief Allocate a new EDI party name GeneralName payload.
+ * @return New EDIPARTYNAME, or NULL on allocation failure.
+ */
+EDIPARTYNAME *EDIPARTYNAME_new(void);
+/**
+ * @brief Free an EDIPARTYNAME structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void EDIPARTYNAME_free(EDIPARTYNAME *a);
+/**
+ * @brief Decode an EDI party name from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded EDIPARTYNAME, or NULL on error.
+ */
+EDIPARTYNAME *d2i_EDIPARTYNAME(EDIPARTYNAME **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an EDI party name to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_EDIPARTYNAME(const EDIPARTYNAME *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for EDIPARTYNAME.
+ * @return Pointer to the static ASN1_ITEM for EDIPARTYNAME.
+ */
+const ASN1_ITEM *EDIPARTYNAME_it(void);
+/**
+ * @brief Compare two otherName values by type OID and typed value.
+ * @param a First OTHERNAME, or NULL.
+ * @param b Second OTHERNAME, or NULL.
+ * @return 0 if equal, or a non-zero value if they differ (including when either is NULL).
+ */
+int OTHERNAME_cmp(OTHERNAME *a, OTHERNAME *b);
+/**
+ * @brief Set the type and owned value pointer of a GeneralName.
+ * @param a GeneralName to update.
+ * @param type Name form (GEN_EMAIL, GEN_DNS, GEN_OTHERNAME, and so on).
+ * @param value Typed payload ownership transferred into @p a for @p type.
+ */
+void GENERAL_NAME_set0_value(GENERAL_NAME *a, int type, void *value);
+/**
+ * @brief Return the typed payload pointer stored in a GeneralName.
+ * @param a GeneralName to query.
+ * @param ptype Optional out-parameter receiving the name form (GEN_*), or NULL to skip.
+ * @return Internal value pointer for the current type (do not free), or NULL if unset.
+ */
+void *GENERAL_NAME_get0_value(const GENERAL_NAME *a, int *ptype);
+/**
+ * @brief Set a GeneralName to type otherName, taking ownership of @p oid and @p value.
+ * @param gen GeneralName to update.
+ * @param oid otherName type OID.
+ * @param value otherName value as an ASN1_TYPE.
+ * @return 1 on success, or 0 on failure.
+ */
+int GENERAL_NAME_set0_othername(GENERAL_NAME *gen,
+    ASN1_OBJECT *oid, ASN1_TYPE *value);
+/**
+ * @brief Retrieve the OID and typed value from a GeneralName of type otherName.
+ * @param gen GeneralName to query.
+ * @param poid Optional output for the otherName type OID (not duplicated).
+ * @param pvalue Optional output for the otherName ASN1_TYPE value (not duplicated).
+ * @return 1 if @p gen is GEN_OTHERNAME, or 0 otherwise.
+ */
+int GENERAL_NAME_get0_otherName(const GENERAL_NAME *gen,
+    ASN1_OBJECT **poid, ASN1_TYPE **pvalue);
+
+/**
+ * @brief Format an ASN.1 OCTET STRING as a hexadecimal configuration string.
+ * @param method Extension method (unused by the default implementation).
+ * @param ia5 Octet string to convert.
+ * @return Newly allocated NUL-terminated hex string, or NULL on error; caller must free it.
+ */
+char *i2s_ASN1_OCTET_STRING(X509V3_EXT_METHOD *method,
+    const ASN1_OCTET_STRING *ia5);
+/**
+ * @brief Parse a configuration string into an ASN.1 OCTET STRING.
+ * @param method Extension method (unused by the default implementation).
+ * @param ctx Extension construction context (unused by the default implementation).
+ * @param str NUL-terminated string whose bytes become the OCTET STRING contents.
+ * @return New ASN1_OCTET_STRING, or NULL on error.
+ */
+ASN1_OCTET_STRING *s2i_ASN1_OCTET_STRING(X509V3_EXT_METHOD *method,
+    X509V3_CTX *ctx, const char *str);
+
+/**
+ * @brief Allocate a new Extended Key Usage extension value.
+ * @return New EXTENDED_KEY_USAGE, or NULL on allocation failure.
+ */
+EXTENDED_KEY_USAGE *EXTENDED_KEY_USAGE_new(void);
+/**
+ * @brief Free an EXTENDED_KEY_USAGE structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void EXTENDED_KEY_USAGE_free(EXTENDED_KEY_USAGE *a);
+/**
+ * @brief Decode an Extended Key Usage extension value from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded EXTENDED_KEY_USAGE, or NULL on error.
+ */
+EXTENDED_KEY_USAGE *d2i_EXTENDED_KEY_USAGE(EXTENDED_KEY_USAGE **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an Extended Key Usage extension value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_EXTENDED_KEY_USAGE(const EXTENDED_KEY_USAGE *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for EXTENDED_KEY_USAGE.
+ * @return Pointer to the static ASN1_ITEM for EXTENDED_KEY_USAGE.
+ */
+const ASN1_ITEM *EXTENDED_KEY_USAGE_it(void);
+/**
+ * @brief Write the accessMethod OID of an AccessDescription to a BIO.
+ * @param bp Destination BIO.
+ * @param a AccessDescription whose method OID is printed.
+ * @return Number of characters written by the underlying i2a helper (typically 2).
+ */
+int i2a_ACCESS_DESCRIPTION(BIO *bp, const ACCESS_DESCRIPTION *a);
+
+/**
+ * @brief Allocate an empty TLS Feature extension value (stack of feature integers).
+ * @return New TLS_FEATURE, or NULL on allocation failure.
+ */
+TLS_FEATURE *TLS_FEATURE_new(void);
+/**
+ * @brief Free a TLS Feature extension value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void TLS_FEATURE_free(TLS_FEATURE *a);
+
+/**
+ * @brief Allocate an empty Certificate Policies extension value.
+ * @return New CERTIFICATEPOLICIES, or NULL on allocation failure.
+ */
+CERTIFICATEPOLICIES *CERTIFICATEPOLICIES_new(void);
+/**
+ * @brief Free a Certificate Policies extension value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void CERTIFICATEPOLICIES_free(CERTIFICATEPOLICIES *a);
+/**
+ * @brief Decode a DER-encoded certificatePolicies extension into a CERTIFICATEPOLICIES stack.
+ * @param a Optional out-parameter receiving the result (reuses *@p a when non-NULL).
+ * @param in Address of a pointer to the DER input; advanced past the consumed bytes on success.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded CERTIFICATEPOLICIES stack, or NULL on error.
+ */
+CERTIFICATEPOLICIES *d2i_CERTIFICATEPOLICIES(CERTIFICATEPOLICIES **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a Certificate Policies extension value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_CERTIFICATEPOLICIES(const CERTIFICATEPOLICIES *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for CERTIFICATEPOLICIES.
+ * @return Pointer to the static ASN1_ITEM for CERTIFICATEPOLICIES.
+ */
+const ASN1_ITEM *CERTIFICATEPOLICIES_it(void);
+/**
+ * @brief Allocate an empty certificate policy information (POLICYINFO) value.
+ * @return New POLICYINFO, or NULL on allocation failure; free with POLICYINFO_free().
+ */
+POLICYINFO *POLICYINFO_new(void);
+/**
+ * @brief Free a certificate policy information value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void POLICYINFO_free(POLICYINFO *a);
+/**
+ * @brief Decode a certificate policy information value from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded POLICYINFO, or NULL on error.
+ */
+POLICYINFO *d2i_POLICYINFO(POLICYINFO **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a certificate policy information value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_POLICYINFO(const POLICYINFO *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for POLICYINFO.
+ * @return Pointer to the static ASN1_ITEM for POLICYINFO.
+ */
+const ASN1_ITEM *POLICYINFO_it(void);
+/**
+ * @brief Allocate a new certificate policy qualifier information value.
+ * @return New POLICYQUALINFO, or NULL on allocation failure.
+ */
+POLICYQUALINFO *POLICYQUALINFO_new(void);
+/**
+ * @brief Free a policy qualifier information value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void POLICYQUALINFO_free(POLICYQUALINFO *a);
+/**
+ * @brief Decode a policy qualifier information value from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded POLICYQUALINFO, or NULL on error.
+ */
+POLICYQUALINFO *d2i_POLICYQUALINFO(POLICYQUALINFO **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a policy qualifier information value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_POLICYQUALINFO(const POLICYQUALINFO *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for POLICYQUALINFO.
+ * @return Pointer to the static ASN1_ITEM for POLICYQUALINFO.
+ */
+const ASN1_ITEM *POLICYQUALINFO_it(void);
+/**
+ * @brief Allocate an empty user notice policy qualifier.
+ * @return New USERNOTICE, or NULL on allocation failure.
+ */
+USERNOTICE *USERNOTICE_new(void);
+/**
+ * @brief Free a user notice policy qualifier and its contents.
+ * @param a Value to free, or NULL.
+ */
+void USERNOTICE_free(USERNOTICE *a);
+/**
+ * @brief Decode a user notice policy qualifier from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded USERNOTICE, or NULL on error.
+ */
+USERNOTICE *d2i_USERNOTICE(USERNOTICE **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a USERNOTICE structure to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_USERNOTICE(const USERNOTICE *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for USERNOTICE.
+ * @return Pointer to the static ASN1_ITEM for USERNOTICE.
+ */
+const ASN1_ITEM *USERNOTICE_it(void);
+/**
+ * @brief Allocate an empty certificate-policy notice reference (organization + notice numbers).
+ * @return Newly allocated NOTICEREF, or NULL on allocation failure.
+ */
+NOTICEREF *NOTICEREF_new(void);
+/**
+ * @brief Free a certificate-policy notice reference and its contents.
+ * @param a Value to free, or NULL.
+ */
+void NOTICEREF_free(NOTICEREF *a);
+/**
+ * @brief Decode a certificate-policy notice reference from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded NOTICEREF, or NULL on error.
+ */
+NOTICEREF *d2i_NOTICEREF(NOTICEREF **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a certificate-policy notice reference to DER.
+ * @param a Notice reference to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_NOTICEREF(const NOTICEREF *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for NOTICEREF.
+ * @return Pointer to the static ASN1_ITEM for NOTICEREF.
+ */
+const ASN1_ITEM *NOTICEREF_it(void);
+
+/**
+ * @brief Allocate a new CRL Distribution Points extension value.
+ * @return New CRL_DIST_POINTS, or NULL on allocation failure.
+ */
+CRL_DIST_POINTS *CRL_DIST_POINTS_new(void);
+/**
+ * @brief Free a CRL Distribution Points extension value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void CRL_DIST_POINTS_free(CRL_DIST_POINTS *a);
+/**
+ * @brief Decode a CRL Distribution Points extension value from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded CRL_DIST_POINTS, or NULL on error.
+ */
+CRL_DIST_POINTS *d2i_CRL_DIST_POINTS(CRL_DIST_POINTS **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a CRL Distribution Points extension value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_CRL_DIST_POINTS(const CRL_DIST_POINTS *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for CRL_DIST_POINTS.
+ * @return Pointer to the static ASN1_ITEM for CRL_DIST_POINTS.
+ */
+const ASN1_ITEM *CRL_DIST_POINTS_it(void);
+/**
+ * @brief Allocate a new CRL distribution point value.
+ * @return New DIST_POINT, or NULL on allocation failure.
+ */
+DIST_POINT *DIST_POINT_new(void);
+/**
+ * @brief Free a CRL distribution point value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void DIST_POINT_free(DIST_POINT *a);
+/**
+ * @brief Decode a CRL distribution point from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded DIST_POINT, or NULL on error.
+ */
+DIST_POINT *d2i_DIST_POINT(DIST_POINT **a, const unsigned char **in, long len);
+/**
+ * @brief DER-encode a DistributionPoint structure.
+ * @param a Distribution point to encode.
+ * @param out Optional; when non-NULL, receives allocated DER or advances an existing buffer pointer.
+ * @return Length of the DER encoding in bytes, or a negative value on error.
+ */
+int i2d_DIST_POINT(const DIST_POINT *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for DIST_POINT.
+ * @return Pointer to the static ASN1_ITEM for DIST_POINT.
+ */
+const ASN1_ITEM *DIST_POINT_it(void);
+/**
+ * @brief Allocate a new distribution point name value.
+ * @return New DIST_POINT_NAME, or NULL on allocation failure.
+ */
+DIST_POINT_NAME *DIST_POINT_NAME_new(void);
+/**
+ * @brief Free a distribution point name value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void DIST_POINT_NAME_free(DIST_POINT_NAME *a);
+/**
+ * @brief Decode a distribution point name from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded DIST_POINT_NAME, or NULL on error.
+ */
+DIST_POINT_NAME *d2i_DIST_POINT_NAME(DIST_POINT_NAME **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a distribution point name to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_DIST_POINT_NAME(const DIST_POINT_NAME *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for DIST_POINT_NAME.
+ * @return Pointer to the static ASN1_ITEM for DIST_POINT_NAME.
+ */
+const ASN1_ITEM *DIST_POINT_NAME_it(void);
+/**
+ * @brief Allocate a new Issuing Distribution Point extension value.
+ * @return New ISSUING_DIST_POINT, or NULL on allocation failure.
+ */
+ISSUING_DIST_POINT *ISSUING_DIST_POINT_new(void);
+/**
+ * @brief Free an Issuing Distribution Point value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ISSUING_DIST_POINT_free(ISSUING_DIST_POINT *a);
+/**
+ * @brief Decode an Issuing Distribution Point extension value from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ISSUING_DIST_POINT, or NULL on error.
+ */
+ISSUING_DIST_POINT *d2i_ISSUING_DIST_POINT(ISSUING_DIST_POINT **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an Issuing Distribution Point extension value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ISSUING_DIST_POINT(const ISSUING_DIST_POINT *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ISSUING_DIST_POINT.
+ * @return Pointer to the static ASN1_ITEM for ISSUING_DIST_POINT.
+ */
+const ASN1_ITEM *ISSUING_DIST_POINT_it(void);
+
+/**
+ * @brief Fill a relative distribution-point name using an issuer X509_NAME.
+ * @param dpn Distribution point name of type relativename to complete.
+ * @param iname Issuer name prefixed to each relative RDN.
+ * @return 1 on success, or 0 on failure.
+ */
+int DIST_POINT_set_dpname(DIST_POINT_NAME *dpn, const X509_NAME *iname);
+
+/**
+ * @brief Check whether certificate subject names satisfy the given Name Constraints.
+ * @param x Certificate whose subject and subjectAltName are checked.
+ * @param nc Name Constraints extension value to apply.
+ * @return X509_V_OK (0) if compliant, or an X509_V_ERR_* code on violation or error.
+ */
+int NAME_CONSTRAINTS_check(X509 *x, NAME_CONSTRAINTS *nc);
+/**
+ * @brief Check whether the certificate Common Name satisfies Name Constraints.
+ * @param x Certificate whose subject CN is checked when not already covered by a DNS SAN.
+ * @param nc Name Constraints extension value to apply.
+ * @return X509_V_OK (0) if compliant, or an X509_V_ERR_* code on violation or error.
+ */
+int NAME_CONSTRAINTS_check_CN(X509 *x, NAME_CONSTRAINTS *nc);
+
+/**
+ * @brief Allocate a new AccessDescription value (Authority Info Access entry).
+ * @return New ACCESS_DESCRIPTION, or NULL on allocation failure.
+ */
+ACCESS_DESCRIPTION *ACCESS_DESCRIPTION_new(void);
+/**
+ * @brief Free an AccessDescription value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ACCESS_DESCRIPTION_free(ACCESS_DESCRIPTION *a);
+/**
+ * @brief Decode an AccessDescription from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ACCESS_DESCRIPTION, or NULL on error.
+ */
+ACCESS_DESCRIPTION *d2i_ACCESS_DESCRIPTION(ACCESS_DESCRIPTION **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an AccessDescription to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ACCESS_DESCRIPTION(const ACCESS_DESCRIPTION *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ACCESS_DESCRIPTION.
+ * @return Pointer to the static ASN1_ITEM for ACCESS_DESCRIPTION.
+ */
+const ASN1_ITEM *ACCESS_DESCRIPTION_it(void);
+/**
+ * @brief Allocate a new Authority Information Access extension value.
+ * @return New AUTHORITY_INFO_ACCESS, or NULL on allocation failure.
+ */
+AUTHORITY_INFO_ACCESS *AUTHORITY_INFO_ACCESS_new(void);
+/**
+ * @brief Free an Authority Information Access extension value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void AUTHORITY_INFO_ACCESS_free(AUTHORITY_INFO_ACCESS *a);
+/**
+ * @brief Decode an Authority Information Access extension value from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded AUTHORITY_INFO_ACCESS, or NULL on error.
+ */
+AUTHORITY_INFO_ACCESS *d2i_AUTHORITY_INFO_ACCESS(AUTHORITY_INFO_ACCESS **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an AuthorityInfoAccess syntax value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_AUTHORITY_INFO_ACCESS(const AUTHORITY_INFO_ACCESS *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for AUTHORITY_INFO_ACCESS.
+ * @return Pointer to the static ASN1_ITEM for AUTHORITY_INFO_ACCESS.
+ */
+const ASN1_ITEM *AUTHORITY_INFO_ACCESS_it(void);
+
+/**
+ * @brief Return the ASN.1 item descriptor for POLICY_MAPPING.
+ * @return Pointer to the static ASN1_ITEM for POLICY_MAPPING.
+ */
+const ASN1_ITEM *POLICY_MAPPING_it(void);
+/**
+ * @brief Allocate a new policy mapping value.
+ * @return New POLICY_MAPPING, or NULL on allocation failure.
+ */
+POLICY_MAPPING *POLICY_MAPPING_new(void);
+/**
+ * @brief Free a policy mapping value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void POLICY_MAPPING_free(POLICY_MAPPING *a);
+/**
+ * @brief Return the ASN.1 item descriptor for POLICY_MAPPINGS.
+ * @return Pointer to the static ASN1_ITEM for POLICY_MAPPINGS.
+ */
+const ASN1_ITEM *POLICY_MAPPINGS_it(void);
+
+/**
+ * @brief Return the ASN.1 item descriptor for GENERAL_SUBTREE.
+ * @return Pointer to the static ASN1_ITEM for GENERAL_SUBTREE.
+ */
+const ASN1_ITEM *GENERAL_SUBTREE_it(void);
+/**
+ * @brief Allocate a new general subtree (Name Constraints entry).
+ * @return New GENERAL_SUBTREE, or NULL on allocation failure.
+ */
+GENERAL_SUBTREE *GENERAL_SUBTREE_new(void);
+/**
+ * @brief Free a general subtree value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void GENERAL_SUBTREE_free(GENERAL_SUBTREE *a);
+
+/**
+ * @brief Return the ASN.1 item descriptor for NAME_CONSTRAINTS.
+ * @return Pointer to the static ASN1_ITEM for NAME_CONSTRAINTS.
+ */
+const ASN1_ITEM *NAME_CONSTRAINTS_it(void);
+/**
+ * @brief Allocate a new Name Constraints extension value.
+ * @return New NAME_CONSTRAINTS, or NULL on allocation failure.
+ */
+NAME_CONSTRAINTS *NAME_CONSTRAINTS_new(void);
+/**
+ * @brief Free a Name Constraints extension value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void NAME_CONSTRAINTS_free(NAME_CONSTRAINTS *a);
+
+/**
+ * @brief Allocate a new Policy Constraints extension value.
+ * @return New POLICY_CONSTRAINTS, or NULL on allocation failure.
+ */
+POLICY_CONSTRAINTS *POLICY_CONSTRAINTS_new(void);
+/**
+ * @brief Free a Policy Constraints extension value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void POLICY_CONSTRAINTS_free(POLICY_CONSTRAINTS *a);
+/**
+ * @brief Return the ASN.1 item descriptor for POLICY_CONSTRAINTS.
+ * @return Pointer to the static ASN1_ITEM for POLICY_CONSTRAINTS.
+ */
+const ASN1_ITEM *POLICY_CONSTRAINTS_it(void);
+
+/**
+ * @brief Parse a string into a GENERAL_NAME of the requested type.
+ * @param out Existing GENERAL_NAME to fill, or NULL to allocate a new one.
+ * @param method Extension method providing context for the conversion, or NULL.
+ * @param ctx Extension construction context, or NULL.
+ * @param gen_type GEN_* constant selecting the name form.
+ * @param value Textual representation of the name.
+ * @param is_nc Non-zero when parsing a name constraint rather than a general name.
+ * @return Populated GENERAL_NAME, or NULL on error.
+ */
+GENERAL_NAME *a2i_GENERAL_NAME(GENERAL_NAME *out,
+    const X509V3_EXT_METHOD *method,
+    X509V3_CTX *ctx, int gen_type,
+    const char *value, int is_nc);
+
+#ifdef OPENSSL_CONF_H
+/**
+ * @brief Parse a single configuration name/value into a GENERAL_NAME.
+ * @param method Extension method describing how the name form is parsed.
+ * @param ctx Extension construction context.
+ * @param cnf Configuration entry whose name selects the GEN_* form and whose value is the text.
+ * @return New GENERAL_NAME, or NULL on error.
+ */
+GENERAL_NAME *v2i_GENERAL_NAME(const X509V3_EXT_METHOD *method,
+    X509V3_CTX *ctx, CONF_VALUE *cnf);
+/**
+ * @brief Parse a configuration name/value into a GENERAL_NAME, optionally reusing @p out.
+ * @param out Existing GENERAL_NAME to fill, or NULL to allocate a new one.
+ * @param method Extension method describing how the name form is parsed.
+ * @param ctx Extension construction context.
+ * @param cnf Configuration entry whose name selects the GEN_* form and whose value is the text.
+ * @param is_nc Non-zero when parsing a name constraint rather than a general name.
+ * @return Populated GENERAL_NAME, or NULL on error.
+ */
+GENERAL_NAME *v2i_GENERAL_NAME_ex(GENERAL_NAME *out,
+    const X509V3_EXT_METHOD *method,
+    X509V3_CTX *ctx, CONF_VALUE *cnf,
+    int is_nc);
+
+/**
+ * @brief Free a CONF_VALUE previously produced for X.509v3 configuration helpers.
+ * @param val Configuration value to free, or NULL (no-op).
+ */
+void X509V3_conf_free(CONF_VALUE *val);
+
+/**
+ * @brief Create an X.509v3 extension from a configuration value identified by NID.
+ * @param conf Configuration object providing section and value lookups.
+ * @param ctx Extension construction context (issuer/subject/req/crl and flags).
+ * @param ext_nid NID of the extension type (for example NID_basic_constraints).
+ * @param value Extension value string, or a section reference starting with '@'.
+ * @return New X509_EXTENSION, or NULL on error.
+ */
+X509_EXTENSION *X509V3_EXT_nconf_nid(CONF *conf, X509V3_CTX *ctx, int ext_nid,
+    const char *value);
+/**
+ * @brief Create an X.509v3 extension from a named configuration value.
+ * @param conf Configuration object providing section and value lookups.
+ * @param ctx Extension construction context (issuer/subject/req/crl and flags).
+ * @param name Extension name or short name (for example "basicConstraints").
+ * @param value Extension value string, or a section reference starting with '@'.
+ * @return New X509_EXTENSION, or NULL on error.
+ */
+X509_EXTENSION *X509V3_EXT_nconf(CONF *conf, X509V3_CTX *ctx, const char *name,
+    const char *value);
+/**
+ * @brief Add all extensions from a configuration section to an extension stack.
+ * @param conf Configuration object containing @p section.
+ * @param ctx Extension construction context.
+ * @param section Name of the configuration section listing extensions.
+ * @param sk Address of a STACK_OF(X509_EXTENSION) to append to; allocated if *@p sk is NULL.
+ * @return 1 on success, or 0 on error.
+ */
+int X509V3_EXT_add_nconf_sk(CONF *conf, X509V3_CTX *ctx, const char *section,
+    STACK_OF(X509_EXTENSION) **sk);
+/**
+ * @brief Add all extensions from a configuration section to a certificate.
+ * @param conf Configuration object containing @p section.
+ * @param ctx Extension construction context.
+ * @param section Name of the configuration section listing extensions.
+ * @param cert Certificate that receives the extensions.
+ * @return 1 on success, or 0 on error.
+ */
+int X509V3_EXT_add_nconf(CONF *conf, X509V3_CTX *ctx, const char *section,
+    X509 *cert);
+/**
+ * @brief Add all extensions from a configuration section to a certificate request.
+ * @param conf Configuration object containing @p section.
+ * @param ctx Extension construction context.
+ * @param section Name of the configuration section listing extensions.
+ * @param req Certificate request that receives the extensions.
+ * @return 1 on success, or 0 on error.
+ */
+int X509V3_EXT_REQ_add_nconf(CONF *conf, X509V3_CTX *ctx, const char *section,
+    X509_REQ *req);
+/**
+ * @brief Add all extensions from a configuration section to a CRL.
+ * @param conf Configuration object containing @p section.
+ * @param ctx Extension construction context.
+ * @param section Name of the configuration section listing extensions.
+ * @param crl CRL that receives the extensions.
+ * @return 1 on success, or 0 on error.
+ */
+int X509V3_EXT_CRL_add_nconf(CONF *conf, X509V3_CTX *ctx, const char *section,
+    X509_CRL *crl);
+
+/**
+ * @brief Create an X.509v3 extension from an LHASH configuration by NID (legacy).
+ * @param conf Legacy LHASH_OF(CONF_VALUE) configuration database.
+ * @param ctx Extension construction context.
+ * @param ext_nid NID of the extension type to create.
+ * @param value Extension value string, or a section reference starting with '@'.
+ * @return New X509_EXTENSION, or NULL on error.
+ */
+X509_EXTENSION *X509V3_EXT_conf_nid(LHASH_OF(CONF_VALUE) *conf,
+    X509V3_CTX *ctx, int ext_nid,
+    const char *value);
+/**
+ * @brief Create an X.509v3 extension from a named LHASH configuration value (legacy).
+ * @param conf Legacy LHASH_OF(CONF_VALUE) configuration database.
+ * @param ctx Extension construction context.
+ * @param name Extension name or short name.
+ * @param value Extension value string, or a section reference starting with '@'.
+ * @return New X509_EXTENSION, or NULL on error.
+ */
+X509_EXTENSION *X509V3_EXT_conf(LHASH_OF(CONF_VALUE) *conf, X509V3_CTX *ctx,
+    const char *name, const char *value);
+/**
+ * @brief Add all extensions from an LHASH configuration section to a certificate (legacy).
+ * @param conf Legacy LHASH_OF(CONF_VALUE) configuration database.
+ * @param ctx Extension construction context.
+ * @param section Name of the configuration section listing extensions.
+ * @param cert Certificate that receives the extensions.
+ * @return 1 on success, or 0 on error.
+ */
+int X509V3_EXT_add_conf(LHASH_OF(CONF_VALUE) *conf, X509V3_CTX *ctx,
+    const char *section, X509 *cert);
+/**
+ * @brief Add all extensions from an LHASH configuration section to a certificate request (legacy).
+ * @param conf Legacy LHASH_OF(CONF_VALUE) configuration database.
+ * @param ctx Extension construction context.
+ * @param section Name of the configuration section listing extensions.
+ * @param req Certificate request that receives the extensions.
+ * @return 1 on success, or 0 on error.
+ */
+int X509V3_EXT_REQ_add_conf(LHASH_OF(CONF_VALUE) *conf, X509V3_CTX *ctx,
+    const char *section, X509_REQ *req);
+/**
+ * @brief Add CRL extensions described by a config section to a CRL.
+ * @param conf Configuration hash containing @p section.
+ * @param ctx Extension context (issuer, CRL, flags) for extension construction.
+ * @param section Name of the config section listing extensions.
+ * @param crl CRL that receives the extensions.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509V3_EXT_CRL_add_conf(LHASH_OF(CONF_VALUE) *conf, X509V3_CTX *ctx,
+    const char *section, X509_CRL *crl);
+
+/**
+ * @brief Append a boolean CONF_VALUE named @p name only when @p asn1_bool is true ("TRUE").
+ * @param name Extension value name to store.
+ * @param asn1_bool Nonzero to add an entry with value "TRUE"; zero leaves @p extlist unchanged.
+ * @param extlist Stack of CONF_VALUE entries to extend; allocated if *@p extlist is NULL.
+ * @return 1 on success, or 0 on error.
+ *
+ * Unlike X509V3_add_value_bool(), a false value does not add a "FALSE" entry.
+ */
+int X509V3_add_value_bool_nf(const char *name, int asn1_bool,
+    STACK_OF(CONF_VALUE) **extlist);
+/**
+ * @brief Parse a CONF_VALUE as a boolean into an ASN.1 boolean integer.
+ * @param value Configuration entry whose value is TRUE/FALSE/Y/N (case-insensitive).
+ * @param asn1_bool Set to 0xFF for true or 0 for false.
+ * @return 1 on success, or 0 on error.
+ */
+int X509V3_get_value_bool(const CONF_VALUE *value, int *asn1_bool);
+/**
+ * @brief Parse a CONF_VALUE as an integer into a newly allocated ASN1_INTEGER.
+ * @param value Configuration entry whose value is a decimal or hex integer string.
+ * @param aint Receives the allocated ASN1_INTEGER on success.
+ * @return 1 on success, or 0 on error.
+ */
+int X509V3_get_value_int(const CONF_VALUE *value, ASN1_INTEGER **aint);
+/**
+ * @brief Attach an NCONF configuration database to an extension context.
+ * @param ctx Extension context whose @c db / @c db_meth are updated.
+ * @param conf CONF object used for section lookups while building extensions.
+ */
+void X509V3_set_nconf(X509V3_CTX *ctx, CONF *conf);
+/**
+ * @brief Attach a legacy LHASH configuration database to an extension context.
+ * @param ctx Extension context whose @c db / @c db_meth are updated.
+ * @param lhash LHASH_OF(CONF_VALUE) configuration to use for section lookups.
+ */
+void X509V3_set_conf_lhash(X509V3_CTX *ctx, LHASH_OF(CONF_VALUE) *lhash);
+#endif
+
+/**
+ * @brief Look up a configuration string via the X509V3_CTX database method.
+ * @param ctx Extension context providing @c db / @c db_meth for CONF access.
+ * @param name Value name to retrieve.
+ * @param section Configuration section name, or NULL for the method default.
+ * @return Newly allocated string (free with X509V3_string_free()), or NULL if absent/error.
+ */
+char *X509V3_get_string(X509V3_CTX *ctx, const char *name, const char *section);
+/**
+ * @brief Load a named configuration section via the context's CONF method.
+ * @param ctx Extension context whose @c db / @c db_meth supply the configuration database.
+ * @param section Section name to retrieve.
+ * @return Stack of CONF_VALUE entries for the section, or NULL on error / if unset.
+ */
+STACK_OF(CONF_VALUE) *X509V3_get_section(X509V3_CTX *ctx, const char *section);
+/**
+ * @brief Free a string previously returned by X509V3_get_string() using the context's conf method.
+ * @param ctx Extension context whose @c db_meth provides free_string, or NULL to use OPENSSL_free().
+ * @param str String to free, or NULL.
+ */
+void X509V3_string_free(X509V3_CTX *ctx, char *str);
+/**
+ * @brief Free a CONF_VALUE section previously returned by X509V3_get_section().
+ * @param ctx Extension context whose @c db_meth provides free_section, or NULL to free with X509V3_conf_free helpers.
+ * @param section Stack of CONF_VALUE entries to free, or NULL.
+ */
+void X509V3_section_free(X509V3_CTX *ctx, STACK_OF(CONF_VALUE) *section);
+/**
+ * @brief Fill an X509V3_CTX with the certificates, request, CRL, and flags used when building extensions.
+ * @param ctx Extension context to initialize.
+ * @param issuer Issuer certificate (for example for authority key identifier), or NULL.
+ * @param subject Subject certificate being constructed, or NULL.
+ * @param req Certificate request being constructed, or NULL (at most one of subject/req/crl is non-NULL).
+ * @param crl CRL being constructed, or NULL.
+ * @param flags Zero, or X509V3_CTX_TEST / X509V3_CTX_REPLACE.
+ */
+void X509V3_set_ctx(X509V3_CTX *ctx, X509 *issuer, X509 *subject,
+    X509_REQ *req, X509_CRL *crl, int flags);
+/* For API backward compatibility, this is separate from X509V3_set_ctx(): */
+/**
+ * @brief Set the issuer private key used as a fallback when building authority key identifiers.
+ * @param ctx Extension context previously filled by X509V3_set_ctx (typically with issuer == subject).
+ * @param pkey Issuer private key whose public counterpart supplies the AKID fallback.
+ * @return 1 on success, or 0 on error.
+ */
+int X509V3_set_issuer_pkey(X509V3_CTX *ctx, EVP_PKEY *pkey);
+
+/**
+ * @brief Append a name/value pair to a CONF_VALUE stack used by X509v3 helpers.
+ * @param name Name string for the new CONF_VALUE (duplicated).
+ * @param value Value string (duplicated); may be NULL.
+ * @param extlist Address of the stack to append to; allocated if NULL.
+ * @return 1 on success, or 0 on error.
+ */
+int X509V3_add_value(const char *name, const char *value,
+    STACK_OF(CONF_VALUE) **extlist);
+/**
+ * @brief Append a name/value pair whose value is an unsigned-char C string to a CONF_VALUE stack.
+ * @param name Name string for the new CONF_VALUE (duplicated).
+ * @param value NUL-terminated unsigned-char value (duplicated as a char string).
+ * @param extlist Address of the stack to append to; allocated if NULL.
+ * @return 1 on success, or 0 on error.
+ */
+int X509V3_add_value_uchar(const char *name, const unsigned char *value,
+    STACK_OF(CONF_VALUE) **extlist);
+/**
+ * @brief Append a boolean CONF_VALUE named @p name with value "TRUE" or "FALSE".
+ * @param name Extension value name to store.
+ * @param asn1_bool Nonzero stores "TRUE"; zero stores "FALSE".
+ * @param extlist Stack of CONF_VALUE entries to extend; allocated if *@p extlist is NULL.
+ * @return 1 on success, or 0 on error.
+ */
+int X509V3_add_value_bool(const char *name, int asn1_bool,
+    STACK_OF(CONF_VALUE) **extlist);
+/**
+ * @brief Append a name/value pair whose value is the decimal form of an ASN1_INTEGER.
+ * @param name Name string for the new CONF_VALUE (duplicated).
+ * @param aint Integer whose decimal string becomes the CONF_VALUE value.
+ * @param extlist Address of the stack to append to; allocated if NULL.
+ * @return 1 on success, or 0 on error.
+ */
+int X509V3_add_value_int(const char *name, const ASN1_INTEGER *aint,
+    STACK_OF(CONF_VALUE) **extlist);
+/**
+ * @brief Convert an ASN1_INTEGER to a newly allocated decimal string.
+ * @param meth Extension method (unused; may be NULL).
+ * @param aint Integer value to convert.
+ * @return Newly allocated C string, or NULL on error; free with OPENSSL_free.
+ */
+char *i2s_ASN1_INTEGER(X509V3_EXT_METHOD *meth, const ASN1_INTEGER *aint);
+/**
+ * @brief Parse a decimal (or 0x-prefixed hex) string into a newly allocated ASN1_INTEGER.
+ * @param meth Extension method (unused; may be NULL).
+ * @param value Numeric string to parse.
+ * @return Newly allocated ASN1_INTEGER, or NULL on error; free with ASN1_INTEGER_free().
+ */
+ASN1_INTEGER *s2i_ASN1_INTEGER(X509V3_EXT_METHOD *meth, const char *value);
+/**
+ * @brief Convert an ASN1_ENUMERATED to a newly allocated decimal string.
+ * @param meth Extension method (unused; may be NULL).
+ * @param aint Enumerated value to convert.
+ * @return Allocated decimal string (caller frees with OPENSSL_free), or NULL on error.
+ */
+char *i2s_ASN1_ENUMERATED(X509V3_EXT_METHOD *meth, const ASN1_ENUMERATED *aint);
+/**
+ * @brief Convert an ASN1_ENUMERATED to a name string using @p meth's ENUMERATED_NAMES table.
+ * @param meth Extension method whose @c usr_data points to an ENUMERATED_NAMES list.
+ * @param aint Enumerated value to convert.
+ * @return Newly allocated name or decimal string, or NULL on error; free with OPENSSL_free.
+ */
+char *i2s_ASN1_ENUMERATED_TABLE(X509V3_EXT_METHOD *meth,
+    const ASN1_ENUMERATED *aint);
+/**
+ * @brief Register a custom X.509v3 extension method.
+ * @param ext Extension method describing encoding, decoding, and printing for one NID.
+ * @return 1 on success, or 0 on error.
+ */
+int X509V3_EXT_add(X509V3_EXT_METHOD *ext);
+/**
+ * @brief Register a NULL-terminated list of custom X.509v3 extension methods.
+ * @param extlist Array of X509V3_EXT_METHOD entries ending with a zeroed sentinel.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509V3_EXT_add_list(X509V3_EXT_METHOD *extlist);
+/**
+ * @brief Alias an existing X.509v3 extension method under a new NID.
+ * @param nid_to NID that should reuse the method of @p nid_from.
+ * @param nid_from NID of an already-registered extension method.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509V3_EXT_add_alias(int nid_to, int nid_from);
+/**
+ * @brief Unregister and free all dynamically added custom X.509v3 extension methods.
+ */
+void X509V3_EXT_cleanup(void);
+
+/**
+ * @brief Look up the registered X509V3_EXT_METHOD for an X509_EXTENSION by its OID.
+ * @param ext Extension whose object identifier selects the method table.
+ * @return Method table for the extension type, or NULL if unknown.
+ */
+const X509V3_EXT_METHOD *X509V3_EXT_get(X509_EXTENSION *ext);
+/**
+ * @brief Look up the registered X509V3_EXT_METHOD for an extension NID.
+ * @param nid Object identifier NID of the extension type.
+ * @return Method table for the extension, or NULL if unknown or @p nid is negative.
+ */
+const X509V3_EXT_METHOD *X509V3_EXT_get_nid(int nid);
+/**
+ * @brief Add the built-in standard X509v3 extension definitions (legacy compatibility).
+ * @return 1.
+ */
+int X509V3_add_standard_extensions(void);
+/**
+ * @brief Parse a comma-separated name[=value] list into a stack of CONF_VALUE entries.
+ * @param line Configuration-style list string (for example "critical,CA:TRUE").
+ * @return Newly allocated stack of name/value pairs, or NULL on failure; free with sk_CONF_VALUE_pop_free.
+ */
+STACK_OF(CONF_VALUE) *X509V3_parse_list(const char *line);
+/**
+ * @brief Decode the ASN.1 value of an X509_EXTENSION into its extension-specific C structure.
+ * @param ext Extension whose octet string is decoded according to its OID.
+ * @return Newly allocated extension-specific object, or NULL if unsupported / malformed; free with the matching free function.
+ */
+void *X509V3_EXT_d2i(X509_EXTENSION *ext);
+/**
+ * @brief Decode the first (or next) extension of type @p nid from a stack into its native structure.
+ * @param x Extension stack to search.
+ * @param nid NID of the extension type to decode.
+ * @param crit Optional out-parameter receiving 1 if critical, -1 if not found, or may be NULL.
+ * @param idx Optional in/out index to resume search after a previous match, or NULL for the first.
+ * @return Newly allocated extension-specific object (caller frees), or NULL if not found / on error.
+ */
+void *X509V3_get_d2i(const STACK_OF(X509_EXTENSION) *x, int nid, int *crit,
+    int *idx);
+
+/**
+ * @brief Build an X509_EXTENSION by encoding an extension-specific structure.
+ * @param ext_nid NID of the extension type (must have a registered X509V3 method).
+ * @param crit Non-zero to mark the extension critical.
+ * @param ext_struc Typed extension value (for example AUTHORITY_KEYID *) matching @p ext_nid.
+ * @return New X509_EXTENSION, or NULL on error.
+ */
+X509_EXTENSION *X509V3_EXT_i2d(int ext_nid, int crit, void *ext_struc);
+/**
+ * @brief Encode extension structure @p value and add/replace it on stack *@p x.
+ * @param x Address of the extension stack (allocated if NULL).
+ * @param nid Extension NID to create.
+ * @param value Extension-specific C structure understood by the X509V3 method for @p nid.
+ * @param crit Nonzero to mark the extension critical.
+ * @param flags X509V3_ADD_* behaviour flags (append, replace, keep existing, …).
+ * @return 1 on success, 0 on error, or -1 when a replace was requested but no match existed.
+ */
+int X509V3_add1_i2d(STACK_OF(X509_EXTENSION) **x, int nid, void *value,
+    int crit, unsigned long flags);
+
+#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+/* The new declarations are in crypto.h, but the old ones were here. */
+#define hex_to_string OPENSSL_buf2hexstr
+#define string_to_hex OPENSSL_hexstr2buf
+#endif
+
+/**
+ * @brief Print a stack of CONF_VALUE extension values to a BIO with indentation.
+ * @param out BIO that receives the printed values.
+ * @param val Name/value pairs describing extension content.
+ * @param indent Number of spaces to indent each line.
+ * @param ml Nonzero to print each value on its own line; zero for a more compact form.
+ */
+void X509V3_EXT_val_prn(BIO *out, STACK_OF(CONF_VALUE) *val, int indent,
+    int ml);
+/**
+ * @brief Print a single X.509v3 extension in human-readable form to a BIO.
+ * @param out BIO that receives the printed extension.
+ * @param ext Extension to decode and print.
+ * @param flag How to handle unknown extensions (X509V3_EXT_DEFAULT, X509V3_EXT_ERROR_UNKNOWN, …).
+ * @param indent Indentation width in spaces for nested output.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509V3_EXT_print(BIO *out, X509_EXTENSION *ext, unsigned long flag,
+    int indent);
+#ifndef OPENSSL_NO_STDIO
+/**
+ * @brief Print a single X.509v3 extension in human-readable form to a FILE stream.
+ * @param out FILE that receives the printed extension.
+ * @param ext Extension to decode and print.
+ * @param flag How to handle unknown extensions (same values as X509V3_EXT_print).
+ * @param indent Indentation width in spaces for nested output.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509V3_EXT_print_fp(FILE *out, X509_EXTENSION *ext, int flag, int indent);
+#endif
+/**
+ * @brief Print a stack of X.509v3 extensions to a BIO with an optional section title.
+ * @param out Destination BIO.
+ * @param title Optional heading printed before the extensions, or NULL.
+ * @param exts Extensions to print.
+ * @param flag X509V3_EXT_* print flags.
+ * @param indent Indentation in spaces.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509V3_extensions_print(BIO *out, const char *title,
+    const STACK_OF(X509_EXTENSION) *exts,
+    unsigned long flag, int indent);
+
+/**
+ * @brief Report whether a certificate appears to be a CA certificate.
+ * @param x Certificate whose basicConstraints / keyUsage / self-signed status are examined.
+ * @return Nonzero CA-likelihood code (see X509_check_ca(3)), or 0 if not a CA.
+ */
+int X509_check_ca(X509 *x);
+/**
+ * @brief Check whether a certificate is suitable for a given purpose (or as a CA for that purpose).
+ * @param x Complete certificate to evaluate (keyUsage, extendedKeyUsage, basicConstraints).
+ * @param id Purpose identifier such as X509_PURPOSE_SSL_SERVER or X509_PURPOSE_ANY.
+ * @param ca Nonzero to check whether @p x may act as a CA for @p id; zero for end-entity purpose.
+ * @return 1 if suitable; 0 if not; -1 on error; for CA checks, values 2–5 indicate legacy/uncertain CA status.
+ */
+int X509_check_purpose(X509 *x, int id, int ca);
+/**
+ * @brief Report whether an extension OID is one that OpenSSL's verifier critically understands.
+ * @param ex Extension to classify (typically taken from a certificate being validated).
+ * @return 1 if the extension NID is on the built-in critical-extension support list, or 0 otherwise.
+ */
+int X509_supported_extension(X509_EXTENSION *ex);
+/**
+ * @brief Store a purpose identifier after validating it against the purpose table.
+ * @param p Destination that receives @p purpose on success.
+ * @param purpose Purpose id such as X509_PURPOSE_SSL_CLIENT; must be known to X509_PURPOSE_get_by_id.
+ * @return 1 on success, or 0 if @p purpose is invalid.
+ */
+int X509_PURPOSE_set(int *p, int purpose);
+/**
+ * @brief Check whether @p issuer appears to have issued @p subject (name and AKID match).
+ * @param issuer Candidate issuer certificate.
+ * @param subject Certificate whose issuer fields are compared.
+ * @return X509_V_OK if @p issuer matches, or an X509_VERR_* reason code otherwise.
+ */
+int X509_check_issued(X509 *issuer, X509 *subject);
+/**
+ * @brief Verify that an Authority Key Identifier matches an issuer certificate.
+ * @param issuer Candidate issuer certificate whose SKID/serial/name are checked.
+ * @param akid Authority Key Identifier to match, or NULL (treated as a match).
+ * @return X509_V_OK on success, or an X509_V_ERR_* AKID mismatch code.
+ */
+int X509_check_akid(const X509 *issuer, const AUTHORITY_KEYID *akid);
+/**
+ * @brief Mark a certificate as a proxy certificate (EXFLAG_PROXY) for non-RFC3820 proxies.
+ * @param x Certificate whose cached extension flags are updated.
+ */
+void X509_set_proxy_flag(X509 *x);
+/**
+ * @brief Set the proxy path length constraint on a certificate marked as a proxy.
+ * @param x Proxy certificate to update.
+ * @param l Maximum number of subsequent proxy certificates allowed in the path.
+ */
+void X509_set_proxy_pathlen(X509 *x, long l);
+/**
+ * @brief Return the proxy path length constraint from a proxy certificate.
+ * @param x Certificate to query.
+ * @return Path length value, or -1 if absent or @p x is not a proxy certificate.
+ */
+long X509_get_proxy_pathlen(X509 *x);
+
+/**
+ * @brief Return the cached X.509v3 extension summary flags for a certificate.
+ * @param x Certificate whose extensions have been processed (for example via X509_check_purpose).
+ * @return Bitmask of EXFLAG_* values describing presence and properties of common extensions.
+ */
+uint32_t X509_get_extension_flags(X509 *x);
+/**
+ * @brief Return the cached Key Usage bits from a certificate.
+ * @param x Certificate to query.
+ * @return Zero or more KU_* flags, or UINT32_MAX if the keyUsage extension is absent.
+ */
+uint32_t X509_get_key_usage(X509 *x);
+/**
+ * @brief Return the cached Extended Key Usage bits from a certificate.
+ * @param x Certificate to query.
+ * @return Zero or more XKU_* flags, or UINT32_MAX if the extendedKeyUsage extension is absent.
+ */
+uint32_t X509_get_extended_key_usage(X509 *x);
+/**
+ * @brief Return the subjectKeyIdentifier extension value from a certificate.
+ * @param x Certificate to query.
+ * @return Internal ASN1_OCTET_STRING pointer, or NULL if absent or unparsable; do not free.
+ */
+const ASN1_OCTET_STRING *X509_get0_subject_key_id(X509 *x);
+/**
+ * @brief Return the authorityKeyIdentifier keyIdentifier value from a certificate.
+ * @param x Certificate to query.
+ * @return Internal ASN1_OCTET_STRING pointer, or NULL if absent or unparsable; do not free.
+ */
+const ASN1_OCTET_STRING *X509_get0_authority_key_id(X509 *x);
+/**
+ * @brief Return the authorityCertIssuer names from the Authority Key Identifier extension.
+ * @param x Certificate to query.
+ * @return Internal pointer to a GENERAL_NAMES stack, or NULL if absent or unparsable; do not free.
+ */
+const GENERAL_NAMES *X509_get0_authority_issuer(X509 *x);
+/**
+ * @brief Return the authorityCertSerialNumber from the Authority Key Identifier extension.
+ * @param x Certificate to query.
+ * @return Internal pointer to the serial number, or NULL if absent or unparsable; do not free.
+ */
+const ASN1_INTEGER *X509_get0_authority_serial(X509 *x);
+
+/**
+ * @brief Return how many entries are in the X509_PURPOSE table.
+ * @return Number of registered purpose definitions.
+ */
+int X509_PURPOSE_get_count(void);
+/**
+ * @brief Return the purpose table entry at a numeric index.
+ * @param idx Index in [0, X509_PURPOSE_get_count()).
+ * @return Pointer to the X509_PURPOSE entry, or NULL if @p idx is out of range.
+ */
+X509_PURPOSE *X509_PURPOSE_get0(int idx);
+/**
+ * @brief Look up a purpose table index by short name.
+ * @param sname Short purpose name such as "sslserver" or "smimesign".
+ * @return Index suitable for X509_PURPOSE_get0, or -1 if not found.
+ */
+int X509_PURPOSE_get_by_sname(const char *sname);
+/**
+ * @brief Look up a purpose table index by purpose identifier.
+ * @param id Purpose id such as X509_PURPOSE_SSL_CLIENT.
+ * @return Index suitable for X509_PURPOSE_get0, or -1 if not found.
+ */
+int X509_PURPOSE_get_by_id(int id);
+/**
+ * @brief Register or replace a certificate purpose entry in the purpose table.
+ * @param id Purpose identifier to add or update.
+ * @param trust Default trust id associated with this purpose.
+ * @param flags Purpose flags; X509_PURPOSE_DYNAMIC is managed internally.
+ * @param ck Callback that decides whether a certificate meets this purpose.
+ * @param name Long human-readable purpose name (copied).
+ * @param sname Short purpose name used by X509_PURPOSE_get_by_sname (copied).
+ * @param arg Application data stored in the purpose entry's usr_data field.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509_PURPOSE_add(int id, int trust, int flags,
+    int (*ck)(const X509_PURPOSE *, const X509 *, int),
+    const char *name, const char *sname, void *arg);
+/**
+ * @brief Return the long human-readable name of a purpose table entry.
+ * @param xp Purpose entry to query.
+ * @return Internal name string; do not free.
+ */
+char *X509_PURPOSE_get0_name(const X509_PURPOSE *xp);
+/**
+ * @brief Return the short name of a purpose table entry.
+ * @param xp Purpose entry to query.
+ * @return Internal short-name string; do not free.
+ */
+char *X509_PURPOSE_get0_sname(const X509_PURPOSE *xp);
+/**
+ * @brief Return the default trust identifier associated with a purpose entry.
+ * @param xp Purpose entry to query.
+ * @return Trust id stored in the entry.
+ */
+int X509_PURPOSE_get_trust(const X509_PURPOSE *xp);
+/**
+ * @brief Free all dynamically registered purpose table entries.
+ */
+void X509_PURPOSE_cleanup(void);
+/**
+ * @brief Return the purpose identifier from a purpose table entry.
+ * @param xp Purpose entry to query.
+ * @return Purpose id such as X509_PURPOSE_SSL_SERVER.
+ */
+int X509_PURPOSE_get_id(const X509_PURPOSE *xp);
+
+/**
+ * @brief Collect email addresses from a certificate's subject and subjectAltName.
+ * @param x Certificate to query.
+ * @return Newly allocated stack of email strings, or NULL on failure; free with X509_email_free.
+ */
+STACK_OF(OPENSSL_STRING) *X509_get1_email(X509 *x);
+/**
+ * @brief Collect email addresses from a certificate request's subject and subjectAltName.
+ * @param x Certificate request to query.
+ * @return Newly allocated stack of email strings, or NULL on failure; free with X509_email_free.
+ */
+STACK_OF(OPENSSL_STRING) *X509_REQ_get1_email(X509_REQ *x);
+/**
+ * @brief Free a stack of email strings returned by X509_get1_email or X509_REQ_get1_email.
+ * @param sk Stack to free, or NULL.
+ */
+void X509_email_free(STACK_OF(OPENSSL_STRING) *sk);
+/**
+ * @brief Extract OCSP responder URIs from a certificate's Authority Information Access extension.
+ * @param x Certificate to examine.
+ * @return New stack of OCSP URI strings (free with X509_email_free()), or NULL if none or on error.
+ */
+STACK_OF(OPENSSL_STRING) *X509_get1_ocsp(X509 *x);
+/* Flags for X509_check_* functions */
+
+/*
+ * Always check subject name for host match even if subject alt names present
+ */
+#define X509_CHECK_FLAG_ALWAYS_CHECK_SUBJECT 0x1
+/* Disable wildcard matching for dnsName fields and common name. */
+#define X509_CHECK_FLAG_NO_WILDCARDS 0x2
+/* Wildcards must not match a partial label. */
+#define X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS 0x4
+/* Allow (non-partial) wildcards to match multiple labels. */
+#define X509_CHECK_FLAG_MULTI_LABEL_WILDCARDS 0x8
+/* Constraint verifier subdomain patterns to match a single labels. */
+#define X509_CHECK_FLAG_SINGLE_LABEL_SUBDOMAINS 0x10
+/* Never check the subject CN */
+#define X509_CHECK_FLAG_NEVER_CHECK_SUBJECT 0x20
+/*
+ * Match reference identifiers starting with "." to any sub-domain.
+ * This is a non-public flag, turned on implicitly when the subject
+ * reference identity is a DNS name.
+ */
+#define _X509_CHECK_FLAG_DOT_SUBDOMAINS 0x8000
+
+/**
+ * @brief Check whether a certificate matches a DNS host name.
+ * @param x Certificate whose subjectAltName / subject CN are examined.
+ * @param chk Host name bytes (not necessarily NUL-terminated when @p chklen is set).
+ * @param chklen Length of @p chk, or 0 to use strlen(@p chk).
+ * @param flags X509_CHECK_FLAG_* controlling matching behaviour.
+ * @param peername Optional output for a newly allocated matched name string, or NULL.
+ * @return 1 on match, 0 on no match, or -1 on malformed input / error.
+ */
+int X509_check_host(X509 *x, const char *chk, size_t chklen,
+    unsigned int flags, char **peername);
+/**
+ * @brief Check whether a certificate's subjectAltName/subject email matches @p chk.
+ * @param x Certificate to check.
+ * @param chk Email address to compare (need not be NUL-terminated if @p chklen is set).
+ * @param chklen Length of @p chk in bytes, or 0 to use strlen(@p chk).
+ * @param flags X509_CHECK_FLAG_* controlling comparison behavior.
+ * @return 1 on match, 0 on no match, or -1 on malformed input / error.
+ */
+int X509_check_email(X509 *x, const char *chk, size_t chklen,
+    unsigned int flags);
+/**
+ * @brief Check whether a certificate's subjectAltName contains an IP address in binary form.
+ * @param x Certificate to match.
+ * @param chk IPv4 (4 bytes) or IPv6 (16 bytes) address in network byte order.
+ * @param chklen Length of @p chk in bytes (4 or 16).
+ * @param flags X509_CHECK_FLAG_* controlling comparison behaviour (currently unused for IP).
+ * @return 1 on match, 0 on no match, or -1 on malformed input / error.
+ */
+int X509_check_ip(X509 *x, const unsigned char *chk, size_t chklen,
+    unsigned int flags);
+/**
+ * @brief Check whether a certificate's subjectAltName contains an IP address given as text.
+ * @param x Certificate to check.
+ * @param ipasc ASCII IPv4 or IPv6 address.
+ * @param flags X509_CHECK_FLAG_* controlling matching behaviour.
+ * @return 1 on match, 0 on no match, or -1 on malformed input / error.
+ */
+int X509_check_ip_asc(X509 *x, const char *ipasc, unsigned int flags);
+
+/**
+ * @brief Convert an ASCII IPv4 or IPv6 address to an OCTET STRING for GeneralName iPAddress.
+ * @param ipasc Address text such as "192.0.2.1" or "2001:db8::1".
+ * @return Newly allocated ASN1_OCTET_STRING with the binary address, or NULL on failure.
+ */
+ASN1_OCTET_STRING *a2i_IPADDRESS(const char *ipasc);
+/**
+ * @brief Convert an ASCII IP address or CIDR prefix to an OCTET STRING for name constraints.
+ * @param ipasc Address or prefix text (for example "192.0.2.0/24" or "2001:db8::/32").
+ * @return Newly allocated ASN1_OCTET_STRING, or NULL on failure.
+ */
+ASN1_OCTET_STRING *a2i_IPADDRESS_NC(const char *ipasc);
+/**
+ * @brief Populate an X509_NAME from a stack of configuration DN name/value pairs.
+ * @param nm Name object to receive Relative Distinguished Name attributes.
+ * @param dn_sk Stack of CONF_VALUE entries describing DN components (multi-valued RDNs via '+').
+ * @param chtype Multibyte string type for attribute values (for example MBSTRING_ASC).
+ * @return 1 on success, or 0 on failure.
+ */
+int X509V3_NAME_from_section(X509_NAME *nm, STACK_OF(CONF_VALUE) *dn_sk,
+    unsigned long chtype);
+
+/**
+ * @brief Print a certificate policy tree node (OID, criticality, qualifiers) to a BIO.
+ * @param out BIO that receives the formatted policy node.
+ * @param node Policy node to print.
+ * @param indent Indentation width in spaces.
+ */
+void X509_POLICY_NODE_print(BIO *out, X509_POLICY_NODE *node, int indent);
+/* clang-format off */
+{-
+    generate_stack_macros("X509_POLICY_NODE");
+-}
+/* clang-format on */
+
+#ifndef OPENSSL_NO_RFC3779
+/**
+ * @brief Inclusive Autonomous System Number range used in RFC 3779 ASIdentifiers.
+ */
+typedef struct ASRange_st {
+    /** Lowest AS number in the range (inclusive). */
+    ASN1_INTEGER *min;
+    /** Highest AS number in the range (inclusive). */
+    ASN1_INTEGER *max;
+} ASRange;
+
+#define ASIdOrRange_id 0
+#define ASIdOrRange_range 1
+
+/**
+ * @brief RFC 3779 AS identifier: either a single AS number or an ASRange.
+ */
+typedef struct ASIdOrRange_st {
+    /** Discriminator: ASIdOrRange_id or ASIdOrRange_range. */
+    int type;
+    /**
+     * @brief AS identifier value selected by @c type.
+     */
+    union {
+        /** Single AS number when @c type is ASIdOrRange_id. */
+        ASN1_INTEGER *id;
+        /** Inclusive AS number range when @c type is ASIdOrRange_range. */
+        ASRange *range;
+    } u;
+} ASIdOrRange;
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(ASIdOrRange) container type.
+ */
+struct stack_st_ASIdOrRange;
+{-
+    generate_stack_macros("ASIdOrRange");
+-}
+/* clang-format on */
+
+/**
+ * @brief Stack of ASIdOrRange values used in an ASIdentifierChoice.
+ */
+typedef STACK_OF(ASIdOrRange) ASIdOrRanges;
+
+#define ASIdentifierChoice_inherit 0
+#define ASIdentifierChoice_asIdsOrRanges 1
+
+/**
+ * @brief RFC 3779 choice between inheriting AS identifiers and listing them explicitly.
+ */
+typedef struct ASIdentifierChoice_st {
+    /** Discriminator: ASIdentifierChoice_inherit or ASIdentifierChoice_asIdsOrRanges. */
+    int type;
+    /**
+     * @brief Choice payload selected by @c type.
+     */
+    union {
+        /** Inherit AS identifiers from the issuer when @c type is ASIdentifierChoice_inherit. */
+        ASN1_NULL *inherit;
+        /** Explicit AS numbers or ranges when @c type is ASIdentifierChoice_asIdsOrRanges. */
+        ASIdOrRanges *asIdsOrRanges;
+    } u;
+} ASIdentifierChoice;
+
+/**
+ * @brief RFC 3779 ASIdentifiers extension: AS numbers and routing domain identifiers.
+ */
+typedef struct ASIdentifiers_st {
+    /** Autonomous System Number identifiers (V3_ASID_ASNUM). */
+    ASIdentifierChoice *asnum;
+    /** Routing Domain Identifier identifiers (V3_ASID_RDI). */
+    ASIdentifierChoice *rdi;
+} ASIdentifiers;
+
+/**
+ * @brief Allocate a new AS number range value.
+ * @return New ASRange, or NULL on allocation failure.
+ */
+ASRange *ASRange_new(void);
+/**
+ * @brief Free an AS number range value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASRange_free(ASRange *a);
+/**
+ * @brief Decode an AS number range from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASRange, or NULL on error.
+ */
+ASRange *d2i_ASRange(ASRange **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an AS number range to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASRange(const ASRange *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASRange.
+ * @return Pointer to the static ASN1_ITEM for ASRange.
+ */
+const ASN1_ITEM *ASRange_it(void);
+
+/**
+ * @brief Allocate a new ASIdOrRange value.
+ * @return New ASIdOrRange, or NULL on allocation failure.
+ */
+ASIdOrRange *ASIdOrRange_new(void);
+/**
+ * @brief Free an ASIdOrRange value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASIdOrRange_free(ASIdOrRange *a);
+/**
+ * @brief Decode an ASIdOrRange from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASIdOrRange, or NULL on error.
+ */
+ASIdOrRange *d2i_ASIdOrRange(ASIdOrRange **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASIdOrRange to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASIdOrRange(const ASIdOrRange *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASIdOrRange.
+ * @return Pointer to the static ASN1_ITEM for ASIdOrRange.
+ */
+const ASN1_ITEM *ASIdOrRange_it(void);
+
+/**
+ * @brief Allocate a new ASIdentifierChoice value.
+ * @return New ASIdentifierChoice, or NULL on allocation failure.
+ */
+ASIdentifierChoice *ASIdentifierChoice_new(void);
+/**
+ * @brief Free an ASIdentifierChoice value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASIdentifierChoice_free(ASIdentifierChoice *a);
+/**
+ * @brief Decode an ASIdentifierChoice from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASIdentifierChoice, or NULL on error.
+ */
+ASIdentifierChoice *d2i_ASIdentifierChoice(ASIdentifierChoice **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASIdentifierChoice to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASIdentifierChoice(const ASIdentifierChoice *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASIdentifierChoice.
+ * @return Pointer to the static ASN1_ITEM for ASIdentifierChoice.
+ */
+const ASN1_ITEM *ASIdentifierChoice_it(void);
+
+/**
+ * @brief Allocate a new ASIdentifiers extension value.
+ * @return New ASIdentifiers, or NULL on allocation failure.
+ */
+ASIdentifiers *ASIdentifiers_new(void);
+/**
+ * @brief Free an ASIdentifiers extension value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASIdentifiers_free(ASIdentifiers *a);
+/**
+ * @brief Decode an ASIdentifiers extension from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASIdentifiers, or NULL on error.
+ */
+ASIdentifiers *d2i_ASIdentifiers(ASIdentifiers **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASIdentifiers extension to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASIdentifiers(const ASIdentifiers *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASIdentifiers.
+ * @return Pointer to the static ASN1_ITEM for ASIdentifiers.
+ */
+const ASN1_ITEM *ASIdentifiers_it(void);
+
+/**
+ * @brief Inclusive IP address range encoded as bit strings (RFC 3779).
+ */
+typedef struct IPAddressRange_st {
+    /** Lowest address in the range (inclusive), as an ASN.1 BIT STRING. */
+    ASN1_BIT_STRING *min;
+    /** Highest address in the range (inclusive), as an ASN.1 BIT STRING. */
+    ASN1_BIT_STRING *max;
+} IPAddressRange;
+
+#define IPAddressOrRange_addressPrefix 0
+#define IPAddressOrRange_addressRange 1
+
+/**
+ * @brief RFC 3779 IP address: either a prefix or an explicit address range.
+ */
+typedef struct IPAddressOrRange_st {
+    /** Discriminator: IPAddressOrRange_addressPrefix or IPAddressOrRange_addressRange. */
+    int type;
+    /**
+     * @brief Address value selected by @c type.
+     */
+    union {
+        /** Address prefix (BIT STRING) when @c type is IPAddressOrRange_addressPrefix. */
+        ASN1_BIT_STRING *addressPrefix;
+        /** Inclusive address range when @c type is IPAddressOrRange_addressRange. */
+        IPAddressRange *addressRange;
+    } u;
+} IPAddressOrRange;
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(IPAddressOrRange) container type.
+ */
+struct stack_st_IPAddressOrRange;
+{-
+    generate_stack_macros("IPAddressOrRange");
+-}
+/* clang-format on */
+
+/**
+ * @brief Stack of IPAddressOrRange values for one address family choice.
+ */
+typedef STACK_OF(IPAddressOrRange) IPAddressOrRanges;
+
+#define IPAddressChoice_inherit 0
+#define IPAddressChoice_addressesOrRanges 1
+
+/**
+ * @brief RFC 3779 choice between inheriting IP address blocks and listing them.
+ */
+typedef struct IPAddressChoice_st {
+    /** Discriminator: IPAddressChoice_inherit or IPAddressChoice_addressesOrRanges. */
+    int type;
+    /**
+     * @brief Choice payload selected by @c type.
+     */
+    union {
+        /** Inherit IP blocks from the issuer when @c type is IPAddressChoice_inherit. */
+        ASN1_NULL *inherit;
+        /** Explicit prefixes or ranges when @c type is IPAddressChoice_addressesOrRanges. */
+        IPAddressOrRanges *addressesOrRanges;
+    } u;
+} IPAddressChoice;
+
+/**
+ * @brief RFC 3779 IP address family entry: AFI/SAFI octets plus an address choice.
+ */
+typedef struct IPAddressFamily_st {
+    /** Address Family Identifier (and optional SAFI) as an OCTET STRING. */
+    ASN1_OCTET_STRING *addressFamily;
+    /** Inherited or explicit address blocks for this family. */
+    IPAddressChoice *ipAddressChoice;
+} IPAddressFamily;
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(IPAddressFamily) container type.
+ */
+struct stack_st_IPAddressFamily;
+{-
+    generate_stack_macros("IPAddressFamily");
+-}
+/* clang-format on */
+
+/**
+ * @brief RFC 3779 IPAddrBlocks extension: stack of per-family address blocks.
+ */
+typedef STACK_OF(IPAddressFamily) IPAddrBlocks;
+
+/**
+ * @brief Allocate a new IPAddressRange value.
+ * @return New IPAddressRange, or NULL on allocation failure.
+ */
+IPAddressRange *IPAddressRange_new(void);
+/**
+ * @brief Free an IPAddressRange value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void IPAddressRange_free(IPAddressRange *a);
+/**
+ * @brief Decode an IPAddressRange from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded IPAddressRange, or NULL on error.
+ */
+IPAddressRange *d2i_IPAddressRange(IPAddressRange **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an IPAddressRange to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_IPAddressRange(const IPAddressRange *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for IPAddressRange.
+ * @return Pointer to the static ASN1_ITEM for IPAddressRange.
+ */
+const ASN1_ITEM *IPAddressRange_it(void);
+
+/**
+ * @brief Allocate an empty IP address or address range (RFC 3779).
+ * @return New IPAddressOrRange, or NULL on allocation failure.
+ */
+IPAddressOrRange *IPAddressOrRange_new(void);
+/**
+ * @brief Free a IP address or address range (RFC 3779) and its contents.
+ * @param a Value to free, or NULL.
+ */
+void IPAddressOrRange_free(IPAddressOrRange *a);
+/**
+ * @brief Decode a IP address or address range (RFC 3779) from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded IPAddressOrRange, or NULL on error.
+ */
+IPAddressOrRange *d2i_IPAddressOrRange(IPAddressOrRange **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a IP address or address range (RFC 3779) to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_IPAddressOrRange(const IPAddressOrRange *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for IPAddressOrRange.
+ * @return Pointer to the static ASN1_ITEM for IPAddressOrRange.
+ */
+const ASN1_ITEM *IPAddressOrRange_it(void);
+/**
+ * @brief Allocate a new IPAddressChoice (inherit or explicit address ranges).
+ * @return New IPAddressChoice, or NULL on allocation failure.
+ */
+IPAddressChoice *IPAddressChoice_new(void);
+/**
+ * @brief Free an IPAddressChoice structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void IPAddressChoice_free(IPAddressChoice *a);
+/**
+ * @brief Decode an IPAddressChoice from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded IPAddressChoice, or NULL on error.
+ */
+IPAddressChoice *d2i_IPAddressChoice(IPAddressChoice **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an IPAddressChoice to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_IPAddressChoice(const IPAddressChoice *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for IPAddressChoice.
+ * @return Pointer to the static ASN1_ITEM for IPAddressChoice.
+ */
+const ASN1_ITEM *IPAddressChoice_it(void);
+
+/**
+ * @brief Allocate a new IPAddressFamily value.
+ * @return New IPAddressFamily, or NULL on allocation failure.
+ */
+IPAddressFamily *IPAddressFamily_new(void);
+/**
+ * @brief Free an IPAddressFamily value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void IPAddressFamily_free(IPAddressFamily *a);
+/**
+ * @brief Decode an IPAddressFamily from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded IPAddressFamily, or NULL on error.
+ */
+IPAddressFamily *d2i_IPAddressFamily(IPAddressFamily **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an IPAddressFamily to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_IPAddressFamily(const IPAddressFamily *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for IPAddressFamily.
+ * @return Pointer to the static ASN1_ITEM for IPAddressFamily.
+ */
+const ASN1_ITEM *IPAddressFamily_it(void);
+
+/*
+ * API tag for elements of the ASIdentifer SEQUENCE.
+ */
+#define V3_ASID_ASNUM 0
+#define V3_ASID_RDI 1
+
+/*
+ * AFI values, assigned by IANA.  It'd be nice to make the AFI
+ * handling code totally generic, but there are too many little things
+ * that would need to be defined for other address families for it to
+ * be worth the trouble.
+ */
+#define IANA_AFI_IPV4 1
+#define IANA_AFI_IPV6 2
+
+/*
+ * Utilities to construct and extract values from RFC3779 extensions,
+ * since some of the encodings (particularly for IP address prefixes
+ * and ranges) are a bit tedious to work with directly.
+ */
+/**
+ * @brief Mark an ASIdentifiers choice as inheriting from the issuer.
+ * @param asid Extension value to modify.
+ * @param which V3_ASID_ASNUM or V3_ASID_RDI selecting which choice inherits.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509v3_asid_add_inherit(ASIdentifiers *asid, int which);
+/**
+ * @brief Add a single AS number or an inclusive AS number range to an ASIdentifiers value.
+ * @param asid Extension value to modify.
+ * @param which V3_ASID_ASNUM or V3_ASID_RDI selecting which choice to update.
+ * @param min Lowest AS number (also the sole ID when @p max is NULL).
+ * @param max Highest AS number for a range, or NULL to add @p min as a single ID.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509v3_asid_add_id_or_range(ASIdentifiers *asid, int which,
+    ASN1_INTEGER *min, ASN1_INTEGER *max);
+/**
+ * @brief Mark an address family in an IPAddrBlocks value as inheriting from the issuer.
+ * @param addr Extension value to modify.
+ * @param afi Address Family Identifier (IANA AFI).
+ * @param safi Optional Subsequent Address Family Identifier, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509v3_addr_add_inherit(IPAddrBlocks *addr,
+    const unsigned afi, const unsigned *safi);
+/**
+ * @brief Add an IP address prefix to an IPAddrBlocks (RFC 3779) extension value.
+ * @param addr Extension value to modify.
+ * @param afi Address Family Identifier (IANA AFI).
+ * @param safi Optional Subsequent Address Family Identifier, or NULL.
+ * @param a Address bytes in network byte order (length implied by @p afi).
+ * @param prefixlen Prefix length in bits.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509v3_addr_add_prefix(IPAddrBlocks *addr,
+    const unsigned afi, const unsigned *safi,
+    unsigned char *a, const int prefixlen);
+/**
+ * @brief Add an inclusive IP address range to an IPAddrBlocks value.
+ * @param addr Extension value to modify.
+ * @param afi Address Family Identifier (IANA AFI).
+ * @param safi Optional Subsequent Address Family Identifier, or NULL.
+ * @param min Lowest address in network byte order (length implied by @p afi).
+ * @param max Highest address in network byte order (same length as @p min).
+ * @return 1 on success, or 0 on failure.
+ */
+int X509v3_addr_add_range(IPAddrBlocks *addr,
+    const unsigned afi, const unsigned *safi,
+    unsigned char *min, unsigned char *max);
+/**
+ * @brief Return the Address Family Identifier from an IPAddressFamily entry.
+ * @param f Address-family entry whose @c addressFamily OCTET STRING is read.
+ * @return 16-bit AFI (for example IANA_AFI_IPV4 or IANA_AFI_IPV6), or 0 if unavailable.
+ */
+unsigned X509v3_addr_get_afi(const IPAddressFamily *f);
+/**
+ * @brief Expand an IPAddressOrRange into inclusive @p min/@p max address bytes for @p afi.
+ * @param aor Address or range choice to expand.
+ * @param afi Address family (IANA_AFI_IPV4 or IANA_AFI_IPV6).
+ * @param min Output buffer receiving the low address bytes.
+ * @param max Output buffer receiving the high address bytes.
+ * @param length Capacity of @p min and @p max in bytes (4 for IPv4, 16 for IPv6).
+ * @return Address length written on success, or 0 on failure.
+ */
+int X509v3_addr_get_range(IPAddressOrRange *aor, const unsigned afi,
+    unsigned char *min, unsigned char *max,
+    const int length);
+
+/*
+ * Canonical forms.
+ */
+/**
+ * @brief Test whether an ASIdentifiers value is already in RFC 3779 canonical form.
+ * @param asid Extension value to check, or NULL (treated as canonical).
+ * @return 1 if canonical (or @p asid is NULL), or 0 otherwise.
+ */
+int X509v3_asid_is_canonical(ASIdentifiers *asid);
+/**
+ * @brief Test whether an IPAddrBlocks value is already in RFC 3779 canonical form.
+ * @param addr Extension value to check, or NULL (treated as canonical).
+ * @return 1 if canonical (or @p addr is NULL), or 0 otherwise.
+ */
+int X509v3_addr_is_canonical(IPAddrBlocks *addr);
+/**
+ * @brief Sort and merge an ASIdentifiers value into RFC 3779 canonical form.
+ * @param asid Extension value to rewrite in place.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509v3_asid_canonize(ASIdentifiers *asid);
+/**
+ * @brief Sort and merge an IPAddrBlocks value into RFC 3779 canonical form.
+ * @param addr Extension value to rewrite in place.
+ * @return 1 on success, or 0 on failure.
+ */
+int X509v3_addr_canonize(IPAddrBlocks *addr);
+
+/*
+ * Tests for inheritance and containment.
+ */
+/**
+ * @brief Test whether an ASIdentifiers value uses inheritance for ASNUM or RDI.
+ * @param asid Extension value to inspect.
+ * @return 1 if either choice is inherit, or 0 otherwise.
+ */
+int X509v3_asid_inherits(ASIdentifiers *asid);
+/**
+ * @brief Report whether an IPAddrBlocks value uses inheritance from the issuer.
+ * @param addr IP address blocks extension to query.
+ * @return 1 if any family inherits, or 0 otherwise.
+ */
+int X509v3_addr_inherits(IPAddrBlocks *addr);
+/**
+ * @brief Test whether AS identifier set @p a is covered by set @p b.
+ * @param a Candidate subset (NULL is treated as a subset of any @p b).
+ * @param b Candidate superset.
+ * @return 1 if @p a is a subset of @p b (neither may use inheritance), or 0 otherwise.
+ */
+int X509v3_asid_subset(ASIdentifiers *a, ASIdentifiers *b);
+/**
+ * @brief Test whether IP address block set @p a is covered by set @p b.
+ * @param a Candidate subset (NULL is treated as a subset of any @p b).
+ * @param b Candidate superset.
+ * @return 1 if @p a is a subset of @p b (neither may use inheritance), or 0 otherwise.
+ */
+int X509v3_addr_subset(IPAddrBlocks *a, IPAddrBlocks *b);
+
+/*
+ * Check whether RFC 3779 extensions nest properly in chains.
+ */
+/**
+ * @brief Validate RFC 3779 AS identifier nesting along a certificate chain in a store context.
+ * @param ctx Store context whose verified chain and verify callback are used.
+ * @return 1 if the path is valid, or 0 on failure (errors reported via @p ctx).
+ */
+int X509v3_asid_validate_path(X509_STORE_CTX *ctx);
+/**
+ * @brief Validate RFC 3779 IP address blocks along the certification path in @p ctx.
+ * @param ctx Store context whose chain is checked for consistent IPAddrBlocks inheritance.
+ * @return 1 if valid, or 0 on failure (sets verify error on @p ctx).
+ */
+int X509v3_addr_validate_path(X509_STORE_CTX *ctx);
+/**
+ * @brief Validate that AS identifiers in @p ext are covered by ancestors in @p chain.
+ * @param chain Certificate chain (leaf first) used to check nested ASIdentifiers extensions.
+ * @param ext AS resource set claimed by the leaf (or NULL to treat as empty).
+ * @param allow_inheritance Non-zero to permit inherit elements when validating.
+ * @return 1 if @p ext is valid given @p chain, or 0 otherwise.
+ */
+int X509v3_asid_validate_resource_set(STACK_OF(X509) *chain,
+    ASIdentifiers *ext,
+    int allow_inheritance);
+/**
+ * @brief Validate that IP address blocks in @p ext are covered by ancestors in @p chain.
+ * @param chain Certificate chain (leaf first) used to check nested IPAddrBlocks extensions.
+ * @param ext IP address resource set claimed by the leaf (or NULL to treat as empty).
+ * @param allow_inheritance Non-zero to permit inherit elements when validating.
+ * @return 1 if @p ext is valid given @p chain, or 0 otherwise.
+ */
+int X509v3_addr_validate_resource_set(STACK_OF(X509) *chain,
+    IPAddrBlocks *ext, int allow_inheritance);
+
+#endif /* OPENSSL_NO_RFC3779 */
+
+/* clang-format off */
+{-
+    generate_stack_macros("ASN1_STRING");
+-}
+/* clang-format on */
+
+/*
+ * Admission Syntax
+ */
+/**
+ * @brief Naming authority identifying who issues profession or admission attributes (Common PKI).
+ */
+typedef struct NamingAuthority_st NAMING_AUTHORITY;
+/**
+ * @brief Profession information: naming authority, profession items/OIDs, and registration number.
+ */
+typedef struct ProfessionInfo_st PROFESSION_INFO;
+/**
+ * @brief One admissions entry in Common PKI AdmissionSyntax (authority and profession infos).
+ */
+typedef struct Admissions_st ADMISSIONS;
+/**
+ * @brief Common PKI AdmissionSyntax extension: admission authority and contents of admissions.
+ */
+typedef struct AdmissionSyntax_st ADMISSION_SYNTAX;
+/**
+ * @brief Allocate a new NAMING_AUTHORITY value.
+ * @return New NAMING_AUTHORITY, or NULL on allocation failure.
+ */
+NAMING_AUTHORITY *NAMING_AUTHORITY_new(void);
+/**
+ * @brief Free a NAMING_AUTHORITY value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void NAMING_AUTHORITY_free(NAMING_AUTHORITY *a);
+/**
+ * @brief Decode a NAMING_AUTHORITY from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded NAMING_AUTHORITY, or NULL on error.
+ */
+NAMING_AUTHORITY *d2i_NAMING_AUTHORITY(NAMING_AUTHORITY **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a NAMING_AUTHORITY to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_NAMING_AUTHORITY(const NAMING_AUTHORITY *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for NAMING_AUTHORITY.
+ * @return Pointer to the static ASN1_ITEM for NAMING_AUTHORITY.
+ */
+const ASN1_ITEM *NAMING_AUTHORITY_it(void);
+/**
+ * @brief Allocate a new PROFESSION_INFO value.
+ * @return New PROFESSION_INFO, or NULL on allocation failure.
+ */
+PROFESSION_INFO *PROFESSION_INFO_new(void);
+/**
+ * @brief Free a PROFESSION_INFO value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void PROFESSION_INFO_free(PROFESSION_INFO *a);
+/**
+ * @brief Decode a PROFESSION_INFO from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded PROFESSION_INFO, or NULL on error.
+ */
+PROFESSION_INFO *d2i_PROFESSION_INFO(PROFESSION_INFO **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a PROFESSION_INFO to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_PROFESSION_INFO(const PROFESSION_INFO *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for PROFESSION_INFO.
+ * @return Pointer to the static ASN1_ITEM for PROFESSION_INFO.
+ */
+const ASN1_ITEM *PROFESSION_INFO_it(void);
+/**
+ * @brief Allocate a new ADMISSIONS value.
+ * @return New ADMISSIONS, or NULL on allocation failure.
+ */
+ADMISSIONS *ADMISSIONS_new(void);
+/**
+ * @brief Free an ADMISSIONS value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ADMISSIONS_free(ADMISSIONS *a);
+/**
+ * @brief Decode an ADMISSIONS value from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ADMISSIONS, or NULL on error.
+ */
+ADMISSIONS *d2i_ADMISSIONS(ADMISSIONS **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ADMISSIONS value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ADMISSIONS(const ADMISSIONS *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ADMISSIONS.
+ * @return Pointer to the static ASN1_ITEM for ADMISSIONS.
+ */
+const ASN1_ITEM *ADMISSIONS_it(void);
+/**
+ * @brief Allocate a new ADMISSION_SYNTAX value.
+ * @return New ADMISSION_SYNTAX, or NULL on allocation failure.
+ */
+ADMISSION_SYNTAX *ADMISSION_SYNTAX_new(void);
+/**
+ * @brief Free an ADMISSION_SYNTAX value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ADMISSION_SYNTAX_free(ADMISSION_SYNTAX *a);
+/**
+ * @brief Decode an ADMISSION_SYNTAX from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ADMISSION_SYNTAX, or NULL on error.
+ */
+ADMISSION_SYNTAX *d2i_ADMISSION_SYNTAX(ADMISSION_SYNTAX **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ADMISSION_SYNTAX to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ADMISSION_SYNTAX(const ADMISSION_SYNTAX *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ADMISSION_SYNTAX.
+ * @return Pointer to the static ASN1_ITEM for ADMISSION_SYNTAX.
+ */
+const ASN1_ITEM *ADMISSION_SYNTAX_it(void);
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(PROFESSION_INFO) container type.
+ */
+struct stack_st_PROFESSION_INFO;
+{-
+    generate_stack_macros("PROFESSION_INFO");
+-}
+/**
+ * @brief Opaque STACK_OF(ADMISSIONS) container type.
+ */
+struct stack_st_ADMISSIONS;
+{-
+    generate_stack_macros("ADMISSIONS");
+-}
+/* clang-format on */
+/**
+ * @brief Stack of PROFESSION_INFO entries used inside an ADMISSIONS structure.
+ */
+typedef STACK_OF(PROFESSION_INFO) PROFESSION_INFOS;
+
+/**
+ * @brief Return the namingAuthorityId object identifier from a NAMING_AUTHORITY.
+ * @param n Naming authority to query.
+ * @return Internal pointer to the authority ID, or NULL if absent; must not be freed by the caller.
+ */
+const ASN1_OBJECT *NAMING_AUTHORITY_get0_authorityId(
+    const NAMING_AUTHORITY *n);
+/**
+ * @brief Return the naming authority URL (IA5String).
+ * @param n Naming authority to query.
+ * @return Internal ASN1_IA5STRING, or NULL if absent; do not free.
+ */
+const ASN1_IA5STRING *NAMING_AUTHORITY_get0_authorityURL(
+    const NAMING_AUTHORITY *n);
+/**
+ * @brief Return the human-readable naming authority text.
+ * @param n Naming authority to query.
+ * @return Internal ASN1_STRING, or NULL if absent; do not free.
+ */
+const ASN1_STRING *NAMING_AUTHORITY_get0_authorityText(
+    const NAMING_AUTHORITY *n);
+/**
+ * @brief Set the naming authority OID, taking ownership of @p namingAuthorityId.
+ * @param n Naming authority to update.
+ * @param namingAuthorityId New authority identifier OID, or NULL to clear.
+ */
+void NAMING_AUTHORITY_set0_authorityId(NAMING_AUTHORITY *n,
+    ASN1_OBJECT *namingAuthorityId);
+/**
+ * @brief Set the authority URL on a NAMING_AUTHORITY, taking ownership of @p namingAuthorityUrl.
+ * @param n Naming authority to update.
+ * @param namingAuthorityUrl New URL IA5String, or NULL to clear; frees any previous value.
+ */
+void NAMING_AUTHORITY_set0_authorityURL(NAMING_AUTHORITY *n,
+    ASN1_IA5STRING *namingAuthorityUrl);
+/**
+ * @brief Set the authority text on a NAMING_AUTHORITY, taking ownership of @p namingAuthorityText.
+ * @param n Naming authority to update.
+ * @param namingAuthorityText New descriptive text, or NULL to clear; frees any previous value.
+ */
+void NAMING_AUTHORITY_set0_authorityText(NAMING_AUTHORITY *n,
+    ASN1_STRING *namingAuthorityText);
+
+/**
+ * @brief Return the admission authority GeneralName from an ADMISSION_SYNTAX.
+ * @param as Admission syntax to query.
+ * @return Internal GENERAL_NAME pointer, or NULL if absent; do not free.
+ */
+const GENERAL_NAME *ADMISSION_SYNTAX_get0_admissionAuthority(
+    const ADMISSION_SYNTAX *as);
+/**
+ * @brief Set the admission authority GeneralName on an ADMISSION_SYNTAX, taking ownership of @p aa.
+ * @param as Admission syntax whose authority is replaced.
+ * @param aa New admission authority name, or NULL to clear; frees any previous value.
+ */
+void ADMISSION_SYNTAX_set0_admissionAuthority(
+    ADMISSION_SYNTAX *as, GENERAL_NAME *aa);
+/**
+ * @brief Return the stack of ADMISSIONS entries from an ADMISSION_SYNTAX.
+ * @param as Admission syntax to query.
+ * @return Internal pointer to the admissions stack, or NULL if absent; must not be freed by the caller.
+ */
+const STACK_OF(ADMISSIONS) *ADMISSION_SYNTAX_get0_contentsOfAdmissions(
+    const ADMISSION_SYNTAX *as);
+/**
+ * @brief Set the admissions stack on an ADMISSION_SYNTAX, taking ownership of @p a.
+ * @param as Admission syntax whose contentsOfAdmissions field is replaced.
+ * @param a New stack of ADMISSIONS, or NULL to clear; frees any previous stack.
+ */
+void ADMISSION_SYNTAX_set0_contentsOfAdmissions(
+    ADMISSION_SYNTAX *as, STACK_OF(ADMISSIONS) *a);
+/**
+ * @brief Return the admission authority GENERAL_NAME from an ADMISSIONS entry.
+ * @param a Admissions entry to query.
+ * @return Internal pointer to the admission authority, or NULL if absent; must not be freed by the caller.
+ */
+const GENERAL_NAME *ADMISSIONS_get0_admissionAuthority(const ADMISSIONS *a);
+/**
+ * @brief Set the admission authority GENERAL_NAME on an ADMISSIONS entry, transferring ownership.
+ * @param a Admissions entry to update; any previous authority is freed.
+ * @param aa New admission authority, or NULL to clear; ownership transfers to @p a.
+ */
+void ADMISSIONS_set0_admissionAuthority(ADMISSIONS *a, GENERAL_NAME *aa);
+/**
+ * @brief Return the naming authority from an ADMISSIONS entry.
+ * @param a Admissions entry to query.
+ * @return Internal pointer to the NAMING_AUTHORITY, or NULL if absent; must not be freed by the caller.
+ */
+const NAMING_AUTHORITY *ADMISSIONS_get0_namingAuthority(const ADMISSIONS *a);
+/**
+ * @brief Set the naming authority on an ADMISSIONS entry, taking ownership of @p na.
+ * @param a Admissions entry whose namingAuthority field is replaced.
+ * @param na New naming authority, or NULL to clear; frees any previous value.
+ */
+void ADMISSIONS_set0_namingAuthority(ADMISSIONS *a, NAMING_AUTHORITY *na);
+/**
+ * @brief Return the profession-info stack from an ADMISSIONS entry.
+ * @param a Admissions entry to query.
+ * @return Internal pointer to the PROFESSION_INFOS stack, or NULL if absent; must not be freed by the caller.
+ */
+const PROFESSION_INFOS *ADMISSIONS_get0_professionInfos(const ADMISSIONS *a);
+/**
+ * @brief Set the profession-info stack on an ADMISSIONS entry, transferring ownership.
+ * @param a Admissions entry to update; any previous stack is freed.
+ * @param pi New PROFESSION_INFOS stack, or NULL to clear; ownership transfers to @p a.
+ */
+void ADMISSIONS_set0_professionInfos(ADMISSIONS *a, PROFESSION_INFOS *pi);
+/**
+ * @brief Return the additional profession info octet string from a PROFESSION_INFO.
+ * @param pi Profession info to query.
+ * @return Internal ASN1_OCTET_STRING pointer, or NULL if absent; must not be freed by the caller.
+ */
+const ASN1_OCTET_STRING *PROFESSION_INFO_get0_addProfessionInfo(
+    const PROFESSION_INFO *pi);
+/**
+ * @brief Set the additionalProfessionInfo OCTET STRING on a PROFESSION_INFO, taking ownership of @p aos.
+ * @param pi Profession info whose addProfessionInfo field is replaced.
+ * @param aos OCTET STRING to adopt, or NULL to clear the field.
+ */
+void PROFESSION_INFO_set0_addProfessionInfo(
+    PROFESSION_INFO *pi, ASN1_OCTET_STRING *aos);
+/**
+ * @brief Return the naming authority from a PROFESSION_INFO.
+ * @param pi Profession info to query.
+ * @return Internal pointer to the NAMING_AUTHORITY, or NULL if absent; must not be freed by the caller.
+ */
+const NAMING_AUTHORITY *PROFESSION_INFO_get0_namingAuthority(
+    const PROFESSION_INFO *pi);
+/**
+ * @brief Set the naming authority on a PROFESSION_INFO, taking ownership of @p na.
+ * @param pi Profession info whose namingAuthority field is replaced.
+ * @param na New naming authority, or NULL to clear; frees any previous value.
+ */
+void PROFESSION_INFO_set0_namingAuthority(
+    PROFESSION_INFO *pi, NAMING_AUTHORITY *na);
+/**
+ * @brief Return the profession item strings from a PROFESSION_INFO.
+ * @param pi Profession info to query.
+ * @return Internal stack of ASN1_STRING profession items, or NULL if absent; must not be freed by the caller.
+ */
+const STACK_OF(ASN1_STRING) *PROFESSION_INFO_get0_professionItems(
+    const PROFESSION_INFO *pi);
+/**
+ * @brief Set the profession items (titles) on a PROFESSION_INFO, taking ownership of @p as.
+ * @param pi Profession info whose professionItems field is replaced.
+ * @param as Stack of profession-item strings, or NULL to clear; frees any previous stack.
+ */
+void PROFESSION_INFO_set0_professionItems(
+    PROFESSION_INFO *pi, STACK_OF(ASN1_STRING) *as);
+/**
+ * @brief Return the profession OID stack from a PROFESSION_INFO.
+ * @param pi Profession info to query.
+ * @return Internal stack of ASN1_OBJECT profession OIDs, or NULL if absent; must not be freed by the caller.
+ */
+const STACK_OF(ASN1_OBJECT) *PROFESSION_INFO_get0_professionOIDs(
+    const PROFESSION_INFO *pi);
+/**
+ * @brief Set the profession OIDs on a PROFESSION_INFO, taking ownership of @p po.
+ * @param pi Profession info to update.
+ * @param po Stack of profession OID values, or NULL to clear; frees any previous stack.
+ */
+void PROFESSION_INFO_set0_professionOIDs(
+    PROFESSION_INFO *pi, STACK_OF(ASN1_OBJECT) *po);
+/**
+ * @brief Return the registration number from a PROFESSION_INFO without duplicating it.
+ * @param pi Profession info to query.
+ * @return Internal PrintableString pointer (do not free), or NULL if absent.
+ */
+const ASN1_PRINTABLESTRING *PROFESSION_INFO_get0_registrationNumber(
+    const PROFESSION_INFO *pi);
+/**
+ * @brief Set the registration number on a PROFESSION_INFO, taking ownership of @p rn.
+ * @param pi Profession info whose registrationNumber field is replaced.
+ * @param rn New registration number PrintableString, or NULL to clear; frees any previous value.
+ */
+void PROFESSION_INFO_set0_registrationNumber(
+    PROFESSION_INFO *pi, ASN1_PRINTABLESTRING *rn);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

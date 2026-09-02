@@ -1,0 +1,1209 @@
+/*
+ * {- join("\n * ", @autowarntext) -}
+ *
+ * Copyright 1995-2021 The OpenSSL Project Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License 2.0 (the "License").  You may not use
+ * this file except in compliance with the License.  You can obtain a copy
+ * in the file LICENSE in the source distribution or at
+ * https://www.openssl.org/source/license.html
+ */
+
+/* clang-format off */
+{-
+use OpenSSL::stackhash qw(generate_stack_macros);
+-}
+/* clang-format on */
+
+#ifndef OPENSSL_PKCS7_H
+#define OPENSSL_PKCS7_H
+#pragma once
+
+#include <openssl/macros.h>
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#define HEADER_PKCS7_H
+#endif
+
+#include <openssl/asn1.h>
+#include <openssl/bio.h>
+#include <openssl/e_os2.h>
+
+#include <openssl/symhacks.h>
+#include <openssl/types.h>
+#include <openssl/pkcs7err.h>
+#ifndef OPENSSL_NO_STDIO
+#include <stdio.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*-
+Encryption_ID           DES-CBC
+Digest_ID               MD5
+Digest_Encryption_ID    rsaEncryption
+Key_Encryption_ID       rsaEncryption
+*/
+
+/**
+ * @brief Library/provider context carried by PKCS#7 objects when fetching algorithms.
+ */
+typedef struct PKCS7_CTX_st {
+    OSSL_LIB_CTX *libctx; /**< Library context used when fetching algorithms for this PKCS#7 object. */
+    /** Property query string for algorithm fetches associated with this PKCS#7 context. */
+    char *propq;
+} PKCS7_CTX;
+
+/**
+ * @brief Issuer name and certificate serial number identifying a PKCS#7 signer or recipient.
+ */
+typedef struct pkcs7_issuer_and_serial_st {
+    /** Distinguished name of the certificate issuer. */
+    X509_NAME *issuer;
+    /** Certificate serial number issued by @c issuer. */
+    ASN1_INTEGER *serial;
+} PKCS7_ISSUER_AND_SERIAL;
+
+/**
+ * @brief PKCS#7 SignerInfo: identity, digest/signature algorithms, attributes, and signature.
+ */
+typedef struct pkcs7_signer_info_st {
+    /** PKCS#7 SignerInfo version (typically 1). */
+    ASN1_INTEGER *version; /* version 1 */
+    /** Issuer name and serial number identifying the signing certificate. */
+    PKCS7_ISSUER_AND_SERIAL *issuer_and_serial;
+    /** Message-digest AlgorithmIdentifier used by this signer. */
+    X509_ALGOR *digest_alg;
+    /** Authenticated (signed) attributes ([0]), or NULL if absent. */
+    STACK_OF(X509_ATTRIBUTE) *auth_attr; /* [ 0 ] */
+    /** @brief Digest encryption (signature) algorithm; the field name is historical. */
+    X509_ALGOR *digest_enc_alg;
+    /** Signature octets (historical name: enc_digest). */
+    ASN1_OCTET_STRING *enc_digest; /* confusing name, actually signature */
+    /** @brief Unauthenticated attributes ([1]). */
+    STACK_OF(X509_ATTRIBUTE) *unauth_attr;
+    /* The private key to sign with */
+    /** Private key used when signing with this signer info (not serialized). */
+    EVP_PKEY *pkey;
+    /** Library/provider context associated with this signer info (not serialized). */
+    const PKCS7_CTX *ctx;
+} PKCS7_SIGNER_INFO;
+/* clang-format off */
+{-
+    generate_stack_macros("PKCS7_SIGNER_INFO");
+-}
+/* clang-format on */
+
+/**
+ * @brief PKCS#7 RecipientInfo: recipient identity and encrypted content-encryption key.
+ */
+typedef struct pkcs7_recip_info_st {
+    /** CMS/PKCS#7 RecipientInfo version (typically 0). */
+    ASN1_INTEGER *version; /* version 0 */
+    /** Issuer name and serial number identifying the recipient certificate. */
+    PKCS7_ISSUER_AND_SERIAL *issuer_and_serial;
+    /** Algorithm used to encrypt the content-encryption key for this recipient. */
+    X509_ALGOR *key_enc_algor;
+    /** Encrypted content-encryption key octets for this recipient. */
+    ASN1_OCTET_STRING *enc_key;
+    /** Recipient certificate used to obtain the public key for this RecipientInfo. */
+    X509 *cert;
+    /** Library/provider context associated with this recipient info (not serialized). */
+    const PKCS7_CTX *ctx;
+} PKCS7_RECIP_INFO;
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(PKCS7_RECIP_INFO) container type.
+ */
+{-
+    generate_stack_macros("PKCS7_RECIP_INFO");
+-}
+/* clang-format on */
+
+/**
+ * @brief PKCS#7 SignedData content: digests, optional certificates/CRLs, signer infos, and encapsulated content.
+ */
+typedef struct pkcs7_signed_st {
+    /** PKCS#7 SignedData version (typically 1). */
+    ASN1_INTEGER *version; /* version 1 */
+    /** @brief Message digests used. */
+    STACK_OF(X509_ALGOR) *md_algs;
+    /** Optional certificates included with the signed data ([0]). */
+    STACK_OF(X509) *cert; /* [ 0 ] */ /* name should be 'certificates' */
+    STACK_OF(X509_CRL) *crl; /**< Certificate revocation lists included with the signed data ([1]). */
+    /** Signer infos describing each signature over the SignedData content. */
+    STACK_OF(PKCS7_SIGNER_INFO) *signer_info;
+    /** Encapsulated content being signed (nested PKCS#7 ContentInfo). */
+    struct pkcs7_st *contents;
+} PKCS7_SIGNED;
+/*
+ * The above structure is very very similar to PKCS7_SIGN_ENVELOPE. How about
+ * merging the two
+ */
+
+/**
+ * @brief PKCS#7 EncryptedContentInfo: content type, content-encryption algorithm, and ciphertext.
+ */
+typedef struct pkcs7_enc_content_st {
+    /** ASN.1 object identifier of the inner content type being encrypted. */
+    ASN1_OBJECT *content_type;
+    /** @brief Content-encryption algorithm. */
+    X509_ALGOR *algorithm;
+    /** Encrypted content octets ([0] IMPLICIT OCTET STRING); may be NULL when streaming. */
+    ASN1_OCTET_STRING *enc_data; /* [ 0 ] */
+    /** Content-encryption cipher used when creating encrypted content (not serialized). */
+    const EVP_CIPHER *cipher;
+    /** Library/provider context associated with this encrypted content (not serialized). */
+    const PKCS7_CTX *ctx;
+} PKCS7_ENC_CONTENT;
+
+/**
+ * @brief PKCS#7 EnvelopedData content: per-recipient key infos and encrypted content.
+ */
+typedef struct pkcs7_enveloped_st {
+    /** CMS/PKCS#7 EnvelopedData version (typically 0). */
+    ASN1_INTEGER *version; /* version 0 */
+    /** @brief Per-recipient encrypted key infos. */
+    STACK_OF(PKCS7_RECIP_INFO) *recipientinfo;
+    PKCS7_ENC_CONTENT *enc_data; /**< Encrypted content info (algorithm and ciphertext). */
+} PKCS7_ENVELOPE;
+
+/**
+ * @brief PKCS#7 SignedAndEnvelopedData content: digests, optional certificates/CRLs, signer infos, per-recipient key infos, and encrypted content.
+ */
+typedef struct pkcs7_signedandenveloped_st {
+    /** CMS/PKCS#7 SignedAndEnvelopedData version (typically 1). */
+    ASN1_INTEGER *version; /* version 1 */
+    /** @brief Message digests used. */
+    STACK_OF(X509_ALGOR) *md_algs;
+    /** Optional certificates included with the signed-and-enveloped data ([0]). */
+    STACK_OF(X509) *cert; /* [ 0 ] */ /* name should be 'certificates' */
+    STACK_OF(X509_CRL) *crl; /**< Certificate revocation lists included with the signed-and-enveloped data ([1]). */
+    /** Signer infos for SignedAndEnvelopedData. */
+    STACK_OF(PKCS7_SIGNER_INFO) *signer_info;
+    /** Encrypted content info for SignedAndEnvelopedData. */
+    PKCS7_ENC_CONTENT *enc_data;
+    /** @brief Per-recipient encrypted key infos. */
+    STACK_OF(PKCS7_RECIP_INFO) *recipientinfo;
+} PKCS7_SIGN_ENVELOPE;
+
+/**
+ * @brief PKCS#7 DigestedData content: digest algorithm, encapsulated content, and message digest.
+ */
+typedef struct pkcs7_digest_st {
+    /** PKCS#7 DigestedData version (typically 0). */
+    ASN1_INTEGER *version; /* version 0 */
+    /** Message-digest AlgorithmIdentifier used for DigestedData. */
+    X509_ALGOR *md; /* md used */
+    /** Encapsulated content whose digest is stored in @c digest. */
+    struct pkcs7_st *contents;
+    /** Message digest octets computed over the encapsulated content. */
+    ASN1_OCTET_STRING *digest;
+} PKCS7_DIGEST;
+
+/**
+ * @brief PKCS#7 EncryptedData content: encrypted content info.
+ */
+typedef struct pkcs7_encrypted_st {
+    /** PKCS#7 EncryptedData version (typically 0). */
+    ASN1_INTEGER *version; /* version 0 */
+    /** Encrypted content info (algorithm and ciphertext) for EncryptedData. */
+    PKCS7_ENC_CONTENT *enc_data;
+} PKCS7_ENCRYPT;
+
+/**
+ * @brief PKCS#7 ContentInfo container holding typed content and related state.
+ */
+typedef struct pkcs7_st {
+    /**
+     * Cached DER encoding of this PKCS#7 structure when non-NULL.
+     */
+    unsigned char *asn1;
+    /** Length in bytes of the cached DER encoding at @c asn1, or 0 when unused. */
+    long length;
+#define PKCS7_S_HEADER 0
+#define PKCS7_S_BODY 1
+#define PKCS7_S_TAIL 2
+    /** Streaming parse/write state (PKCS7_S_HEADER, PKCS7_S_BODY, or PKCS7_S_TAIL). */
+    int state; /* used during processing */
+    /** Non-zero when the PKCS#7 content is detached from the signedData structure. */
+    int detached;
+    /** ASN.1 object identifier naming the PKCS#7 content type (selects @c d union arm). */
+    ASN1_OBJECT *type;
+    /**
+     * @brief Content as defined by the type.
+     *
+     * All encryption/message digests are applied to the 'contents', leaving
+     * out the 'type' field.
+     */
+    union {
+        /** Generic content pointer used for unrecognized or untyped PKCS#7 payloads. */
+        char *ptr;
+        /* NID_pkcs7_data */
+        /** Raw data content when type is NID_pkcs7_data. */
+        ASN1_OCTET_STRING *data;
+        /* NID_pkcs7_signed */
+        /** SignedData content when type is NID_pkcs7_signed (named @c sign because @c signed is a C keyword). */
+        PKCS7_SIGNED *sign; /* field name 'signed' would clash with C keyword */
+        /* NID_pkcs7_enveloped */
+        /** EnvelopedData content when type is NID_pkcs7_enveloped. */
+        PKCS7_ENVELOPE *enveloped;
+        /* NID_pkcs7_signedAndEnveloped */
+        /** SignedAndEnvelopedData content when type is NID_pkcs7_signedAndEnveloped. */
+        PKCS7_SIGN_ENVELOPE *signed_and_enveloped;
+        /* NID_pkcs7_digest */
+        /** DigestedData content when type is NID_pkcs7_digest. */
+        PKCS7_DIGEST *digest;
+        /* NID_pkcs7_encrypted */
+        /** EncryptedData content when type is NID_pkcs7_encrypted. */
+        PKCS7_ENCRYPT *encrypted;
+        /* Anything else */
+        /** Catch-all content for unrecognized PKCS#7 types (ASN.1 ANY). */
+        ASN1_TYPE *other;
+    } d;
+    /** Library/provider context associated with this PKCS#7 object. */
+    PKCS7_CTX ctx;
+} PKCS7;
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(PKCS7) container type.
+ */
+{-
+    generate_stack_macros("PKCS7");
+-}
+/* clang-format on */
+
+#define PKCS7_OP_SET_DETACHED_SIGNATURE 1
+#define PKCS7_OP_GET_DETACHED_SIGNATURE 2
+
+#define PKCS7_get_signed_attributes(si) ((si)->auth_attr)
+#define PKCS7_get_attributes(si) ((si)->unauth_attr)
+
+#define PKCS7_type_is_signed(a) (OBJ_obj2nid((a)->type) == NID_pkcs7_signed)
+#define PKCS7_type_is_encrypted(a) (OBJ_obj2nid((a)->type) == NID_pkcs7_encrypted)
+#define PKCS7_type_is_enveloped(a) (OBJ_obj2nid((a)->type) == NID_pkcs7_enveloped)
+#define PKCS7_type_is_signedAndEnveloped(a) \
+    (OBJ_obj2nid((a)->type) == NID_pkcs7_signedAndEnveloped)
+#define PKCS7_type_is_data(a) (OBJ_obj2nid((a)->type) == NID_pkcs7_data)
+#define PKCS7_type_is_digest(a) (OBJ_obj2nid((a)->type) == NID_pkcs7_digest)
+
+#define PKCS7_set_detached(p, v) \
+    PKCS7_ctrl(p, PKCS7_OP_SET_DETACHED_SIGNATURE, v, NULL)
+#define PKCS7_get_detached(p) \
+    PKCS7_ctrl(p, PKCS7_OP_GET_DETACHED_SIGNATURE, 0, NULL)
+
+#define PKCS7_is_detached(p7) (PKCS7_type_is_signed(p7) && PKCS7_get_detached(p7))
+
+/* S/MIME related flags */
+
+#define PKCS7_TEXT 0x1
+#define PKCS7_NOCERTS 0x2
+#define PKCS7_NOSIGS 0x4
+#define PKCS7_NOCHAIN 0x8
+#define PKCS7_NOINTERN 0x10
+#define PKCS7_NOVERIFY 0x20
+#define PKCS7_DETACHED 0x40
+#define PKCS7_BINARY 0x80
+#define PKCS7_NOATTR 0x100
+#define PKCS7_NOSMIMECAP 0x200
+#define PKCS7_NOOLDMIMETYPE 0x400
+#define PKCS7_CRLFEOL 0x800
+#define PKCS7_STREAM 0x1000
+#define PKCS7_NOCRL 0x2000
+#define PKCS7_PARTIAL 0x4000
+#define PKCS7_REUSE_DIGEST 0x8000
+#define PKCS7_NO_DUAL_CONTENT 0x10000
+
+/* Flags: for compatibility with older code */
+
+#define SMIME_TEXT PKCS7_TEXT
+#define SMIME_NOCERTS PKCS7_NOCERTS
+#define SMIME_NOSIGS PKCS7_NOSIGS
+#define SMIME_NOCHAIN PKCS7_NOCHAIN
+#define SMIME_NOINTERN PKCS7_NOINTERN
+#define SMIME_NOVERIFY PKCS7_NOVERIFY
+#define SMIME_DETACHED PKCS7_DETACHED
+#define SMIME_BINARY PKCS7_BINARY
+#define SMIME_NOATTR PKCS7_NOATTR
+
+/* CRLF ASCII canonicalisation */
+#define SMIME_ASCIICRLF 0x80000
+
+/**
+ * @brief Allocate an empty PKCS#7 IssuerAndSerialNumber.
+ * @return New PKCS7_ISSUER_AND_SERIAL, or NULL on allocation failure.
+ */
+PKCS7_ISSUER_AND_SERIAL *PKCS7_ISSUER_AND_SERIAL_new(void);
+/**
+ * @brief Free a PKCS#7 IssuerAndSerialNumber and its contents.
+ * @param a Value to free, or NULL.
+ */
+void PKCS7_ISSUER_AND_SERIAL_free(PKCS7_ISSUER_AND_SERIAL *a);
+/**
+ * @brief Decode a PKCS#7 IssuerAndSerialNumber from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded PKCS7_ISSUER_AND_SERIAL, or NULL on error.
+ */
+PKCS7_ISSUER_AND_SERIAL *d2i_PKCS7_ISSUER_AND_SERIAL(PKCS7_ISSUER_AND_SERIAL **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a PKCS#7 IssuerAndSerialNumber to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_PKCS7_ISSUER_AND_SERIAL(const PKCS7_ISSUER_AND_SERIAL *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for PKCS7_ISSUER_AND_SERIAL.
+ * @return Pointer to the static ASN1_ITEM for PKCS7_ISSUER_AND_SERIAL.
+ */
+const ASN1_ITEM *PKCS7_ISSUER_AND_SERIAL_it(void);
+
+
+/**
+ * @brief Digest the DER encoding of a PKCS7_ISSUER_AND_SERIAL structure.
+ * @param data Issuer-and-serial value whose ASN.1 encoding is hashed.
+ * @param type Digest algorithm used to hash the DER encoding.
+ * @param md Buffer that receives the digest bytes (at least EVP_MD_size(@p type)).
+ * @param len Receives the digest length in bytes.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_ISSUER_AND_SERIAL_digest(PKCS7_ISSUER_AND_SERIAL *data,
+    const EVP_MD *type, unsigned char *md,
+    unsigned int *len);
+#ifndef OPENSSL_NO_STDIO
+/**
+ * @brief Decode a PKCS#7 structure from a FILE stream in DER form.
+ * @param fp Open file positioned at the start of the DER encoding.
+ * @param p7 Optional destination pointer updated to the result, or NULL.
+ * @return Decoded PKCS7, or NULL on error.
+ */
+PKCS7 *d2i_PKCS7_fp(FILE *fp, PKCS7 **p7);
+/**
+ * @brief Write a DER-encoded PKCS#7 structure to a FILE.
+ * @param fp Output stream.
+ * @param p7 PKCS#7 object to encode.
+ * @return Number of bytes written, or a negative / zero value on error.
+ */
+int i2d_PKCS7_fp(FILE *fp, const PKCS7 *p7);
+#endif
+/**
+ * @brief Deep-copy a PKCS#7 structure (PKCS7_dup).
+ * @param a Source PKCS7 to duplicate.
+ * @return Newly allocated PKCS7 copy, or NULL on failure; free with PKCS7_free().
+ */
+DECLARE_ASN1_DUP_FUNCTION(PKCS7)
+/**
+ * @brief Decode a DER-encoded PKCS#7 structure from a BIO.
+ * @param bp BIO supplying the DER encoding.
+ * @param p7 Optional destination pointer updated to the result, or NULL.
+ * @return Decoded PKCS7, or NULL on error.
+ */
+PKCS7 *d2i_PKCS7_bio(BIO *bp, PKCS7 **p7);
+/**
+ * @brief Write a DER-encoded PKCS#7 structure to a BIO.
+ * @param bp Output BIO receiving the DER encoding.
+ * @param p7 PKCS#7 object to serialise.
+ * @return Number of bytes written, or a negative value on error.
+ */
+int i2d_PKCS7_bio(BIO *bp, const PKCS7 *p7);
+/**
+ * @brief Output a PKCS#7 structure in BER format, streaming content from @p in when required.
+ * @param out BIO that receives the BER-encoded PKCS#7.
+ * @param p7 PKCS#7 object to serialise.
+ * @param in Optional content BIO for streaming signed/enveloped data, or NULL.
+ * @param flags SMIME_* / PKCS7_* streaming and encoding flags.
+ * @return 1 on success, or 0 on failure.
+ */
+int i2d_PKCS7_bio_stream(BIO *out, PKCS7 *p7, BIO *in, int flags);
+/**
+ * @brief Write a PKCS#7 structure as PEM, streaming content from @p in when required.
+ * @param out BIO that receives the PEM-encoded PKCS#7.
+ * @param p7 PKCS#7 object to serialise.
+ * @param in Optional content BIO for streaming signed/enveloped data, or NULL.
+ * @param flags SMIME_* / PKCS7_* streaming and encoding flags.
+ * @return 1 on success, or 0 on failure.
+ */
+int PEM_write_bio_PKCS7_stream(BIO *out, PKCS7 *p7, BIO *in, int flags);
+
+/**
+ * @brief Allocate an empty PKCS#7 SignerInfo.
+ * @return New PKCS7_SIGNER_INFO, or NULL on allocation failure.
+ */
+PKCS7_SIGNER_INFO *PKCS7_SIGNER_INFO_new(void);
+/**
+ * @brief Free a PKCS#7 SignerInfo and its contents.
+ * @param a Value to free, or NULL.
+ */
+void PKCS7_SIGNER_INFO_free(PKCS7_SIGNER_INFO *a);
+/**
+ * @brief Decode a PKCS#7 SignerInfo from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded PKCS7_SIGNER_INFO, or NULL on error.
+ */
+PKCS7_SIGNER_INFO *d2i_PKCS7_SIGNER_INFO(PKCS7_SIGNER_INFO **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a PKCS#7 SignerInfo to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_PKCS7_SIGNER_INFO(const PKCS7_SIGNER_INFO *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for PKCS7_SIGNER_INFO.
+ * @return Pointer to the static ASN1_ITEM for PKCS7_SIGNER_INFO.
+ */
+const ASN1_ITEM *PKCS7_SIGNER_INFO_it(void);
+
+/**
+ * @brief Allocate an empty PKCS#7 recipient info structure.
+ * @return New PKCS7_RECIP_INFO, or NULL on allocation failure.
+ */
+PKCS7_RECIP_INFO *PKCS7_RECIP_INFO_new(void);
+/**
+ * @brief Free a PKCS#7 recipient info structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void PKCS7_RECIP_INFO_free(PKCS7_RECIP_INFO *a);
+/**
+ * @brief Decode a PKCS#7 recipient info structure from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded PKCS7_RECIP_INFO, or NULL on error.
+ */
+PKCS7_RECIP_INFO *d2i_PKCS7_RECIP_INFO(PKCS7_RECIP_INFO **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a PKCS#7 recipient info structure to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_PKCS7_RECIP_INFO(const PKCS7_RECIP_INFO *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for PKCS7_RECIP_INFO.
+ * @return Pointer to the static ASN1_ITEM for PKCS7_RECIP_INFO.
+ */
+const ASN1_ITEM *PKCS7_RECIP_INFO_it(void);
+/**
+ * @brief Allocate an empty PKCS#7 SignedData.
+ * @return New PKCS7_SIGNED, or NULL on allocation failure.
+ */
+PKCS7_SIGNED *PKCS7_SIGNED_new(void);
+/**
+ * @brief Free a PKCS#7 SignedData and its contents.
+ * @param a Value to free, or NULL.
+ */
+void PKCS7_SIGNED_free(PKCS7_SIGNED *a);
+/**
+ * @brief Decode a PKCS#7 SignedData from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded PKCS7_SIGNED, or NULL on error.
+ */
+PKCS7_SIGNED *d2i_PKCS7_SIGNED(PKCS7_SIGNED **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a PKCS#7 SignedData to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_PKCS7_SIGNED(const PKCS7_SIGNED *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for PKCS7_SIGNED.
+ * @return Pointer to the static ASN1_ITEM for PKCS7_SIGNED.
+ */
+const ASN1_ITEM *PKCS7_SIGNED_it(void);
+
+/**
+ * @brief Allocate an empty PKCS#7 EncryptedContentInfo.
+ * @return New PKCS7_ENC_CONTENT, or NULL on allocation failure.
+ */
+PKCS7_ENC_CONTENT *PKCS7_ENC_CONTENT_new(void);
+/**
+ * @brief Free a PKCS#7 EncryptedContentInfo and its contents.
+ * @param a Value to free, or NULL.
+ */
+void PKCS7_ENC_CONTENT_free(PKCS7_ENC_CONTENT *a);
+/**
+ * @brief Decode a PKCS#7 EncryptedContentInfo from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded PKCS7_ENC_CONTENT, or NULL on error.
+ */
+PKCS7_ENC_CONTENT *d2i_PKCS7_ENC_CONTENT(PKCS7_ENC_CONTENT **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a PKCS#7 EncryptedContentInfo to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_PKCS7_ENC_CONTENT(const PKCS7_ENC_CONTENT *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for PKCS7_ENC_CONTENT.
+ * @return Pointer to the static ASN1_ITEM for PKCS7_ENC_CONTENT.
+ */
+const ASN1_ITEM *PKCS7_ENC_CONTENT_it(void);
+
+/**
+ * @brief Allocate an empty PKCS#7 EnvelopedData structure.
+ * @return New PKCS7_ENVELOPE, or NULL on allocation failure.
+ */
+PKCS7_ENVELOPE *PKCS7_ENVELOPE_new(void);
+/**
+ * @brief Free a PKCS#7 EnvelopedData structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void PKCS7_ENVELOPE_free(PKCS7_ENVELOPE *a);
+/**
+ * @brief Decode a PKCS#7 EnvelopedData structure from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded PKCS7_ENVELOPE, or NULL on error.
+ */
+PKCS7_ENVELOPE *d2i_PKCS7_ENVELOPE(PKCS7_ENVELOPE **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a PKCS#7 EnvelopedData structure to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_PKCS7_ENVELOPE(const PKCS7_ENVELOPE *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for PKCS7_ENVELOPE.
+ * @return Pointer to the static ASN1_ITEM for PKCS7_ENVELOPE.
+ */
+const ASN1_ITEM *PKCS7_ENVELOPE_it(void);
+/**
+ * @brief Allocate an empty PKCS#7 SignedAndEnvelopedData structure.
+ * @return New PKCS7_SIGN_ENVELOPE, or NULL on allocation failure.
+ */
+PKCS7_SIGN_ENVELOPE *PKCS7_SIGN_ENVELOPE_new(void);
+/**
+ * @brief Free a PKCS#7 SignedAndEnvelopedData structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void PKCS7_SIGN_ENVELOPE_free(PKCS7_SIGN_ENVELOPE *a);
+/**
+ * @brief Decode a PKCS#7 SignedAndEnvelopedData structure from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded PKCS7_SIGN_ENVELOPE, or NULL on error.
+ */
+PKCS7_SIGN_ENVELOPE *d2i_PKCS7_SIGN_ENVELOPE(PKCS7_SIGN_ENVELOPE **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a PKCS#7 SignedAndEnvelopedData structure to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_PKCS7_SIGN_ENVELOPE(const PKCS7_SIGN_ENVELOPE *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for PKCS7_SIGN_ENVELOPE.
+ * @return Pointer to the static ASN1_ITEM for PKCS7_SIGN_ENVELOPE.
+ */
+const ASN1_ITEM *PKCS7_SIGN_ENVELOPE_it(void);
+/**
+ * @brief Allocate an empty PKCS#7 DigestedData structure.
+ * @return New PKCS7_DIGEST, or NULL on allocation failure.
+ */
+PKCS7_DIGEST *PKCS7_DIGEST_new(void);
+/**
+ * @brief Free a PKCS#7 DigestedData structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void PKCS7_DIGEST_free(PKCS7_DIGEST *a);
+/**
+ * @brief Decode a PKCS#7 DigestedData structure from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded PKCS7_DIGEST, or NULL on error.
+ */
+PKCS7_DIGEST *d2i_PKCS7_DIGEST(PKCS7_DIGEST **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a PKCS#7 DigestedData structure to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_PKCS7_DIGEST(const PKCS7_DIGEST *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for PKCS7_DIGEST.
+ * @return Pointer to the static ASN1_ITEM for PKCS7_DIGEST.
+ */
+const ASN1_ITEM *PKCS7_DIGEST_it(void);
+/**
+ * @brief Allocate an empty PKCS#7 EncryptedData.
+ * @return New PKCS7_ENCRYPT, or NULL on allocation failure.
+ */
+PKCS7_ENCRYPT *PKCS7_ENCRYPT_new(void);
+/**
+ * @brief Free a PKCS#7 EncryptedData and its contents.
+ * @param a Value to free, or NULL.
+ */
+void PKCS7_ENCRYPT_free(PKCS7_ENCRYPT *a);
+/**
+ * @brief Decode a PKCS#7 EncryptedData from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded PKCS7_ENCRYPT, or NULL on error.
+ */
+PKCS7_ENCRYPT *d2i_PKCS7_ENCRYPT(PKCS7_ENCRYPT **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a PKCS#7 EncryptedData to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_PKCS7_ENCRYPT(const PKCS7_ENCRYPT *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for PKCS7_ENCRYPT.
+ * @return Pointer to the static ASN1_ITEM for PKCS7_ENCRYPT.
+ */
+const ASN1_ITEM *PKCS7_ENCRYPT_it(void);
+
+/**
+ * @brief Allocate an empty PKCS#7 structure.
+ * @return New PKCS7, or NULL on allocation failure.
+ */
+PKCS7 *PKCS7_new(void);
+/**
+ * @brief Free a PKCS#7 structure and its contents.
+ * @param a Value to free, or NULL.
+ */
+void PKCS7_free(PKCS7 *a);
+/**
+ * @brief Decode a PKCS#7 structure from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded PKCS7, or NULL on error.
+ */
+PKCS7 *d2i_PKCS7(PKCS7 **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a PKCS#7 structure to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_PKCS7(const PKCS7 *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for PKCS7.
+ * @return Pointer to the static ASN1_ITEM for PKCS7.
+ */
+const ASN1_ITEM *PKCS7_it(void);
+/**
+ * @brief Allocate an empty PKCS#7 structure with an explicit library context and property query.
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query for algorithm fetches, or NULL.
+ * @return New PKCS7, or NULL on allocation failure; free with PKCS7_free.
+ */
+PKCS7 *PKCS7_new_ex(OSSL_LIB_CTX *libctx, const char *propq);
+
+/**
+ * @brief Return the ASN.1 item descriptor used when signing PKCS#7 authenticated attributes.
+ * @return Pointer to the static ASN1_ITEM for PKCS7_ATTR_SIGN.
+ */
+const ASN1_ITEM *PKCS7_ATTR_SIGN_it(void);
+/**
+ * @brief Return the ASN.1 item descriptor used when verifying PKCS#7 authenticated attributes.
+ * @return Pointer to the static ASN1_ITEM for PKCS7_ATTR_VERIFY.
+ */
+const ASN1_ITEM *PKCS7_ATTR_VERIFY_it(void);
+
+/**
+ * @brief Encode a PKCS#7 structure to DER using indefinite-length (NDEF) constructed encoding.
+ * @param a PKCS#7 value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_PKCS7_NDEF(const PKCS7 *a, unsigned char **out);
+/**
+ * @brief Print a PKCS#7 structure to a BIO.
+ * @param out BIO to write human-readable output to.
+ * @param x PKCS#7 ContentInfo to print.
+ * @param indent Indentation depth in spaces.
+ * @param pctx Optional ASN.1 print context, or NULL for defaults.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_print_ctx(BIO *out, const PKCS7 *x, int indent,
+    const ASN1_PCTX *pctx);
+
+/**
+ * @brief Perform a control operation on a PKCS#7 object (for example set/get detached signature).
+ * @param p7 PKCS#7 object to modify or query.
+ * @param cmd Control code such as PKCS7_OP_SET_DETACHED_SIGNATURE or PKCS7_OP_GET_DETACHED_SIGNATURE.
+ * @param larg Integer argument interpreted according to @p cmd (for example detached flag).
+ * @param parg Optional pointer argument for @p cmd, or NULL when unused.
+ * @return Command-specific long result; for set/get detached, the detached flag (non-zero when detached).
+ */
+long PKCS7_ctrl(PKCS7 *p7, int cmd, long larg, char *parg);
+
+/**
+ * @brief Return whether a PKCS#7 content type is not one of the standard PKCS#7 content NIDs.
+ * @param p7 PKCS#7 object whose content type is examined.
+ * @return 1 if the type is "other" (not data/signed/enveloped/signedAndEnveloped/digest/encrypted), or 0 if it matches a standard type.
+ */
+int PKCS7_type_is_other(PKCS7 *p7);
+/**
+ * @brief Set the PKCS#7 content type and allocate the corresponding content structure.
+ * @param p7 PKCS#7 object to initialise.
+ * @param type Content-type NID such as NID_pkcs7_signed or NID_pkcs7_enveloped.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_set_type(PKCS7 *p7, int type);
+/**
+ * @brief Set a PKCS#7 content type to an ASN.1 OTHER content value, transferring ownership of @p other.
+ * @param p7 PKCS#7 structure to update.
+ * @param type NID of the content type.
+ * @param other ASN.1 value describing the content; ownership transfers to @p p7 on success.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_set0_type_other(PKCS7 *p7, int type, ASN1_TYPE *other);
+/**
+ * @brief Set the inner content of a SignedData / DigestedData PKCS#7 to @p p7_data.
+ * @param p7 Outer PKCS#7 whose content type supports nested content.
+ * @param p7_data Inner PKCS#7 content object; ownership is transferred on success.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_set_content(PKCS7 *p7, PKCS7 *p7_data);
+/**
+ * @brief Populate a PKCS#7 signer info with certificate, key, and digest algorithm.
+ * @param p7i SignerInfo to configure.
+ * @param x509 Signer's certificate (sets issuer/serial).
+ * @param pkey Signer's private key.
+ * @param dgst Digest algorithm used for the signature.
+ * @return 1 on success, or 0 on error.
+ */
+int PKCS7_SIGNER_INFO_set(PKCS7_SIGNER_INFO *p7i, X509 *x509, EVP_PKEY *pkey,
+    const EVP_MD *dgst);
+/**
+ * @brief Compute and store the signature for a prepared PKCS#7 signer info.
+ * @param si Signer info previously configured with PKCS7_SIGNER_INFO_set() (and optional attributes).
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_SIGNER_INFO_sign(PKCS7_SIGNER_INFO *si);
+/**
+ * @brief Attach a prepared signer info to a PKCS#7 SignedData or SignedAndEnvelopedData structure.
+ * @param p7 PKCS#7 object that already has a signed content type.
+ * @param p7i Signer info to add; the structure retains a reference to it.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_add_signer(PKCS7 *p7, PKCS7_SIGNER_INFO *p7i);
+/**
+ * @brief Add a certificate to a PKCS#7 SignedData or SignedAndEnvelopedData structure.
+ * @param p7 PKCS#7 object that already has a signed content type.
+ * @param cert Certificate to include; a reference is retained by @p p7.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_add_certificate(PKCS7 *p7, X509 *cert);
+/**
+ * @brief Add a certificate revocation list to a PKCS#7 SignedData or SignedAndEnvelopedData structure.
+ * @param p7 PKCS#7 object that already has a signed content type.
+ * @param crl CRL to include; a reference is retained by @p p7.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_add_crl(PKCS7 *p7, X509_CRL *crl);
+/**
+ * @brief Allocate nested content of type @p nid and attach it to a PKCS#7 structure.
+ * @param p7 PKCS#7 ContentInfo that receives the new nested content.
+ * @param nid NID of the content type to create (for example NID_pkcs7_data).
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_content_new(PKCS7 *p7, int nid);
+/**
+ * @brief Verify a PKCS#7 signed content digest against a signer info and certificate store.
+ * @param cert_store Trusted store used to locate and validate the signer certificate.
+ * @param ctx Verification context reused or initialized for the signer certificate check.
+ * @param bio BIO supplying the signed content octets (digest input).
+ * @param p7 Signed PKCS#7 structure containing certificates and signer infos.
+ * @param si Signer info whose signature and digest are verified.
+ * @return 1 if verification succeeds, or 0 / a negative value on failure.
+ */
+int PKCS7_dataVerify(X509_STORE *cert_store, X509_STORE_CTX *ctx,
+    BIO *bio, PKCS7 *p7, PKCS7_SIGNER_INFO *si);
+/**
+ * @brief Verify one PKCS#7 signer info's signature against content digested from @p bio.
+ * @param bio BIO supplying the signed content octets (digest input).
+ * @param p7 Signed PKCS#7 structure containing the signer infos / certificates.
+ * @param si Signer info whose signature is verified.
+ * @param signer Certificate whose public key verifies @p si (may be from @p p7).
+ * @return 1 if the signature is valid, or 0 / a negative value on failure.
+ */
+int PKCS7_signatureVerify(BIO *bio, PKCS7 *p7, PKCS7_SIGNER_INFO *si,
+    X509 *signer);
+
+/**
+ * @brief Create a BIO chain for writing content into a PKCS#7 structure (digest/encrypt filters).
+ * @param p7 PKCS#7 object being signed, enveloped, digested, or encrypted.
+ * @param bio Optional BIO supplying detached content, or NULL to embed content in @p p7.
+ * @return BIO to which application data should be written, or NULL on failure.
+ */
+BIO *PKCS7_dataInit(PKCS7 *p7, BIO *bio);
+/**
+ * @brief Finalize PKCS#7 content processing after data has been written through @p bio.
+ * @param p7 PKCS#7 structure being signed, enveloped, or digested.
+ * @param bio Filter BIO chain previously obtained from PKCS7_dataInit() / related setup.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_dataFinal(PKCS7 *p7, BIO *bio);
+/**
+ * @brief Create a BIO that decrypts/verifies PKCS#7 content for reading.
+ * @param p7 PKCS#7 EnvelopedData / SignedAndEnvelopedData (or similar) to decode.
+ * @param pkey Recipient private key for decryption, or NULL when not required.
+ * @param in_bio Optional BIO supplying encrypted content when not embedded in @p p7, or NULL.
+ * @param pcert Recipient certificate used to select the matching RecipientInfo, or NULL.
+ * @return BIO that yields cleartext content, or NULL on error.
+ */
+BIO *PKCS7_dataDecode(PKCS7 *p7, EVP_PKEY *pkey, BIO *in_bio, X509 *pcert);
+
+/**
+ * @brief Create a signer info from @p x509 / @p pkey / @p dgst and add it to signed PKCS#7 @p p7.
+ * @param p7 PKCS#7 SignedData (or signed-and-enveloped) object to update.
+ * @param x509 Signer certificate identifying the signing key.
+ * @param pkey Private key corresponding to @p x509.
+ * @param dgst Message digest algorithm used for signing.
+ * @return The new PKCS7_SIGNER_INFO on success, or NULL on failure.
+ */
+PKCS7_SIGNER_INFO *PKCS7_add_signature(PKCS7 *p7, X509 *x509,
+    EVP_PKEY *pkey, const EVP_MD *dgst);
+/**
+ * @brief Find the certificate in @p p7 that matches a signer info's issuer and serial.
+ * @param p7 PKCS#7 object whose certificate set is searched.
+ * @param si Signer info whose issuerAndSerialNumber is matched.
+ * @return Matching X509 from @p p7 (do not free), or NULL if none is present.
+ */
+X509 *PKCS7_cert_from_signer_info(PKCS7 *p7, PKCS7_SIGNER_INFO *si);
+/**
+ * @brief Set the message-digest algorithm on a DigestedData PKCS#7 structure.
+ * @param p7 PKCS#7 object of type digestedData.
+ * @param md Digest method to record in the DigestedData AlgorithmIdentifier.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_set_digest(PKCS7 *p7, const EVP_MD *md);
+/**
+ * @brief Return the signer infos from a signed or signed-and-enveloped PKCS#7 structure.
+ * @param p7 PKCS#7 object of type signedData or signedAndEnvelopedData.
+ * @return Internal STACK_OF(PKCS7_SIGNER_INFO), or NULL if unavailable; do not free.
+ */
+STACK_OF(PKCS7_SIGNER_INFO) *PKCS7_get_signer_info(PKCS7 *p7);
+
+/**
+ * @brief Create a recipient info from @p x509 and add it to enveloped or signed-and-enveloped PKCS#7 @p p7.
+ * @param p7 PKCS#7 EnvelopedData or SignedAndEnvelopedData to update.
+ * @param x509 Recipient certificate whose public key encrypts the content-encryption key.
+ * @return The new PKCS7_RECIP_INFO on success, or NULL on failure.
+ */
+PKCS7_RECIP_INFO *PKCS7_add_recipient(PKCS7 *p7, X509 *x509);
+/**
+ * @brief Return non-owning pointers to a signer info's key and digest/signature algorithms.
+ * @param si Signer info to query.
+ * @param pk Optional destination for the signing private key pointer, or NULL.
+ * @param pdig Optional destination for the digest AlgorithmIdentifier, or NULL.
+ * @param psig Optional destination for the signature AlgorithmIdentifier, or NULL.
+ */
+void PKCS7_SIGNER_INFO_get0_algs(PKCS7_SIGNER_INFO *si, EVP_PKEY **pk,
+    X509_ALGOR **pdig, X509_ALGOR **psig);
+/**
+ * @brief Return a non-owning pointer to a recipient info's key-encryption algorithm.
+ * @param ri Recipient info to query.
+ * @param penc Destination for the key-encryption AlgorithmIdentifier, or NULL.
+ */
+void PKCS7_RECIP_INFO_get0_alg(PKCS7_RECIP_INFO *ri, X509_ALGOR **penc);
+/**
+ * @brief Add a recipient info structure to a PKCS#7 enveloped-data object.
+ * @param p7 PKCS#7 object of type enveloped or signed-and-enveloped data.
+ * @param ri Recipient info to append; on success ownership transfers to @p p7.
+ * @return 1 on success, or 0 on error.
+ */
+int PKCS7_add_recipient_info(PKCS7 *p7, PKCS7_RECIP_INFO *ri);
+/**
+ * @brief Populate a PKCS#7 recipient info from a recipient certificate.
+ * @param p7i RecipientInfo structure to fill (issuer/serial and encrypted-key algorithm).
+ * @param x509 Recipient X.509 certificate whose public key encrypts the content-encryption key.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_RECIP_INFO_set(PKCS7_RECIP_INFO *p7i, X509 *x509);
+/**
+ * @brief Set the content-encryption cipher on an enveloped or encrypted PKCS#7 structure.
+ * @param p7 PKCS#7 EnvelopedData, SignedAndEnvelopedData, or EncryptedData object.
+ * @param cipher Symmetric cipher used to encrypt the content (must support ASN.1 parameters).
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_set_cipher(PKCS7 *p7, const EVP_CIPHER *cipher);
+/**
+ * @brief Prepare a PKCS#7 structure for streaming BER output and return content-boundary pointers.
+ * @param boundary Receives a pointer into the ASN.1 encoding where streaming content is spliced.
+ * @param p7 PKCS#7 object prepared with streaming flags (for example PKCS7_STREAM).
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_stream(unsigned char ***boundary, PKCS7 *p7);
+
+/**
+ * @brief Return the issuer-and-serial of signer info @p idx in a signed PKCS#7 structure.
+ * @param p7 PKCS#7 SignedData or SignedAndEnvelopedData object.
+ * @param idx Zero-based index into the signer-info stack.
+ * @return Pointer to the internal PKCS7_ISSUER_AND_SERIAL (do not free), or NULL if out of range.
+ */
+PKCS7_ISSUER_AND_SERIAL *PKCS7_get_issuer_and_serial(PKCS7 *p7, int idx);
+/**
+ * @brief Return an ASN.1 octet string from a PKCS#7 structure.
+ * @param p7 PKCS#7 object to query.
+ * @return Pointer to an internal ASN1_OCTET_STRING, or NULL if the structure
+ *         cannot be parsed. The returned pointer must not be freed by the caller.
+ */
+ASN1_OCTET_STRING *PKCS7_get_octet_string(PKCS7 *p7);
+/**
+ * @brief Extract the message-digest OCTET STRING from a set of authenticatedAttributes.
+ * @param sk Attribute stack from a PKCS7_SIGNER_INFO.
+ * @return Pointer to the digest octets within @p sk, or NULL if absent; do not free.
+ */
+ASN1_OCTET_STRING *PKCS7_digest_from_attributes(STACK_OF(X509_ATTRIBUTE) *sk);
+/**
+ * @brief Add an authenticated (signed) attribute to a PKCS#7 signer info.
+ * @param p7si Signer info receiving the attribute.
+ * @param nid Attribute type NID (for example NID_pkcs9_contentType).
+ * @param type ASN.1 value type tag (V_ASN1_*) for @p data.
+ * @param data Attribute value pointer interpreted according to @p type.
+ * @return 1 on success, or 0 on error.
+ */
+int PKCS7_add_signed_attribute(PKCS7_SIGNER_INFO *p7si, int nid, int type,
+    void *data);
+/**
+ * @brief Add an unauthenticated attribute to a PKCS#7 signer info.
+ * @param p7si Signer info receiving the attribute.
+ * @param nid Attribute type NID (for example NID_pkcs9_unstructuredName).
+ * @param atrtype ASN.1 value type tag (V_ASN1_*) for @p value.
+ * @param value Attribute value pointer interpreted according to @p atrtype.
+ * @return 1 on success, or 0 on error.
+ */
+int PKCS7_add_attribute(PKCS7_SIGNER_INFO *p7si, int nid, int atrtype,
+    void *value);
+/**
+ * @brief Return an unauthenticated attribute of type @p nid from a PKCS#7 signer info.
+ * @param si Signer info whose unauthenticated attributes are searched.
+ * @param nid Attribute type NID to look up.
+ * @return Pointer to the attribute value, or NULL if not present.
+ */
+ASN1_TYPE *PKCS7_get_attribute(const PKCS7_SIGNER_INFO *si, int nid);
+/**
+ * @brief Return a signed attribute of type @p nid from a PKCS#7 signer info.
+ * @param si Signer info to search.
+ * @param nid Attribute type NID to look up.
+ * @return Pointer to the attribute value, or NULL if not present.
+ */
+ASN1_TYPE *PKCS7_get_signed_attribute(const PKCS7_SIGNER_INFO *si, int nid);
+/**
+ * @brief Replace the authenticatedAttributes of a signer info with a copy of @p sk.
+ * @param p7si Signer info to update.
+ * @param sk Attributes to install (copied); may be empty.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_set_signed_attributes(PKCS7_SIGNER_INFO *p7si,
+    STACK_OF(X509_ATTRIBUTE) *sk);
+/**
+ * @brief Replace the unauthenticated attributes on a PKCS#7 signer info.
+ * @param p7si Signer info whose unauthenticated attribute set is replaced.
+ * @param sk New attribute stack; on success ownership transfers to @p p7si.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_set_attributes(PKCS7_SIGNER_INFO *p7si,
+    STACK_OF(X509_ATTRIBUTE) *sk);
+
+/**
+ * @brief Create a PKCS#7 signed-data structure using the default library context.
+ * @param signcert Signer certificate, or NULL when only adding certs/flags require it.
+ * @param pkey Private key corresponding to @p signcert, or NULL for deferred signing.
+ * @param certs Optional additional certificates to include, or NULL.
+ * @param data BIO supplying the content to sign when not using detached/streaming flags.
+ * @param flags PKCS7_* flags controlling detached content, streaming, and attributes.
+ * @return New PKCS7, or NULL on error; free with PKCS7_free.
+ */
+PKCS7 *PKCS7_sign(X509 *signcert, EVP_PKEY *pkey, STACK_OF(X509) *certs,
+    BIO *data, int flags);
+/**
+ * @brief Create a PKCS#7 signed-data structure, with library context and property query.
+ * @param signcert Signer certificate, or NULL when only adding certs/flags require it.
+ * @param pkey Private key corresponding to @p signcert, or NULL for deferred signing.
+ * @param certs Optional additional certificates to include, or NULL.
+ * @param data BIO supplying the content to sign when not using detached/streaming flags.
+ * @param flags PKCS7_* flags controlling detached content, streaming, and attributes.
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query for algorithm fetches, or NULL.
+ * @return New PKCS7, or NULL on error; free with PKCS7_free.
+ */
+PKCS7 *PKCS7_sign_ex(X509 *signcert, EVP_PKEY *pkey, STACK_OF(X509) *certs,
+    BIO *data, int flags, OSSL_LIB_CTX *libctx,
+    const char *propq);
+
+/**
+ * @brief Add a signer to an existing SignedData PKCS#7 created for incremental signing.
+ * @param p7 PKCS#7 SignedData object previously prepared for signing.
+ * @param signcert Certificate corresponding to @p pkey.
+ * @param pkey Private key used to sign.
+ * @param md Message digest algorithm, or NULL to use the key's default.
+ * @param flags PKCS7_* signing flags (for example PKCS7_REUSE_DIGEST or PKCS7_PARTIAL).
+ * @return New signer info on success, or NULL on failure.
+ */
+PKCS7_SIGNER_INFO *PKCS7_sign_add_signer(PKCS7 *p7,
+    X509 *signcert, EVP_PKEY *pkey,
+    const EVP_MD *md, int flags);
+
+/**
+ * @brief Finalize a PKCS#7 structure by digesting content from a BIO and completing signatures or encryption.
+ * @param p7 Partially constructed PKCS#7 object (for example from PKCS7_sign() with PKCS7_PARTIAL).
+ * @param data BIO supplying the content to process, or NULL when content is already embedded.
+ * @param flags PKCS7_* processing flags such as PKCS7_STREAM or PKCS7_DETACHED.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_final(PKCS7 *p7, BIO *data, int flags);
+/**
+ * @brief Verify a PKCS#7 signedData structure and optionally write the content.
+ * @param p7 Signed PKCS#7 object to verify.
+ * @param certs Optional untrusted certificates that may complete signer chains.
+ * @param store Trusted certificate store used for chain verification.
+ * @param indata BIO supplying detached content when the signature does not embed it.
+ * @param out Optional BIO that receives the verified content.
+ * @param flags PKCS7_* verification flags (for example PKCS7_NOVERIFY, PKCS7_DETACHED).
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
+    BIO *indata, BIO *out, int flags);
+/**
+ * @brief Return the signer certificates used by PKCS7_verify() without duplicating them.
+ * @param p7 Signed PKCS#7 object whose signers are located.
+ * @param certs Optional certificates searched in addition to those embedded in @p p7.
+ * @param flags PKCS7_* flags controlling signer lookup (for example PKCS7_NOINTERN).
+ * @return Stack of X509 pointers owned by @p p7 / @p certs (do not free elements), or NULL on error.
+ */
+STACK_OF(X509) *PKCS7_get0_signers(PKCS7 *p7, STACK_OF(X509) *certs,
+    int flags);
+/**
+ * @brief Create a PKCS#7 envelopedData encrypting @p in for each recipient in @p certs.
+ * @param certs Recipient certificates whose public keys encrypt the content-encryption key (RSA keys).
+ * @param in BIO supplying the plaintext content.
+ * @param cipher Content-encryption cipher (for example triple-DES or AES).
+ * @param flags PKCS7_* encryption flags (for example PKCS7_TEXT, PKCS7_BINARY, PKCS7_STREAM).
+ * @return New PKCS7 envelopedData object, or NULL on error; free with PKCS7_free.
+ */
+PKCS7 *PKCS7_encrypt(STACK_OF(X509) *certs, BIO *in, const EVP_CIPHER *cipher,
+    int flags);
+/**
+ * @brief Create a PKCS#7 envelopedData encrypting @p in for each recipient in @p certs.
+ * @param certs Recipient certificates whose public keys encrypt the content-encryption key.
+ * @param in BIO supplying the plaintext content.
+ * @param cipher Content-encryption cipher (for example AES-256-CBC).
+ * @param flags PKCS7_* encryption flags.
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query for algorithm fetches, or NULL.
+ * @return New PKCS7 envelopedData object, or NULL on error.
+ */
+PKCS7 *PKCS7_encrypt_ex(STACK_OF(X509) *certs, BIO *in,
+    const EVP_CIPHER *cipher, int flags,
+    OSSL_LIB_CTX *libctx, const char *propq);
+/**
+ * @brief Decrypt a PKCS#7 envelopedData (or signed-and-enveloped) structure for a recipient.
+ * @param p7 Enveloped PKCS#7 object to decrypt.
+ * @param pkey Recipient private key matching a RecipientInfo in @p p7.
+ * @param cert Recipient certificate used to select the matching RecipientInfo, or NULL.
+ * @param data BIO that receives the decrypted content.
+ * @param flags PKCS7_* decryption flags (for example PKCS7_TEXT).
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_decrypt(PKCS7 *p7, EVP_PKEY *pkey, X509 *cert, BIO *data,
+    int flags);
+
+/**
+ * @brief Attach an S/MIME capabilities attribute to a PKCS#7 signer info.
+ * @param si Signer info that receives the SMIMECapabilities signed attribute.
+ * @param cap Stack of X509_ALGOR capability descriptors (for example from PKCS7_simple_smimecap).
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_add_attrib_smimecap(PKCS7_SIGNER_INFO *si,
+    STACK_OF(X509_ALGOR) *cap);
+/**
+ * @brief Return the SMIMECapabilities attribute from a PKCS#7 signer info.
+ * @param si Signer info whose authenticated attributes are searched.
+ * @return Stack of X509_ALGOR capability descriptors, or NULL if absent; do not free.
+ */
+STACK_OF(X509_ALGOR) *PKCS7_get_smimecap(PKCS7_SIGNER_INFO *si);
+/**
+ * @brief Append a simple SMIMECapabilities AlgorithmIdentifier for @p nid to @p sk.
+ * @param sk Capability stack receiving the new AlgorithmIdentifier.
+ * @param nid Algorithm NID to advertise (cipher or digest).
+ * @param arg Optional algorithm parameter (for example key length for RC2), or -1 / 0 when unused.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_simple_smimecap(STACK_OF(X509_ALGOR) *sk, int nid, int arg);
+
+/**
+ * @brief Add a PKCS#9 contentType authenticated attribute to a PKCS#7 signer info.
+ * @param si Signer info receiving the content-type attribute.
+ * @param coid Content-type OID to attach, or NULL to use NID_pkcs7_data.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_add_attrib_content_type(PKCS7_SIGNER_INFO *si, ASN1_OBJECT *coid);
+/**
+ * @brief Add a signing-time authenticated attribute, taking ownership of @p t.
+ * @param si SignerInfo to update.
+ * @param t Signing time to attach, or NULL to use the current time (allocated internally).
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_add0_attrib_signing_time(PKCS7_SIGNER_INFO *si, ASN1_TIME *t);
+/**
+ * @brief Add a PKCS#9 messageDigest authenticated attribute to a SignerInfo.
+ * @param si SignerInfo to update.
+ * @param md Digest octets to embed (copied into a new ASN1_OCTET_STRING).
+ * @param mdlen Length of @p md in bytes.
+ * @return 1 on success, or 0 on failure.
+ */
+int PKCS7_add1_attrib_digest(PKCS7_SIGNER_INFO *si,
+    const unsigned char *md, int mdlen);
+
+/**
+ * @brief Write a PKCS#7 object in S/MIME (PEM/CMS) form to a BIO.
+ * @param bio Output BIO for the S/MIME message.
+ * @param p7 PKCS#7 structure to write.
+ * @param data Optional content BIO for streaming, or NULL when content is already in @p p7.
+ * @param flags SMIME_* writing flags (for example SMIME_DETACHED).
+ * @return 1 on success, or 0 on failure.
+ */
+int SMIME_write_PKCS7(BIO *bio, PKCS7 *p7, BIO *data, int flags);
+/**
+ * @brief Parse an S/MIME message into a PKCS#7 structure, optionally reusing @p p7.
+ * @param bio BIO supplying the S/MIME message.
+ * @param bcont Optional destination for a memory BIO holding cleartext signed content, or NULL.
+ * @param p7 Optional pre-allocated PKCS7 from PKCS7_new_ex(), or NULL to allocate a new one.
+ * @return Parsed PKCS7, or NULL on error; free with PKCS7_free.
+ */
+PKCS7 *SMIME_read_PKCS7_ex(BIO *bio, BIO **bcont, PKCS7 **p7);
+/**
+ * @brief Parse an S/MIME message into a PKCS#7 structure using the default library context.
+ * @param bio BIO supplying the S/MIME message.
+ * @param bcont Optional destination for a memory BIO holding cleartext signed content, or NULL.
+ * @return Parsed PKCS7, or NULL on error; free with PKCS7_free.
+ */
+PKCS7 *SMIME_read_PKCS7(BIO *bio, BIO **bcont);
+
+/**
+ * @brief Create a filter BIO that finalises and writes streaming PKCS#7 ASN.1 to @p out.
+ * @param out Downstream BIO that receives the encoded PKCS#7.
+ * @param p7 Partial PKCS#7 structure created with PKCS7_STREAM (or similar streaming flags).
+ * @return New BIO filter, or NULL on error; free with BIO_free.
+ */
+BIO *BIO_new_PKCS7(BIO *out, PKCS7 *p7);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

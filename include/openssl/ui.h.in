@@ -1,0 +1,746 @@
+/*
+ * {- join("\n * ", @autowarntext) -}
+ *
+ * Copyright 2001-2020 The OpenSSL Project Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License 2.0 (the "License").  You may not use
+ * this file except in compliance with the License.  You can obtain a copy
+ * in the file LICENSE in the source distribution or at
+ * https://www.openssl.org/source/license.html
+ */
+
+/* clang-format off */
+{-
+use OpenSSL::stackhash qw(generate_stack_macros);
+-}
+/* clang-format on */
+
+#ifndef OPENSSL_UI_H
+#define OPENSSL_UI_H
+#pragma once
+
+#include <openssl/macros.h>
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#define HEADER_UI_H
+#endif
+
+#include <openssl/opensslconf.h>
+
+#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+#include <openssl/crypto.h>
+#endif
+#include <openssl/safestack.h>
+#include <openssl/pem.h>
+#include <openssl/types.h>
+#include <openssl/uierr.h>
+
+/* For compatibility reasons, the macro OPENSSL_NO_UI is currently retained */
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#ifdef OPENSSL_NO_UI_CONSOLE
+#define OPENSSL_NO_UI
+#endif
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*
+ * All the following functions return -1 or NULL on error and in some cases
+ * (UI_process()) -2 if interrupted or in some other way cancelled. When
+ * everything is fine, they return 0, a positive value or a non-NULL pointer,
+ * all depending on their purpose.
+ */
+
+/* Creators and destructor.   */
+/**
+ * @brief Allocate a new UI that uses the process-wide default UI_METHOD.
+ * @return New UI, or NULL on error; free with UI_free().
+ */
+UI *UI_new(void);
+/**
+ * @brief Create a new UI that uses the given method instead of the default.
+ * @param method UI_METHOD that performs prompting for this UI.
+ * @return New UI, or NULL on error; free with UI_free().
+ */
+UI *UI_new_method(const UI_METHOD *method);
+/**
+ * @brief Free a UI and any duplicated strings, results, and related storage.
+ * @param ui UI to free, or NULL (no-op).
+ */
+void UI_free(UI *ui);
+
+/*-
+   The following functions are used to add strings to be printed and prompt
+   strings to prompt for data.  The names are UI_{add,dup}_<function>_string
+   and UI_{add,dup}_input_boolean.
+
+   UI_{add,dup}_<function>_string have the following meanings:
+        add     add a text or prompt string.  The pointers given to these
+                functions are used verbatim, no copying is done.
+        dup     make a copy of the text or prompt string, then add the copy
+                to the collection of strings in the user interface.
+        <function>
+                The function is a name for the functionality that the given
+                string shall be used for.  It can be one of:
+                        input   use the string as data prompt.
+                        verify  use the string as verification prompt.  This
+                                is used to verify a previous input.
+                        info    use the string for informational output.
+                        error   use the string for error output.
+   Honestly, there's currently no difference between info and error for the
+   moment.
+
+   UI_{add,dup}_input_boolean have the same semantics for "add" and "dup",
+   and are typically used when one wants to prompt for a yes/no response.
+
+   All of the functions in this group take a UI and a prompt string.
+   The string input and verify addition functions also take a flag argument,
+   a buffer for the result to end up with, a minimum input size and a maximum
+   input size (the result buffer MUST be large enough to be able to contain
+   the maximum number of characters).  Additionally, the verify addition
+   functions takes another buffer to compare the result against.
+   The boolean input functions take an action description string (which should
+   be safe to ignore if the expected user action is obvious, for example with
+   a dialog box with an OK button and a Cancel button), a string of acceptable
+   characters to mean OK and to mean Cancel.  The two last strings are checked
+   to make sure they don't have common characters.  Additionally, the same
+   flag argument as for the string input is taken, as well as a result buffer.
+   The result buffer is required to be at least one byte long.  Depending on
+   the answer, the first character from the OK or the Cancel character strings
+   will be stored in the first byte of the result buffer.  No NUL will be
+   added, so the result is *not* a string.
+
+   On success, the all return an index of the added information.  That index
+   is useful when retrieving results with UI_get0_result(). */
+/**
+ * @brief Add a prompt that collects a string into a caller-owned result buffer.
+ * @param ui UI that will own the prompt descriptor.
+ * @param prompt Prompt text used verbatim (not copied).
+ * @param flags Input flags such as UI_INPUT_FLAG_ECHO or UI_INPUT_FLAG_DEFAULT_PWD.
+ * @param result_buf Buffer that receives the entered text (must hold @p maxsize characters plus NUL).
+ * @param minsize Minimum accepted result length, not counting the terminating NUL.
+ * @param maxsize Maximum accepted result length, not counting the terminating NUL.
+ * @return Positive prompt index on success, or a value <= 0 on failure.
+ */
+int UI_add_input_string(UI *ui, const char *prompt, int flags,
+    char *result_buf, int minsize, int maxsize);
+/**
+ * @brief Add a string prompt, duplicating @p prompt into UI-owned storage.
+ * @param ui UI object collecting prompts.
+ * @param prompt Text shown to the user (copied).
+ * @param flags UI_INPUT_FLAG_* behaviour bits.
+ * @param result_buf Buffer receiving the user input (size at least @p maxsize+1).
+ * @param minsize Minimum accepted result length.
+ * @param maxsize Maximum accepted result length (excluding the trailing NUL).
+ * @return Index of the added string on success, or a negative value on error.
+ */
+int UI_dup_input_string(UI *ui, const char *prompt, int flags,
+    char *result_buf, int minsize, int maxsize);
+/**
+ * @brief Add a string prompt whose result must match @p test_buf (for example password confirm).
+ * @param ui UI object collecting prompts.
+ * @param prompt Text shown to the user.
+ * @param flags UI_INPUT_FLAG_* behaviour bits.
+ * @param result_buf Buffer receiving the user input (size at least @p maxsize+1).
+ * @param minsize Minimum accepted result length.
+ * @param maxsize Maximum accepted result length.
+ * @param test_buf Expected string that the result must equal.
+ * @return Non-negative index of the added string on success, or a negative value on error.
+ */
+int UI_add_verify_string(UI *ui, const char *prompt, int flags,
+    char *result_buf, int minsize, int maxsize,
+    const char *test_buf);
+/**
+ * @brief Add a password prompt that must match @p test_buf, copying the prompt string.
+ * @param ui UI object that will collect the response.
+ * @param prompt Prompt text duplicated into @p ui.
+ * @param flags UI string flags such as UI_INPUT_FLAG_DEFAULT_PWD.
+ * @param result_buf Buffer receiving the user's input.
+ * @param minsize Minimum acceptable input length.
+ * @param maxsize Capacity of @p result_buf.
+ * @param test_buf Expected verification string that the input must equal.
+ * @return Index of the added string on success, or a negative value on error.
+ */
+int UI_dup_verify_string(UI *ui, const char *prompt, int flags,
+    char *result_buf, int minsize, int maxsize,
+    const char *test_buf);
+/**
+ * @brief Add a yes/no prompt that stores one OK or Cancel character in @p result_buf.
+ * @param ui UI that will own the prompt descriptor.
+ * @param prompt Descriptive prompt text used verbatim (not copied).
+ * @param action_desc Text describing acceptable answers (may be ignored by some methods).
+ * @param ok_chars Characters that mean affirmative; first match is stored in @p result_buf.
+ * @param cancel_chars Characters that mean cancel; must not overlap @p ok_chars.
+ * @param flags Input flags passed through to the UI method.
+ * @param result_buf At least one byte; receives the matched OK or Cancel character (no NUL).
+ * @return Positive prompt index on success, or a value <= 0 on failure.
+ */
+int UI_add_input_boolean(UI *ui, const char *prompt, const char *action_desc,
+    const char *ok_chars, const char *cancel_chars,
+    int flags, char *result_buf);
+/**
+ * @brief Add a boolean prompt, copying the prompt strings into @p ui.
+ * @param ui UI object collecting prompts.
+ * @param prompt Text shown to the user.
+ * @param action_desc Optional description of the action being affirmed, or NULL.
+ * @param ok_chars Characters that mean "yes" (for example "yY").
+ * @param cancel_chars Characters that mean "no" (for example "nN").
+ * @param flags UI_INPUT_FLAG_* behaviour bits.
+ * @param result_buf Single-byte buffer receiving the chosen ok/cancel character.
+ * @return Non-negative index of the added boolean on success, or a negative value on error.
+ */
+int UI_dup_input_boolean(UI *ui, const char *prompt, const char *action_desc,
+    const char *ok_chars, const char *cancel_chars,
+    int flags, char *result_buf);
+/**
+ * @brief Add informational text shown with other prompts (pointer used verbatim).
+ * @param ui UI that will own the info string descriptor.
+ * @param text Informational text to display.
+ * @return Positive index on success, or a value <= 0 on failure.
+ */
+int UI_add_info_string(UI *ui, const char *text);
+/**
+ * @brief Add informational text after copying @p text into UI-owned storage.
+ * @param ui UI that will own the duplicated info string.
+ * @param text Informational text to copy and display.
+ * @return Positive index on success, or a value <= 0 on failure.
+ */
+int UI_dup_info_string(UI *ui, const char *text);
+/**
+ * @brief Add an error message string to a UI for display (pointer stored, not copied).
+ * @param ui UI that will show the error text.
+ * @param text Error text that must remain valid for the lifetime of @p ui.
+ * @return Positive index on success, or a value <= 0 on failure.
+ */
+int UI_add_error_string(UI *ui, const char *text);
+/**
+ * @brief Add an error/info string, duplicating @p text into UI-owned storage.
+ * @param ui UI object collecting prompts and messages.
+ * @param text Message shown to the user (copied).
+ * @return Index of the added string on success, or a negative value on error.
+ */
+int UI_dup_error_string(UI *ui, const char *text);
+
+/* These are the possible flags.  They can be or'ed together. */
+/* Use to have echoing of input */
+#define UI_INPUT_FLAG_ECHO 0x01
+/*
+ * Use a default password.  Where that password is found is completely up to
+ * the application, it might for example be in the user data set with
+ * UI_add_user_data().  It is not recommended to have more than one input in
+ * each UI being marked with this flag, or the application might get
+ * confused.
+ */
+#define UI_INPUT_FLAG_DEFAULT_PWD 0x02
+
+/*-
+ * The user of these routines may want to define flags of their own.  The core
+ * UI won't look at those, but will pass them on to the method routines.  They
+ * must use higher bits so they don't get confused with the UI bits above.
+ * UI_INPUT_FLAG_USER_BASE tells which is the lowest bit to use.  A good
+ * example of use is this:
+ *
+ *    #define MY_UI_FLAG1       (0x01 << UI_INPUT_FLAG_USER_BASE)
+ *
+ */
+#define UI_INPUT_FLAG_USER_BASE 16
+
+/**
+ * @brief Build a heap-allocated prompt string for an input description and optional object name.
+ * @param ui_method UI whose method may supply a custom prompt constructor; may be NULL to use the default wording.
+ * @param phrase_desc Short description of what to enter (for example "pass phrase").
+ * @param object_name Optional object name (file, card, …), or NULL.
+ * @return Prompt allocated with OPENSSL_malloc() (caller frees with OPENSSL_free()), or NULL on allocation failure.
+ *
+ * Without a custom constructor the default form is
+ * "Enter {phrase_desc} for {object_name}:" (or without the " for …" clause when @p object_name is NULL).
+ */
+char *UI_construct_prompt(UI *ui_method,
+    const char *phrase_desc, const char *object_name);
+
+/*
+ * The following function is used to store a pointer to user-specific data.
+ * Any previous such pointer will be returned and replaced.
+ *
+ * For callback purposes, this function makes a lot more sense than using
+ * ex_data, since the latter requires that different parts of OpenSSL or
+ * applications share the same ex_data index.
+ *
+ * Note that the UI_OpenSSL() method completely ignores the user data. Other
+ * methods may not, however.
+ */
+/**
+ * @brief Store application user data on a UI, replacing any previous pointer.
+ * @param ui UI that holds the user-data pointer for its method.
+ * @param user_data Application pointer for the method to use (UI_OpenSSL ignores it).
+ * @return Previous user-data pointer, or NULL if none was set / it was destroyed as duplicated data.
+ */
+void *UI_add_user_data(UI *ui, void *user_data);
+/*
+ * Alternatively, this function is used to duplicate the user data.
+ * This uses the duplicator method function.  The destroy function will
+ * be used to free the user data in this case.
+ */
+/**
+ * @brief Duplicate @p user_data via the method's duplicator and store it on the UI.
+ * @param ui UI that takes ownership of the duplicated data.
+ * @param user_data Application data to duplicate with UI_method_set_data_duplicator().
+ * @return 0 on success, or -1 on allocation failure or if no duplicator is set.
+ */
+int UI_dup_user_data(UI *ui, void *user_data);
+/* We need a user data retrieving function as well.  */
+/**
+ * @brief Return the application user data last set with UI_add_user_data or UI_dup_user_data.
+ * @param ui UI to query.
+ * @return User data pointer, or NULL if none is set.
+ */
+void *UI_get0_user_data(UI *ui);
+
+/**
+ * @brief Return the result text for a UI prompt by its add-index.
+ * @param ui UI object that was processed with UI_process().
+ * @param i Index returned when the prompt was added (for example by UI_add_input_string()).
+ * @return Pointer to the result buffer for that prompt, or NULL on error.
+ */
+const char *UI_get0_result(UI *ui, int i);
+/**
+ * @brief Return the length in bytes of the result text for a UI prompt by its add-index.
+ * @param ui UI object that was processed with UI_process().
+ * @param i Index returned when the prompt was added (for example by UI_add_input_string()).
+ * @return Non-negative result length on success, or a negative value on error.
+ */
+int UI_get_result_length(UI *ui, int i);
+
+/**
+ * @brief Run the UI method to present prompts and collect answers for all added strings.
+ * @param ui UI previously populated with UI_add_*() / UI_dup_*() strings.
+ * @return 0 on success, a negative value on error, or -2 if the user cancelled.
+ */
+int UI_process(UI *ui);
+
+/*
+ * Give a user interface parameterised control commands.  This can be used to
+ * send down an integer, a data pointer or a function pointer, as well as be
+ * used to get information from a UI.
+ */
+/**
+ * @brief Send a parameterised control command to a UI (or query UI state).
+ * @param ui UI to control.
+ * @param cmd Command such as UI_CTRL_PRINT_ERRORS or UI_CTRL_IS_REDOABLE.
+ * @param i Integer argument for @p cmd (for example 1 to enable UI_CTRL_PRINT_ERRORS).
+ * @param p Optional data pointer for @p cmd; unused for the built-in commands.
+ * @param f Optional function pointer for @p cmd; unused for the built-in commands.
+ * @return Command-specific value on success (e.g. redoable flag), or -1 on error.
+ */
+int UI_ctrl(UI *ui, int cmd, long i, void *p, void (*f)(void));
+
+/* The commands */
+/*
+ * Use UI_CONTROL_PRINT_ERRORS with the value 1 to have UI_process print the
+ * OpenSSL error stack before printing any info or added error messages and
+ * before any prompting.
+ */
+#define UI_CTRL_PRINT_ERRORS 1
+/*
+ * Check if a UI_process() is possible to do again with the same instance of
+ * a user interface.  This makes UI_ctrl() return 1 if it is redoable, and 0
+ * if not.
+ */
+#define UI_CTRL_IS_REDOABLE 2
+
+/* Some methods may use extra data */
+#define UI_set_app_data(s, arg) UI_set_ex_data(s, 0, arg)
+#define UI_get_app_data(s) UI_get_ex_data(s, 0)
+
+#define UI_get_ex_new_index(l, p, newf, dupf, freef) \
+    CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_UI, l, p, newf, dupf, freef)
+/**
+ * @brief Store application-specific ex_data on a UI at index @p idx.
+ * @param r UI that holds the ex_data.
+ * @param idx Ex_data index from UI_get_ex_new_index (or 0 for app data).
+ * @param arg Pointer to store; previous value at @p idx is replaced.
+ * @return 1 on success, or 0 on failure.
+ */
+int UI_set_ex_data(UI *r, int idx, void *arg);
+/**
+ * @brief Retrieve application-specific ex_data previously stored on a UI.
+ * @param r UI to query.
+ * @param idx Ex_data index from UI_get_ex_new_index (or 0 for app data).
+ * @return Stored pointer, or NULL if unset.
+ */
+void *UI_get_ex_data(const UI *r, int idx);
+
+/* Use specific methods instead of the built-in one */
+/**
+ * @brief Change the process-wide default UI_METHOD used by UI_new().
+ * @param meth Method that becomes the default; not thread-safe against concurrent OpenSSL use.
+ */
+void UI_set_default_method(const UI_METHOD *meth);
+/**
+ * @brief Return the process-wide default UI_METHOD used by UI_new().
+ * @return Current default UI_METHOD pointer.
+ */
+const UI_METHOD *UI_get_default_method(void);
+/**
+ * @brief Return the UI_METHOD currently associated with a UI instance.
+ * @param ui UI to query.
+ * @return Pointer to the active UI_METHOD.
+ */
+const UI_METHOD *UI_get_method(UI *ui);
+/**
+ * @brief Replace the UI_METHOD associated with an existing UI instance.
+ * @param ui UI whose method is changed.
+ * @param meth New method for @p ui.
+ * @return Previous UI_METHOD associated with @p ui.
+ */
+const UI_METHOD *UI_set_method(UI *ui, const UI_METHOD *meth);
+
+#ifndef OPENSSL_NO_UI_CONSOLE
+
+/* The method with all the built-in thingies */
+/**
+ * @brief Return OpenSSL's built-in console UI_METHOD (machine/OS-dependent prompting).
+ * @return Pointer to the built-in method (not necessarily the current default).
+ */
+UI_METHOD *UI_OpenSSL(void);
+
+#endif
+
+/*
+ * NULL method.  Literally does nothing, but may serve as a placeholder
+ * to avoid internal default.
+ */
+/**
+ * @brief Return a no-op UI_METHOD that performs no prompting.
+ * @return Pointer to the null method (useful as a placeholder instead of relying on internal defaults).
+ */
+const UI_METHOD *UI_null(void);
+
+/* ---------- For method writers ---------- */
+/*-
+   A method contains a number of functions that implement the low level
+   of the User Interface.  The functions are:
+
+        an opener       This function starts a session, maybe by opening
+                        a channel to a tty, or by opening a window.
+        a writer        This function is called to write a given string,
+                        maybe to the tty, maybe as a field label in a
+                        window.
+        a flusher       This function is called to flush everything that
+                        has been output so far.  It can be used to actually
+                        display a dialog box after it has been built.
+        a reader        This function is called to read a given prompt,
+                        maybe from the tty, maybe from a field in a
+                        window.  Note that it's called with all string
+                        structures, not only the prompt ones, so it must
+                        check such things itself.
+        a closer        This function closes the session, maybe by closing
+                        the channel to the tty, or closing the window.
+
+   All these functions are expected to return:
+
+        0       on error.
+        1       on success.
+        -1      on out-of-band events, for example if some prompting has
+                been canceled (by pressing Ctrl-C, for example).  This is
+                only checked when returned by the flusher or the reader.
+
+   The way this is used, the opener is first called, then the writer for all
+   strings, then the flusher, then the reader for all strings and finally the
+   closer.  Note that if you want to prompt from a terminal or other command
+   line interface, the best is to have the reader also write the prompts
+   instead of having the writer do it.  If you want to prompt from a dialog
+   box, the writer can be used to build up the contents of the box, and the
+   flusher to actually display the box and run the event loop until all data
+   has been given, after which the reader only grabs the given data and puts
+   them back into the UI strings.
+
+   All method functions take a UI as argument.  Additionally, the writer and
+   the reader take a UI_STRING.
+*/
+
+/*
+ * The UI_STRING type is the data structure that contains all the needed info
+ * about a string or a prompt, including test data for a verification prompt.
+ */
+/**
+ * @brief Prompt or output string entry stored in a UI for method writers to consume.
+ */
+typedef struct ui_string_st UI_STRING;
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(UI_STRING) container type.
+ */
+struct stack_st_UI_STRING;
+{-
+    generate_stack_macros("UI_STRING");
+-}
+/* clang-format on */
+
+/*
+ * The different types of strings that are currently supported. This is only
+ * needed by method authors.
+ */
+enum UI_string_types {
+    /** Unset or invalid UI_STRING type. */
+    UIT_NONE = 0,
+    UIT_PROMPT, /* Prompt for a string */
+    UIT_VERIFY, /* Prompt for a string and verify */
+    UIT_BOOLEAN, /* Prompt for a yes/no response */
+    UIT_INFO, /* Send info to the user */
+    UIT_ERROR /* Send an error message to the user */
+};
+
+/* Create and manipulate methods */
+/**
+ * @brief Allocate a new UI_METHOD with the given name.
+ * @param name Human-readable method name stored on the method.
+ * @return New UI_METHOD, or NULL on allocation failure; free with UI_destroy_method.
+ */
+UI_METHOD *UI_create_method(const char *name);
+/**
+ * @brief Destroy a UI_METHOD created with UI_create_method().
+ * @param ui_method Method to free.
+ */
+void UI_destroy_method(UI_METHOD *ui_method);
+/**
+ * @brief Set the opener callback that starts a UI session (for example opens a tty or window).
+ * @param method Method whose opener is replaced.
+ * @param opener Callback receiving the UI; returns 1 on success, 0 on error, or -1 on cancel.
+ * @return 0 on success, or -1 if @p method is NULL.
+ */
+int UI_method_set_opener(UI_METHOD *method, int (*opener)(UI *ui));
+/**
+ * @brief Set the writer callback that outputs each UI_STRING (prompt label, info, or error).
+ * @param method Method whose writer is replaced.
+ * @param writer Callback for one UI_STRING; returns 1 on success, 0 on error, or -1 on cancel.
+ * @return 0 on success, or -1 if @p method is NULL.
+ */
+int UI_method_set_writer(UI_METHOD *method,
+    int (*writer)(UI *ui, UI_STRING *uis));
+/**
+ * @brief Set the flusher callback that presents accumulated UI output (for example shows a dialog).
+ * @param method Method whose flusher is replaced.
+ * @param flusher Callback after all writers run; returns 1 on success, 0 on error, or -1 on cancel.
+ * @return 0 on success, or -1 if @p method is NULL.
+ */
+int UI_method_set_flusher(UI_METHOD *method, int (*flusher)(UI *ui));
+/**
+ * @brief Set the reader callback that collects input for each UI_STRING prompt.
+ * @param method Method whose reader is replaced.
+ * @param reader Callback for one UI_STRING; returns 1 on success, 0 on error, or -1 on cancel.
+ * @return 0 on success, or -1 if @p method is NULL.
+ */
+int UI_method_set_reader(UI_METHOD *method,
+    int (*reader)(UI *ui, UI_STRING *uis));
+/**
+ * @brief Set the closer callback that ends a UI session (for example closes a tty or window).
+ * @param method Method whose closer is replaced.
+ * @param closer Callback receiving the UI; returns 1 on success or 0 on error.
+ * @return 0 on success, or -1 if @p method is NULL.
+ */
+int UI_method_set_closer(UI_METHOD *method, int (*closer)(UI *ui));
+/**
+ * @brief Set callbacks used by UI_dup_user_data() to copy and free method user data.
+ * @param method Method whose data duplicator pair is replaced.
+ * @param duplicator Allocates a copy of @p ui_data for @p ui.
+ * @param destructor Frees data previously produced by @p duplicator.
+ * @return 0 on success, or -1 if @p method is NULL.
+ */
+int UI_method_set_data_duplicator(UI_METHOD *method,
+    void *(*duplicator)(UI *ui, void *ui_data),
+    void (*destructor)(UI *ui, void *ui_data));
+/**
+ * @brief Set the callback that builds prompt strings for a UI_METHOD.
+ * @param method Method whose prompt constructor is replaced.
+ * @param prompt_constructor Allocates a prompt for @p phrase_desc and @p object_name (caller frees), or NULL.
+ * @return 0 on success, or -1 if @p method is NULL.
+ */
+int UI_method_set_prompt_constructor(UI_METHOD *method,
+    char *(*prompt_constructor)(UI *ui,
+        const char
+            *phrase_desc,
+        const char
+            *object_name));
+/**
+ * @brief Store application-specific ex_data on a UI_METHOD at index @p idx.
+ * @param method Method that holds the ex_data.
+ * @param idx Ex_data index from CRYPTO_get_ex_new_index.
+ * @param data Pointer to store.
+ * @return 1 on success, or 0 on failure.
+ */
+int UI_method_set_ex_data(UI_METHOD *method, int idx, void *data);
+/**
+ * @brief Return the opener callback previously set on a UI_METHOD.
+ * @param method Method to query.
+ * @return Opener function pointer, or NULL if unset.
+ */
+int (*UI_method_get_opener(const UI_METHOD *method))(UI *);
+/**
+ * @brief Return the writer callback previously set on a UI_METHOD.
+ * @param method Method to query.
+ * @return Writer function pointer, or NULL if unset.
+ */
+int (*UI_method_get_writer(const UI_METHOD *method))(UI *, UI_STRING *);
+/**
+ * @brief Return the flusher callback previously set on a UI_METHOD.
+ * @param method Method to query.
+ * @return Flusher function pointer, or NULL if unset.
+ */
+int (*UI_method_get_flusher(const UI_METHOD *method))(UI *);
+/**
+ * @brief Return the reader callback previously set on a UI_METHOD.
+ * @param method Method to query.
+ * @return Reader function pointer that fills a UI_STRING, or NULL if unset.
+ */
+int (*UI_method_get_reader(const UI_METHOD *method))(UI *, UI_STRING *);
+/**
+ * @brief Return the closer callback previously set on a UI_METHOD.
+ * @param method Method to query.
+ * @return Closer function pointer, or NULL if unset.
+ */
+int (*UI_method_get_closer(const UI_METHOD *method))(UI *);
+/**
+ * @brief Return the prompt-constructor callback previously set on a UI_METHOD.
+ * @param method Method to query.
+ * @return Prompt constructor function pointer, or NULL if unset.
+ */
+char *(*UI_method_get_prompt_constructor(const UI_METHOD *method))(UI *, const char *, const char *);
+/**
+ * @brief Return the user-data duplicator callback previously set on a UI_METHOD.
+ * @param method Method to query.
+ * @return Duplicator function pointer, or NULL if unset.
+ */
+void *(*UI_method_get_data_duplicator(const UI_METHOD *method))(UI *, void *);
+/**
+ * @brief Return the user-data destructor callback previously set on a UI_METHOD.
+ * @param method Method to query.
+ * @return Destructor function pointer, or NULL if unset.
+ */
+void (*UI_method_get_data_destructor(const UI_METHOD *method))(UI *, void *);
+/**
+ * @brief Return application ex_data previously stored on a UI_METHOD.
+ * @param method Method to query.
+ * @param idx Ex_data index from UI_get_ex_new_index().
+ * @return Stored pointer, or NULL if unset.
+ */
+const void *UI_method_get_ex_data(const UI_METHOD *method, int idx);
+
+/*
+ * The following functions are helpers for method writers to access relevant
+ * data from a UI_STRING.
+ */
+
+/* Return type of the UI_STRING */
+/**
+ * @brief Return which kind of UI prompt or message a UI_STRING represents.
+ * @param uis UI string object to query.
+ * @return One of the UI_string_types values (prompt, verify, boolean, info, or error).
+ */
+enum UI_string_types UI_get_string_type(UI_STRING *uis);
+/* Return input flags of the UI_STRING */
+/**
+ * @brief Return the input flags associated with a UI_STRING.
+ * @param uis UI string object to query.
+ * @return Flags previously set on @p uis (for example UI_INPUT_FLAG_*).
+ */
+int UI_get_input_flags(UI_STRING *uis);
+/* Return the actual string to output (the prompt, info or error) */
+/**
+ * @brief Return the string to present to the user for a UI_STRING (prompt, info, or error).
+ * @param uis UI string object to query.
+ * @return Output text associated with @p uis.
+ */
+const char *UI_get0_output_string(UI_STRING *uis);
+/**
+ * @brief Return the optional action description for a boolean UI_STRING.
+ * @param uis UI string to query.
+ * @return Action instruction text for UIT_BOOLEAN prompts, or NULL for other types.
+ */
+const char *UI_get0_action_string(UI_STRING *uis);
+/**
+ * @brief Return the user-entered result string stored on a prompt UI_STRING.
+ * @param uis UI string to query.
+ * @return NUL-terminated result for UIT_PROMPT / UIT_VERIFY / UIT_BOOLEAN, or NULL otherwise.
+ */
+const char *UI_get0_result_string(UI_STRING *uis);
+/**
+ * @brief Return the length in bytes of the result stored on a prompt UI_STRING.
+ * @param uis UI string to query.
+ * @return Result length for UIT_PROMPT / UIT_VERIFY / UIT_BOOLEAN, or -1 for other types.
+ */
+int UI_get_result_string_length(UI_STRING *uis);
+/**
+ * @brief Return the reference string a verify prompt's result must match.
+ * @param uis UI string to query.
+ * @return Comparison string for UIT_VERIFY prompts, or NULL for other types.
+ */
+const char *UI_get0_test_string(UI_STRING *uis);
+/* Return the required minimum size of the result */
+/**
+ * @brief Return the minimum accepted result length for a UI string prompt.
+ * @param uis UI_STRING of type UIT_PROMPT / UIT_VERIFY.
+ * @return Minimum size in characters, or -1 if not applicable.
+ */
+int UI_get_result_minsize(UI_STRING *uis);
+/**
+ * @brief Return the maximum allowed length of the result for a prompt UI_STRING.
+ * @param uis UI string to query.
+ * @return Maximum result size for UIT_PROMPT / UIT_VERIFY, or -1 for other types.
+ */
+int UI_get_result_maxsize(UI_STRING *uis);
+/* Set the result of a UI_STRING. */
+/**
+ * @brief Store a NUL-terminated prompt result on a UI_STRING (length taken from the string).
+ * @param ui UI that owns @p uis (used for error reporting).
+ * @param uis Prompt, verify, or boolean string receiving the result.
+ * @param result NUL-terminated result text to copy (same rules as UI_set_result_ex).
+ * @return 0 on success (or when @p uis is not a result-bearing type), or -1 on error.
+ */
+int UI_set_result(UI *ui, UI_STRING *uis, const char *result);
+/**
+ * @brief Store a prompt result of explicit length on a UI_STRING.
+ * @param ui UI that owns @p uis (used for error reporting).
+ * @param uis Prompt, verify, or boolean string receiving the result.
+ * @param result Result bytes to copy; length need not be NUL-terminated when @p len is given.
+ * @param len Number of bytes in @p result.
+ * @return 0 on success (or when @p uis is not a result-bearing type), or -1 on error.
+ */
+int UI_set_result_ex(UI *ui, UI_STRING *uis, const char *result, int len);
+
+/* A couple of popular utility functions */
+/**
+ * @brief Prompt for a passphrase into @p buf using the default UI_METHOD.
+ * @param buf Destination buffer for the NUL-terminated passphrase.
+ * @param length Capacity of @p buf including the terminating NUL.
+ * @param prompt Prompt text shown to the user.
+ * @param verify Non-zero to ask twice and require the entries to match.
+ * @return 0 on success, or a negative value on error.
+ */
+int UI_UTIL_read_pw_string(char *buf, int length, const char *prompt,
+    int verify);
+/**
+ * @brief Prompt for a passphrase, using @p buff as the verification scratch buffer.
+ * @param buf Destination buffer for the NUL-terminated passphrase.
+ * @param buff Scratch buffer used when @p verify is non-zero to hold the second entry.
+ * @param size Capacity of @p buf and @p buff including the terminating NUL.
+ * @param prompt Prompt text shown to the user.
+ * @param verify Non-zero to ask twice and require the entries to match.
+ * @return 0 on success, or a negative value on error.
+ */
+int UI_UTIL_read_pw(char *buf, char *buff, int size, const char *prompt,
+    int verify);
+/**
+ * @brief Build a temporary UI_METHOD that wraps a PEM password callback.
+ * @param cb PEM-style password callback to invoke for passphrase collection.
+ * @param rwflag 0 for entry without verification, or 1 to verify the passphrase.
+ * @return New UI_METHOD to free with UI_destroy_method(), or NULL on error.
+ */
+UI_METHOD *UI_UTIL_wrap_read_pem_callback(pem_password_cb *cb, int rwflag);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

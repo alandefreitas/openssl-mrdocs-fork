@@ -1,0 +1,294 @@
+/*
+ * {- join("\n * ", @autowarntext) -}
+ *
+ * Copyright 2019-2021 The OpenSSL Project Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License 2.0 (the "License").  You may not use
+ * this file except in compliance with the License.  You can obtain a copy
+ * in the file LICENSE in the source distribution or at
+ * https://www.openssl.org/source/license.html
+ */
+
+/* clang-format off */
+{-
+use OpenSSL::stackhash qw(generate_stack_macros);
+-}
+/* clang-format on */
+
+#ifndef OPENSSL_ESS_H
+#define OPENSSL_ESS_H
+#pragma once
+
+#include <openssl/opensslconf.h>
+
+#include <openssl/safestack.h>
+#include <openssl/x509.h>
+#include <openssl/esserr.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @brief ESS IssuerSerial: certificate issuer name and serial number (RFC 2634).
+ */
+struct ESS_issuer_serial;
+/**
+ * @brief ESS IssuerSerial: certificate issuer name and serial number (RFC 2634).
+ */
+typedef struct ESS_issuer_serial ESS_ISSUER_SERIAL;
+/**
+ * @brief ESS CertID: SHA-1 hash identifying a signing certificate (RFC 2634).
+ */
+struct ESS_cert_id;
+/**
+ * @brief ESS CertID: SHA-1 hash identifying a signing certificate (RFC 2634).
+ */
+typedef struct ESS_cert_id ESS_CERT_ID;
+/**
+ * @brief ESS SigningCertificate attribute listing CertIDs for the signer chain (RFC 2634).
+ */
+struct ESS_signing_cert;
+/**
+ * @brief ESS SigningCertificate attribute listing CertIDs for the signer chain (RFC 2634).
+ */
+typedef struct ESS_signing_cert ESS_SIGNING_CERT;
+
+/* clang-format off */
+{-
+    generate_stack_macros("ESS_CERT_ID");
+-}
+/* clang-format on */
+
+/**
+ * @brief ESS SigningCertificateV2 attribute with CertIDv2 entries (RFC 5035).
+ */
+struct ESS_signing_cert_v2_st;
+/**
+ * @brief ESS SigningCertificateV2 attribute with CertIDv2 entries (RFC 5035).
+ */
+typedef struct ESS_signing_cert_v2_st ESS_SIGNING_CERT_V2;
+/**
+ * @brief ESS CertIDv2: hash identifying a signing certificate with a chosen digest (RFC 5035).
+ */
+struct ESS_cert_id_v2_st;
+/**
+ * @brief ESS CertIDv2: hash identifying a signing certificate with a chosen digest (RFC 5035).
+ */
+typedef struct ESS_cert_id_v2_st ESS_CERT_ID_V2;
+
+/* clang-format off */
+{-
+    generate_stack_macros("ESS_CERT_ID_V2");
+-}
+/* clang-format on */
+
+/**
+ * @brief Allocate an empty ESS IssuerSerial.
+ * @return New ESS_ISSUER_SERIAL, or NULL on allocation failure.
+ */
+ESS_ISSUER_SERIAL *ESS_ISSUER_SERIAL_new(void);
+/**
+ * @brief Free a ESS IssuerSerial and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ESS_ISSUER_SERIAL_free(ESS_ISSUER_SERIAL *a);
+/**
+ * @brief Decode a ESS IssuerSerial from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ESS_ISSUER_SERIAL, or NULL on error.
+ */
+ESS_ISSUER_SERIAL *d2i_ESS_ISSUER_SERIAL(ESS_ISSUER_SERIAL **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a ESS IssuerSerial to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ESS_ISSUER_SERIAL(const ESS_ISSUER_SERIAL *a, unsigned char **out);
+/**
+ * @brief Duplicate a ESS IssuerSerial.
+ * @param a Value to copy.
+ * @return Deep copy of @p a, or NULL on error.
+ */
+ESS_ISSUER_SERIAL *ESS_ISSUER_SERIAL_dup(const ESS_ISSUER_SERIAL *a);
+
+/**
+ * @brief Allocate an empty ESS CertID.
+ * @return New ESS_CERT_ID, or NULL on allocation failure.
+ */
+ESS_CERT_ID *ESS_CERT_ID_new(void);
+/**
+ * @brief Free a ESS CertID and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ESS_CERT_ID_free(ESS_CERT_ID *a);
+/**
+ * @brief Decode a ESS CertID from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ESS_CERT_ID, or NULL on error.
+ */
+ESS_CERT_ID *d2i_ESS_CERT_ID(ESS_CERT_ID **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a ESS CertID to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ESS_CERT_ID(const ESS_CERT_ID *a, unsigned char **out);
+/**
+ * @brief Duplicate a ESS CertID.
+ * @param a Value to copy.
+ * @return Deep copy of @p a, or NULL on error.
+ */
+ESS_CERT_ID *ESS_CERT_ID_dup(const ESS_CERT_ID *a);
+
+/**
+ * @brief Allocate an empty ESS SigningCertificate attribute.
+ * @return New ESS_SIGNING_CERT, or NULL on allocation failure.
+ */
+ESS_SIGNING_CERT *ESS_SIGNING_CERT_new(void);
+/**
+ * @brief Free a ESS SigningCertificate attribute and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ESS_SIGNING_CERT_free(ESS_SIGNING_CERT *a);
+/**
+ * @brief Decode a ESS SigningCertificate attribute from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ESS_SIGNING_CERT, or NULL on error.
+ */
+ESS_SIGNING_CERT *d2i_ESS_SIGNING_CERT(ESS_SIGNING_CERT **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a ESS SigningCertificate attribute to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ESS_SIGNING_CERT(const ESS_SIGNING_CERT *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ESS_SIGNING_CERT.
+ * @return Pointer to the static ASN1_ITEM for ESS_SIGNING_CERT.
+ */
+const ASN1_ITEM *ESS_SIGNING_CERT_it(void);
+/**
+ * @brief Duplicate a ESS SigningCertificate attribute.
+ * @param a Value to copy.
+ * @return Deep copy of @p a, or NULL on error.
+ */
+ESS_SIGNING_CERT *ESS_SIGNING_CERT_dup(const ESS_SIGNING_CERT *a);
+
+/**
+ * @brief Allocate an empty ESS CertIDv2.
+ * @return New ESS_CERT_ID_V2, or NULL on allocation failure.
+ */
+ESS_CERT_ID_V2 *ESS_CERT_ID_V2_new(void);
+/**
+ * @brief Free a ESS CertIDv2 and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ESS_CERT_ID_V2_free(ESS_CERT_ID_V2 *a);
+/**
+ * @brief Decode a ESS CertIDv2 from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ESS_CERT_ID_V2, or NULL on error.
+ */
+ESS_CERT_ID_V2 *d2i_ESS_CERT_ID_V2(ESS_CERT_ID_V2 **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a ESS CertIDv2 to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ESS_CERT_ID_V2(const ESS_CERT_ID_V2 *a, unsigned char **out);
+/**
+ * @brief Duplicate a ESS CertIDv2.
+ * @param a Value to copy.
+ * @return Deep copy of @p a, or NULL on error.
+ */
+ESS_CERT_ID_V2 *ESS_CERT_ID_V2_dup(const ESS_CERT_ID_V2 *a);
+
+/**
+ * @brief Allocate an empty ESS SigningCertificateV2 attribute.
+ * @return New ESS_SIGNING_CERT_V2, or NULL on allocation failure.
+ */
+ESS_SIGNING_CERT_V2 *ESS_SIGNING_CERT_V2_new(void);
+/**
+ * @brief Free a ESS SigningCertificateV2 attribute and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ESS_SIGNING_CERT_V2_free(ESS_SIGNING_CERT_V2 *a);
+/**
+ * @brief Decode a ESS SigningCertificateV2 attribute from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ESS_SIGNING_CERT_V2, or NULL on error.
+ */
+ESS_SIGNING_CERT_V2 *d2i_ESS_SIGNING_CERT_V2(ESS_SIGNING_CERT_V2 **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a ESS SigningCertificateV2 attribute to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ESS_SIGNING_CERT_V2(const ESS_SIGNING_CERT_V2 *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ESS_SIGNING_CERT_V2.
+ * @return Pointer to the static ASN1_ITEM for ESS_SIGNING_CERT_V2.
+ */
+const ASN1_ITEM *ESS_SIGNING_CERT_V2_it(void);
+/**
+ * @brief Duplicate a ESS SigningCertificateV2 attribute.
+ * @param a Value to copy.
+ * @return Deep copy of @p a, or NULL on error.
+ */
+ESS_SIGNING_CERT_V2 *ESS_SIGNING_CERT_V2_dup(const ESS_SIGNING_CERT_V2 *a);
+
+/**
+ * @brief Build an ESS SigningCertificate attribute from a signer cert and optional chain.
+ * @param signcert Signing certificate whose SHA-1 CertID is placed first.
+ * @param certs Optional additional certificates to include as CertIDs, or NULL.
+ * @param set_issuer_serial Nonzero to include issuerSerial for @p signcert (always included for @p certs).
+ * @return New ESS_SIGNING_CERT, or NULL on allocation failure.
+ */
+ESS_SIGNING_CERT *OSSL_ESS_signing_cert_new_init(const X509 *signcert,
+    const STACK_OF(X509) *certs,
+    int set_issuer_serial);
+/**
+ * @brief Build an ESS SigningCertificateV2 attribute using digest @p hash_alg.
+ * @param hash_alg Message digest used for CertIDv2 hashes.
+ * @param signcert Signing certificate whose CertIDv2 is placed first.
+ * @param certs Optional additional certificates to include as CertIDv2 entries, or NULL.
+ * @param set_issuer_serial Nonzero to include issuerSerial for @p signcert (always included for @p certs).
+ * @return New ESS_SIGNING_CERT_V2, or NULL on allocation failure.
+ */
+ESS_SIGNING_CERT_V2 *OSSL_ESS_signing_cert_v2_new_init(const EVP_MD *hash_alg,
+    const X509 *signcert,
+    const STACK_OF(X509) *certs,
+    int set_issuer_serial);
+/**
+ * @brief Verify that @p chain satisfies ESS signing-certificate identifiers in @p ss and/or @p ssv2.
+ * @param ss Optional ESS SigningCertificate (CertID) attribute, or NULL.
+ * @param ssv2 Optional ESS SigningCertificateV2 (CertIDv2) attribute, or NULL.
+ * @param chain Certificate validation chain; the first entry must be the signer.
+ * @param require_signing_cert Nonzero to require that @p ss or @p ssv2 is non-NULL.
+ * @return 1 on success, 0 if a required certificate is missing, or -1 on other error.
+ */
+int OSSL_ESS_check_signing_certs(const ESS_SIGNING_CERT *ss,
+    const ESS_SIGNING_CERT_V2 *ssv2,
+    const STACK_OF(X509) *chain,
+    int require_signing_cert);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

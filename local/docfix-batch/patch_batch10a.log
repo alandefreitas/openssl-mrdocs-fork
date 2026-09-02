@@ -1,0 +1,32 @@
+  OK: async.h :: ASYNC_WAIT_CTX_get_all_fds
+  OK: dh.h :: EVP_PKEY_CTX_set_dh_paramgen_prime_len
+  OK: dh.h :: DH_check_pub_key_ex
+  OK: dh.h :: DH_check_pub_key
+  OK: dh.h :: DH_clear_flags
+  OK: dh.h :: DH_meth_get0_app_data
+  OK: dh.h :: DH_meth_set_init
+  OK: dsa.h :: DSA_do_sign
+  OK: dsa.h :: DSA_free
+  OK: dsa.h :: DSA_set_ex_data
+  OK: dsa.h :: d2i/i2d_DSAPublicKey
+  OK: dsa.h :: DSA_print
+  OK: dsa.h :: DSA_dup_DH
+  OK: dsa.h :: DSA_get0_key
+  OK: dsa.h :: DSA_get0_g
+  OK: dsa.h :: DSA_clear_flags
+  OK: dsa.h :: DSA_set_flags
+  OK: dsa.h :: DSA_meth_free
+  OK: dsa.h :: DSA_meth_get0_name
+  OK: dsa.h :: DSA_meth_get0_app_data
+  OK: dsa.h :: DSA_meth_set_sign_setup
+  OK: dsa.h :: DSA_meth_set_mod_exp
+  OK: dsa.h :: DSA_meth_get_finish
+  OK: dsa.h :: DSA_meth_set_finish
+  OK: dsa.h :: DSA_meth_get_paramgen
+  OK: ec.h :: EVP_PKEY_CTX_set_ecdh_cofactor_mode
+  OK: engine.h :: ENGINE_register_DSA
+  OK: engine.h :: ENGINE_register_all_pkey_asn1_meths
+  MISS: engine.h :: ENGINE_get_static_state
+
+Done: 28 ok, 1 missing
+  MISSING: engine.h:ENGINE_get_static_state

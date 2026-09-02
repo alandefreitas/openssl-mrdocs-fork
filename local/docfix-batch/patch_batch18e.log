@@ -1,0 +1,83 @@
+=== batch 18e: ssl/stack/types/x509 ===
+  OK: ssl.h :: SRP_Calc_A_param
+  OK: ssl.h.in :: SRP_Calc_A_param
+  OK: ssl.h :: SSL_CTX_sess_get_new_cb
+  OK: ssl.h.in :: SSL_CTX_sess_get_new_cb
+  OK: ssl.h :: SSL_set1_host
+  OK: ssl.h.in :: SSL_set1_host
+  OK: ssl.h :: SSL_client_hello_get0_random
+  OK: ssl.h.in :: SSL_client_hello_get0_random
+  OK: ssl.h :: SSL_CTX_get_ex_data
+  OK: ssl.h.in :: SSL_CTX_get_ex_data
+  OK: ssl.h :: SSL_get_rpoll_descriptor
+  OK: ssl.h.in :: SSL_get_rpoll_descriptor
+  OK: stack.h :: OPENSSL_STACK
+  OK: stack.h :: OPENSSL_sk_freefunc
+  OK: stack.h :: OPENSSL_sk_push
+  OK: types.h :: ASN1_INTEGER/BIT_STRING
+  OK: types.h :: EVP_PKEY_ASN1_METHOD
+  OK: types.h :: EVP_KDF_CTX
+  OK: types.h :: RSA_OAEP_PARAMS
+  OK: types.h :: EC_KEY_METHOD
+  OK: types.h :: SSL_CTX
+  OK: types.h :: OCSP_RESPID
+  OK: types.h :: SCT
+  OK: types.h :: OSSL_ITEM
+  OK: types.h :: OSSL_PARAM_BLD
+  OK: types.h :: OSSL_SELF_TEST
+  OK: types.h :: evp_pkey_asn1_method_st record
+  OK: types.h :: evp_kdf_ctx_st record
+  OK: types.h :: rsa_oaep_params_st record
+  OK: types.h :: ocsp_responder_id_st record
+  OK: types.h :: ossl_param_bld_st record
+  OK: x509.h :: enc_len
+  OK: x509.h.in :: enc_len
+  OK: x509.h :: NETSCAPE_SPKI_b64_encode
+  OK: x509.h.in :: NETSCAPE_SPKI_b64_encode
+  OK: x509.h :: X509_sign_ctx
+  OK: x509.h.in :: X509_sign_ctx
+  OK: x509.h :: d2i_ECPrivateKey_fp
+  OK: x509.h.in :: d2i_ECPrivateKey_fp
+  OK: x509.h :: d2i_PKCS8_PRIV_KEY_INFO_fp
+  OK: x509.h.in :: d2i_PKCS8_PRIV_KEY_INFO_fp
+  OK: x509.h :: X509_get_default_private_dir
+  OK: x509.h.in :: X509_get_default_private_dir
+  OK: x509.h :: X509_get0_distinguishing_id
+  OK: x509.h.in :: X509_get0_distinguishing_id
+  OK: x509.h :: X509_REQ_get_attr_count
+  OK: x509.h.in :: X509_REQ_get_attr_count
+  OK: x509.h :: X509_NAME_add_entry
+  OK: x509.h.in :: X509_NAME_add_entry
+  OK: x509.h :: X509_EXTENSION_get_data
+  OK: x509.h.in :: X509_EXTENSION_get_data
+  OK: x509.h :: PKCS8_pkey_get0
+  OK: x509.h.in :: PKCS8_pkey_get0
+  OK: x509_vfy.h :: stack_st_X509_TRUST
+  MISS: x509_vfy.h.in :: stack_st_X509_TRUST
+  OK: x509_vfy.h :: X509_TRUST_add
+  OK: x509_vfy.h.in :: X509_TRUST_add
+  OK: x509_vfy.h :: X509_STORE_CTX_print_verify_cb
+  OK: x509_vfy.h.in :: X509_STORE_CTX_print_verify_cb
+  OK: x509_vfy.h :: X509_STORE_CTX_check_revocation_fn
+  OK: x509_vfy.h.in :: X509_STORE_CTX_check_revocation_fn
+  OK: x509_vfy.h :: X509_OBJECT_retrieve_match
+  OK: x509_vfy.h.in :: X509_OBJECT_retrieve_match
+  OK: x509_vfy.h :: X509_STORE_CTX_set_verify_cb
+  OK: x509_vfy.h.in :: X509_STORE_CTX_set_verify_cb
+  OK: x509_vfy.h :: X509_STORE_CTX_get_by_subject
+  OK: x509_vfy.h.in :: X509_STORE_CTX_get_by_subject
+  OK: x509_vfy.h :: X509_LOOKUP_by_alias
+  OK: x509_vfy.h.in :: X509_LOOKUP_by_alias
+  OK: x509_vfy.h :: X509_STORE_load_locations_ex
+  OK: x509_vfy.h.in :: X509_STORE_load_locations_ex
+  OK: x509_vfy.h :: X509_STORE_CTX_get0_parent_ctx
+  OK: x509_vfy.h.in :: X509_STORE_CTX_get0_parent_ctx
+  OK: x509_vfy.h :: X509_STORE_CTX_set0_verified_chain
+  OK: x509_vfy.h.in :: X509_STORE_CTX_set0_verified_chain
+  OK: x509v3.h :: X509V3_EXT_S2I
+  OK: x509v3.h.in :: X509V3_EXT_S2I
+  OK: x509v3.h :: X509V3_extensions_print
+  OK: x509v3.h.in :: X509V3_extensions_print
+
+OK=78 MISS=1
+  missing: x509_vfy.h.in:stack_st_X509_TRUST

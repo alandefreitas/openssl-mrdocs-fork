@@ -1,0 +1,2870 @@
+/*
+ * {- join("\n * ", @autowarntext) -}
+ *
+ * Copyright 1995-2023 The OpenSSL Project Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License 2.0 (the "License").  You may not use
+ * this file except in compliance with the License.  You can obtain a copy
+ * in the file LICENSE in the source distribution or at
+ * https://www.openssl.org/source/license.html
+ */
+
+/* clang-format off */
+{-
+use OpenSSL::stackhash qw(generate_stack_macros);
+-}
+/* clang-format on */
+
+#ifndef OPENSSL_ASN1_H
+#define OPENSSL_ASN1_H
+#pragma once
+
+#include <openssl/macros.h>
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#define HEADER_ASN1_H
+#endif
+
+#ifndef OPENSSL_NO_STDIO
+#include <stdio.h>
+#endif
+#include <time.h>
+#include <openssl/e_os2.h>
+#include <openssl/opensslconf.h>
+#include <openssl/bio.h>
+#include <openssl/safestack.h>
+#include <openssl/asn1err.h>
+#include <openssl/symhacks.h>
+
+#include <openssl/types.h>
+#include <openssl/bn.h>
+
+#ifdef OPENSSL_BUILD_SHLIBCRYPTO
+#undef OPENSSL_EXTERN
+#define OPENSSL_EXTERN OPENSSL_EXPORT
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define V_ASN1_UNIVERSAL 0x00
+#define V_ASN1_APPLICATION 0x40
+#define V_ASN1_CONTEXT_SPECIFIC 0x80
+#define V_ASN1_PRIVATE 0xc0
+
+#define V_ASN1_CONSTRUCTED 0x20
+#define V_ASN1_PRIMITIVE_TAG 0x1f
+#define V_ASN1_PRIMATIVE_TAG /*compat*/ V_ASN1_PRIMITIVE_TAG
+
+#define V_ASN1_APP_CHOOSE -2 /* let the recipient choose */
+#define V_ASN1_OTHER -3 /* used in ASN1_TYPE */
+#define V_ASN1_ANY -4 /* used in ASN1 template code */
+
+#define V_ASN1_UNDEF -1
+/* ASN.1 tag values */
+#define V_ASN1_EOC 0
+#define V_ASN1_BOOLEAN 1 /**/
+#define V_ASN1_INTEGER 2
+#define V_ASN1_BIT_STRING 3
+#define V_ASN1_OCTET_STRING 4
+#define V_ASN1_NULL 5
+#define V_ASN1_OBJECT 6
+#define V_ASN1_OBJECT_DESCRIPTOR 7
+#define V_ASN1_EXTERNAL 8
+#define V_ASN1_REAL 9
+#define V_ASN1_ENUMERATED 10
+#define V_ASN1_UTF8STRING 12
+#define V_ASN1_SEQUENCE 16
+#define V_ASN1_SET 17
+#define V_ASN1_NUMERICSTRING 18 /**/
+#define V_ASN1_PRINTABLESTRING 19
+#define V_ASN1_T61STRING 20
+#define V_ASN1_TELETEXSTRING 20 /* alias */
+#define V_ASN1_VIDEOTEXSTRING 21 /**/
+#define V_ASN1_IA5STRING 22
+#define V_ASN1_UTCTIME 23
+#define V_ASN1_GENERALIZEDTIME 24 /**/
+#define V_ASN1_GRAPHICSTRING 25 /**/
+#define V_ASN1_ISO64STRING 26 /**/
+#define V_ASN1_VISIBLESTRING 26 /* alias */
+#define V_ASN1_GENERALSTRING 27 /**/
+#define V_ASN1_UNIVERSALSTRING 28 /**/
+#define V_ASN1_BMPSTRING 30
+
+/*
+ * NB the constants below are used internally by ASN1_INTEGER
+ * and ASN1_ENUMERATED to indicate the sign. They are *not* on
+ * the wire tag values.
+ */
+
+#define V_ASN1_NEG 0x100
+#define V_ASN1_NEG_INTEGER (2 | V_ASN1_NEG)
+#define V_ASN1_NEG_ENUMERATED (10 | V_ASN1_NEG)
+
+/* For use with d2i_ASN1_type_bytes() */
+#define B_ASN1_NUMERICSTRING 0x0001
+#define B_ASN1_PRINTABLESTRING 0x0002
+#define B_ASN1_T61STRING 0x0004
+#define B_ASN1_TELETEXSTRING 0x0004
+#define B_ASN1_VIDEOTEXSTRING 0x0008
+#define B_ASN1_IA5STRING 0x0010
+#define B_ASN1_GRAPHICSTRING 0x0020
+#define B_ASN1_ISO64STRING 0x0040
+#define B_ASN1_VISIBLESTRING 0x0040
+#define B_ASN1_GENERALSTRING 0x0080
+#define B_ASN1_UNIVERSALSTRING 0x0100
+#define B_ASN1_OCTET_STRING 0x0200
+#define B_ASN1_BIT_STRING 0x0400
+#define B_ASN1_BMPSTRING 0x0800
+#define B_ASN1_UNKNOWN 0x1000
+#define B_ASN1_UTF8STRING 0x2000
+#define B_ASN1_UTCTIME 0x4000
+#define B_ASN1_GENERALIZEDTIME 0x8000
+#define B_ASN1_SEQUENCE 0x10000
+/* For use with ASN1_mbstring_copy() */
+#define MBSTRING_FLAG 0x1000
+#define MBSTRING_UTF8 (MBSTRING_FLAG)
+#define MBSTRING_ASC (MBSTRING_FLAG | 1)
+#define MBSTRING_BMP (MBSTRING_FLAG | 2)
+#define MBSTRING_UNIV (MBSTRING_FLAG | 4)
+#define SMIME_OLDMIME 0x400
+#define SMIME_CRLFEOL 0x800
+#define SMIME_STREAM 0x1000
+
+/* Stacks for types not otherwise defined in this header */
+/* clang-format off */
+{-
+    generate_stack_macros("X509_ALGOR");
+-}
+/* clang-format on */
+
+#define ASN1_STRING_FLAG_BITS_LEFT 0x08 /* Set if 0x07 has bits left value */
+/*
+ * This indicates that the ASN1_STRING is not a real value but just a place
+ * holder for the location where indefinite length constructed data should be
+ * inserted in the memory buffer
+ */
+#define ASN1_STRING_FLAG_NDEF 0x010
+
+/*
+ * This flag is used by the CMS code to indicate that a string is not
+ * complete and is a place holder for content when it had all been accessed.
+ * The flag will be reset when content has been written to it.
+ */
+
+#define ASN1_STRING_FLAG_CONT 0x020
+/*
+ * This flag is used by ASN1 code to indicate an ASN1_STRING is an MSTRING
+ * type.
+ */
+#define ASN1_STRING_FLAG_MSTRING 0x040
+/* String is embedded and only content should be freed */
+#define ASN1_STRING_FLAG_EMBED 0x080
+/* String should be parsed in RFC 5280's time format */
+#define ASN1_STRING_FLAG_X509_TIME 0x100
+/* This is the base type that holds just about everything :-) */
+struct asn1_string_st {
+    /** Number of content octets in @c data (not including a trailing NUL unless present in the encoding). */
+    int length;
+    /** ASN.1 tag / string type (for example V_ASN1_OCTET_STRING or V_ASN1_UTF8STRING). */
+    int type;
+    /** Content octets; length is given by @c length (may be NULL when empty). */
+    unsigned char *data;
+    /**
+     * Type-dependent flags (ASN1_STRING_FLAG_*); for BIT STRING, unused-bits
+     * and related encoding details are recorded here.
+     */
+    long flags;
+};
+
+/**
+ * @brief Saved DER encoding of an ASN.1 value, used when re-emitting the
+ * original bytes (for example so invalid encodings do not break signatures).
+ */
+typedef struct ASN1_ENCODING_st {
+    /** Saved DER encoding of an ASN.1 value (may be invalid). */
+    unsigned char *enc;
+    /** Length in bytes of the buffer at @c enc. */
+    long len;
+    /** Non-zero when @c enc is invalid and must not be reused for signatures. */
+    int modified;
+} ASN1_ENCODING;
+
+/* Used with ASN1 LONG type: if a long is set to this it is omitted */
+#define ASN1_LONG_UNDEF 0x7fffffffL
+
+#define STABLE_FLAGS_MALLOC 0x01
+/*
+ * A zero passed to ASN1_STRING_TABLE_new_add for the flags is interpreted
+ * as "don't change" and STABLE_FLAGS_MALLOC is always set. By setting
+ * STABLE_FLAGS_MALLOC only we can clear the existing value. Use the alias
+ * STABLE_FLAGS_CLEAR to reflect this.
+ */
+#define STABLE_FLAGS_CLEAR STABLE_FLAGS_MALLOC
+#define STABLE_NO_MASK 0x02
+#define DIRSTRING_TYPE \
+    (B_ASN1_PRINTABLESTRING | B_ASN1_T61STRING | B_ASN1_BMPSTRING | B_ASN1_UTF8STRING)
+#define PKCS9STRING_TYPE (DIRSTRING_TYPE | B_ASN1_IA5STRING)
+
+struct asn1_string_table_st {
+    /** Numeric identifier (NID_*) this table entry constrains. */
+    int nid;
+    /** Minimum allowed string size in characters for this NID (-1 = no minimum). */
+    long minsize;
+    /** Maximum allowed string size in characters for this NID (-1 = unlimited). */
+    long maxsize;
+    /** B_ASN1_* bitmask of permitted string types for this NID. */
+    unsigned long mask;
+    /** STABLE_FLAGS_* bits controlling how the table entry is applied. */
+    unsigned long flags;
+};
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(ASN1_STRING_TABLE) container type.
+ */
+struct stack_st_ASN1_STRING_TABLE;
+{-
+    generate_stack_macros("ASN1_STRING_TABLE");
+-}
+/* clang-format on */
+
+/* size limits: this stuff is taken straight from RFC2459 */
+
+#define ub_name 32768
+#define ub_common_name 64
+#define ub_locality_name 128
+#define ub_state_name 128
+#define ub_organization_name 64
+#define ub_organization_unit_name 64
+#define ub_title 64
+#define ub_email_address 128
+
+/*
+ * Declarations for template structures: for full definitions see asn1t.h
+ */
+/**
+ * @brief Opaque field descriptor used when building ASN.1 ITEM templates.
+ *
+ * Full layout lives in asn1t.h; callers typically obtain templates via
+ * ASN1_ITEM macros rather than constructing ASN1_TEMPLATE values by hand.
+ */
+typedef struct ASN1_TEMPLATE_st ASN1_TEMPLATE;
+/**
+ * @brief Opaque ASN.1 tag/length cache (struct ASN1_TLC_st) used while
+ * decoding constructed types; layout is private to the ASN.1 implementation.
+ */
+typedef struct ASN1_TLC_st ASN1_TLC;
+/**
+ * @brief Opaque ASN.1 value handle used by generic item encode/decode and S/MIME helpers.
+ *
+ * Concrete layouts are described by an ASN1_ITEM; callers treat ASN1_VALUE as an
+ * incomplete type and cast through type-specific APIs when needed.
+ */
+typedef struct ASN1_VALUE_st ASN1_VALUE;
+
+/* Declare ASN1 functions: the implement macro in in asn1t.h */
+
+/*
+ * The mysterious 'extern' that's passed to some macros is innocuous,
+ * and is there to quiet pre-C99 compilers that may complain about empty
+ * arguments in macro calls.
+ */
+
+#define DECLARE_ASN1_FUNCTIONS_attr(attr, type) \
+    DECLARE_ASN1_FUNCTIONS_name_attr(attr, type, type)
+#define DECLARE_ASN1_FUNCTIONS(type) \
+    DECLARE_ASN1_FUNCTIONS_attr(extern, type)
+
+#define DECLARE_ASN1_ALLOC_FUNCTIONS_attr(attr, type) \
+    DECLARE_ASN1_ALLOC_FUNCTIONS_name_attr(attr, type, type)
+#define DECLARE_ASN1_ALLOC_FUNCTIONS(type) \
+    DECLARE_ASN1_ALLOC_FUNCTIONS_attr(extern, type)
+
+#define DECLARE_ASN1_FUNCTIONS_name_attr(attr, type, name)   \
+    DECLARE_ASN1_ALLOC_FUNCTIONS_name_attr(attr, type, name) \
+    DECLARE_ASN1_ENCODE_FUNCTIONS_name_attr(attr, type, name)
+#define DECLARE_ASN1_FUNCTIONS_name(type, name) \
+    DECLARE_ASN1_FUNCTIONS_name_attr(extern, type, name)
+
+#define DECLARE_ASN1_ENCODE_FUNCTIONS_attr(attr, type, itname, name) \
+    DECLARE_ASN1_ENCODE_FUNCTIONS_only_attr(attr, type, name)        \
+    DECLARE_ASN1_ITEM_attr(attr, itname)
+#define DECLARE_ASN1_ENCODE_FUNCTIONS(type, itname, name) \
+    DECLARE_ASN1_ENCODE_FUNCTIONS_attr(extern, type, itname, name)
+
+#define DECLARE_ASN1_ENCODE_FUNCTIONS_name_attr(attr, type, name) \
+    DECLARE_ASN1_ENCODE_FUNCTIONS_attr(attr, type, name, name)
+#define DECLARE_ASN1_ENCODE_FUNCTIONS_name(type, name) \
+    DECLARE_ASN1_ENCODE_FUNCTIONS_name_attr(extern, type, name)
+
+#define DECLARE_ASN1_ENCODE_FUNCTIONS_only_attr(attr, type, name)        \
+    attr type *d2i_##name(type **a, const unsigned char **in, long len); \
+    attr int i2d_##name(const type *a, unsigned char **out);
+#define DECLARE_ASN1_ENCODE_FUNCTIONS_only(type, name) \
+    DECLARE_ASN1_ENCODE_FUNCTIONS_only_attr(extern, type, name)
+
+#define DECLARE_ASN1_NDEF_FUNCTION_attr(attr, name) \
+    attr int i2d_##name##_NDEF(const name *a, unsigned char **out);
+#define DECLARE_ASN1_NDEF_FUNCTION(name) \
+    DECLARE_ASN1_NDEF_FUNCTION_attr(extern, name)
+
+#define DECLARE_ASN1_ALLOC_FUNCTIONS_name_attr(attr, type, name) \
+    attr type *name##_new(void);                                 \
+    attr void name##_free(type *a);
+#define DECLARE_ASN1_ALLOC_FUNCTIONS_name(type, name) \
+    DECLARE_ASN1_ALLOC_FUNCTIONS_name_attr(extern, type, name)
+
+#define DECLARE_ASN1_DUP_FUNCTION_attr(attr, type) \
+    DECLARE_ASN1_DUP_FUNCTION_name_attr(attr, type, type)
+#define DECLARE_ASN1_DUP_FUNCTION(type) \
+    DECLARE_ASN1_DUP_FUNCTION_attr(extern, type)
+
+#define DECLARE_ASN1_DUP_FUNCTION_name_attr(attr, type, name) \
+    attr type *name##_dup(const type *a);
+#define DECLARE_ASN1_DUP_FUNCTION_name(type, name) \
+    DECLARE_ASN1_DUP_FUNCTION_name_attr(extern, type, name)
+
+#define DECLARE_ASN1_PRINT_FUNCTION_attr(attr, stname) \
+    DECLARE_ASN1_PRINT_FUNCTION_fname_attr(attr, stname, stname)
+#define DECLARE_ASN1_PRINT_FUNCTION(stname) \
+    DECLARE_ASN1_PRINT_FUNCTION_attr(extern, stname)
+
+#define DECLARE_ASN1_PRINT_FUNCTION_fname_attr(attr, stname, fname)   \
+    attr int fname##_print_ctx(BIO *out, const stname *x, int indent, \
+        const ASN1_PCTX *pctx);
+#define DECLARE_ASN1_PRINT_FUNCTION_fname(stname, fname) \
+    DECLARE_ASN1_PRINT_FUNCTION_fname_attr(extern, stname, fname)
+
+#define D2I_OF(type) type *(*)(type **, const unsigned char **, long)
+#define I2D_OF(type) int (*)(const type *, unsigned char **)
+
+#define CHECKED_D2I_OF(type, d2i) \
+    ((d2i_of_void *)(1 ? d2i : ((D2I_OF(type))0)))
+#define CHECKED_I2D_OF(type, i2d) \
+    ((i2d_of_void *)(1 ? i2d : ((I2D_OF(type))0)))
+#define CHECKED_NEW_OF(type, xnew) \
+    ((void *(*)(void))(1 ? xnew : ((type * (*)(void))0)))
+#define CHECKED_PTR_OF(type, p) \
+    ((void *)(1 ? p : (type *)0))
+#define CHECKED_PPTR_OF(type, p) \
+    ((void **)(1 ? p : (type **)0))
+
+#define TYPEDEF_D2I_OF(type) typedef type *d2i_of_##type(type **, const unsigned char **, long)
+#define TYPEDEF_I2D_OF(type) typedef int i2d_of_##type(const type *, unsigned char **)
+#define TYPEDEF_D2I2D_OF(type) \
+    TYPEDEF_D2I_OF(type);      \
+    TYPEDEF_I2D_OF(type)
+
+/**
+ * @brief Function-pointer type for a type-erased ASN.1 DER decoder (d2i_*).
+ * @param a Optional destination pointer updated to the decoded object, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded object pointer, or NULL on error.
+ */
+typedef void *d2i_of_void(void **, const unsigned char **, long);
+/**
+ * @brief Function-pointer type for a type-erased ASN.1 DER encoder (i2d_*).
+ * @param a Object to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+typedef int i2d_of_void(const void *, unsigned char **);
+
+/*-
+ * The following macros and typedefs allow an ASN1_ITEM
+ * to be embedded in a structure and referenced. Since
+ * the ASN1_ITEM pointers need to be globally accessible
+ * (possibly from shared libraries) they may exist in
+ * different forms. On platforms that support it the
+ * ASN1_ITEM structure itself will be globally exported.
+ * Other platforms will export a function that returns
+ * an ASN1_ITEM pointer.
+ *
+ * To handle both cases transparently the macros below
+ * should be used instead of hard coding an ASN1_ITEM
+ * pointer in a structure.
+ *
+ * The structure will look like this:
+ *
+ * typedef struct SOMETHING_st {
+ *      ...
+ *      ASN1_ITEM_EXP *iptr;
+ *      ...
+ * } SOMETHING;
+ *
+ * It would be initialised as e.g.:
+ *
+ * SOMETHING somevar = {...,ASN1_ITEM_ref(X509),...};
+ *
+ * and the actual pointer extracted with:
+ *
+ * const ASN1_ITEM *it = ASN1_ITEM_ptr(somevar.iptr);
+ *
+ * Finally an ASN1_ITEM pointer can be extracted from an
+ * appropriate reference with: ASN1_ITEM_rptr(X509). This
+ * would be used when a function takes an ASN1_ITEM * argument.
+ *
+ */
+
+/*
+ * Platforms that can't easily handle shared global variables are declared as
+ * functions returning ASN1_ITEM pointers.
+ */
+
+/* ASN1_ITEM pointer exported type */
+/**
+ * @brief Function type that returns a pointer to a static ASN1_ITEM descriptor.
+ *
+ * Used with ASN1_ITEM_ptr() so ASN.1 items can be referenced as function
+ * exports rather than as data symbols on platforms that require that form.
+ */
+typedef const ASN1_ITEM *ASN1_ITEM_EXP(void);
+
+/* Macro to obtain ASN1_ITEM pointer from exported type */
+#define ASN1_ITEM_ptr(iptr) (iptr())
+
+/* Macro to include ASN1_ITEM pointer from base type */
+#define ASN1_ITEM_ref(iptr) (iptr##_it)
+
+#define ASN1_ITEM_rptr(ref) (ref##_it())
+
+#define DECLARE_ASN1_ITEM_attr(attr, name) \
+    attr const ASN1_ITEM *name##_it(void);
+#define DECLARE_ASN1_ITEM(name) \
+    DECLARE_ASN1_ITEM_attr(extern, name)
+
+/* Parameters used by ASN1_STRING_print_ex() */
+
+/*
+ * These determine which characters to escape: RFC2253 special characters,
+ * control characters and MSB set characters
+ */
+
+#define ASN1_STRFLGS_ESC_2253 1
+#define ASN1_STRFLGS_ESC_CTRL 2
+#define ASN1_STRFLGS_ESC_MSB 4
+
+/* Lower 8 bits are reserved as an output type specifier */
+#define ASN1_DTFLGS_TYPE_MASK 0x0FUL
+#define ASN1_DTFLGS_RFC822 0x00UL
+#define ASN1_DTFLGS_ISO8601 0x01UL
+
+/*
+ * This flag determines how we do escaping: normally RC2253 backslash only,
+ * set this to use backslash and quote.
+ */
+
+#define ASN1_STRFLGS_ESC_QUOTE 8
+
+/* These three flags are internal use only. */
+
+/* Character is a valid PrintableString character */
+#define CHARTYPE_PRINTABLESTRING 0x10
+/* Character needs escaping if it is the first character */
+#define CHARTYPE_FIRST_ESC_2253 0x20
+/* Character needs escaping if it is the last character */
+#define CHARTYPE_LAST_ESC_2253 0x40
+
+/*
+ * NB the internal flags are safely reused below by flags handled at the top
+ * level.
+ */
+
+/*
+ * If this is set we convert all character strings to UTF8 first
+ */
+
+#define ASN1_STRFLGS_UTF8_CONVERT 0x10
+
+/*
+ * If this is set we don't attempt to interpret content: just assume all
+ * strings are 1 byte per character. This will produce some pretty odd
+ * looking output!
+ */
+
+#define ASN1_STRFLGS_IGNORE_TYPE 0x20
+
+/* If this is set we include the string type in the output */
+#define ASN1_STRFLGS_SHOW_TYPE 0x40
+
+/*
+ * This determines which strings to display and which to 'dump' (hex dump of
+ * content octets or DER encoding). We can only dump non character strings or
+ * everything. If we don't dump 'unknown' they are interpreted as character
+ * strings with 1 octet per character and are subject to the usual escaping
+ * options.
+ */
+
+#define ASN1_STRFLGS_DUMP_ALL 0x80
+#define ASN1_STRFLGS_DUMP_UNKNOWN 0x100
+
+/*
+ * These determine what 'dumping' does, we can dump the content octets or the
+ * DER encoding: both use the RFC2253 #XXXXX notation.
+ */
+
+#define ASN1_STRFLGS_DUMP_DER 0x200
+
+/*
+ * This flag specifies that RC2254 escaping shall be performed.
+ */
+#define ASN1_STRFLGS_ESC_2254 0x400
+
+/*
+ * All the string flags consistent with RFC2253, escaping control characters
+ * isn't essential in RFC2253 but it is advisable anyway.
+ */
+
+#define ASN1_STRFLGS_RFC2253 (ASN1_STRFLGS_ESC_2253 | ASN1_STRFLGS_ESC_CTRL | ASN1_STRFLGS_ESC_MSB | ASN1_STRFLGS_UTF8_CONVERT | ASN1_STRFLGS_DUMP_UNKNOWN | ASN1_STRFLGS_DUMP_DER)
+
+struct asn1_type_st {
+    /** Active ASN.1 type tag (V_ASN1_*) selecting which union arm is valid. */
+    int type;
+    /**
+     * @brief Typed ASN.1 ANY payload; the active arm matches @c type.
+     */
+    union {
+        /** Untyped pointer view of the ANY value when no more specific arm applies. */
+        char *ptr;
+        /** BOOLEAN value when type is V_ASN1_BOOLEAN. */
+        ASN1_BOOLEAN boolean;
+        /** Generic ASN.1 string when type is an ASN1_STRING-compatible tag. */
+        ASN1_STRING *asn1_string;
+        /** OBJECT IDENTIFIER when type is V_ASN1_OBJECT. */
+        ASN1_OBJECT *object;
+        /** INTEGER value when type is V_ASN1_INTEGER. */
+        ASN1_INTEGER *integer;
+        /** ENUMERATED value when type is V_ASN1_ENUMERATED. */
+        ASN1_ENUMERATED *enumerated;
+        /** BIT STRING value when type is V_ASN1_BIT_STRING. */
+        ASN1_BIT_STRING *bit_string;
+        /** OCTET STRING value when type is V_ASN1_OCTET_STRING. */
+        ASN1_OCTET_STRING *octet_string;
+        /** PrintableString value when type is V_ASN1_PRINTABLESTRING. */
+        ASN1_PRINTABLESTRING *printablestring;
+        /** TeletexString / T61String value when type is V_ASN1_T61STRING. */
+        ASN1_T61STRING *t61string;
+        /** IA5String value when type is V_ASN1_IA5STRING. */
+        ASN1_IA5STRING *ia5string;
+        /** GeneralString value when type is V_ASN1_GENERALSTRING. */
+        ASN1_GENERALSTRING *generalstring;
+        /** BMPString (UCS-2) value when type is V_ASN1_BMPSTRING. */
+        ASN1_BMPSTRING *bmpstring;
+        /** UniversalString value when type is V_ASN1_UNIVERSALSTRING. */
+        ASN1_UNIVERSALSTRING *universalstring;
+        /** UTCTime value when type is V_ASN1_UTCTIME. */
+        ASN1_UTCTIME *utctime;
+        /** GeneralizedTime value when type is V_ASN1_GENERALIZEDTIME. */
+        ASN1_GENERALIZEDTIME *generalizedtime;
+        /** VisibleString value when type is V_ASN1_VISIBLESTRING. */
+        ASN1_VISIBLESTRING *visiblestring;
+        /** UTF8String value when type is V_ASN1_UTF8STRING. */
+        ASN1_UTF8STRING *utf8string;
+        /*
+         * set and sequence are left complete and still contain the set or
+         * sequence bytes
+         */
+        /** Raw ASN.1 SET contents when type is V_ASN1_SET. */
+        ASN1_STRING *set;
+        /** Raw ASN.1 SEQUENCE contents when type is V_ASN1_SEQUENCE. */
+        ASN1_STRING *sequence;
+        /** Generic ASN1_VALUE pointer for OTHER / opaque ANY payloads. */
+        ASN1_VALUE *asn1_value;
+    } value;
+};
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(ASN1_TYPE) container type.
+ */
+struct stack_st_ASN1_TYPE;
+{-
+    generate_stack_macros("ASN1_TYPE");
+-}
+/* clang-format on */
+
+/**
+ * @brief Stack of ASN1_TYPE values representing SEQUENCE OF ANY or SET OF ANY.
+ */
+typedef STACK_OF(ASN1_TYPE) ASN1_SEQUENCE_ANY;
+
+/**
+ * @brief Decode an ASN.1 SEQUENCE OF ANY from DER into a stack of ASN1_TYPE values.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_SEQUENCE_ANY stack, or NULL on error.
+ */
+ASN1_SEQUENCE_ANY *d2i_ASN1_SEQUENCE_ANY(ASN1_SEQUENCE_ANY **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a stack of ASN1_TYPE values as an ASN.1 SEQUENCE OF ANY in DER.
+ * @param a Stack to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_SEQUENCE_ANY(const ASN1_SEQUENCE_ANY *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_SEQUENCE_ANY.
+ * @return Pointer to the static ASN1_ITEM for ASN1_SEQUENCE_ANY.
+ */
+const ASN1_ITEM *ASN1_SEQUENCE_ANY_it(void);
+/**
+ * @brief Decode an ASN.1 SET OF ANY from DER into a stack of ASN1_TYPE values.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_SEQUENCE_ANY stack representing the SET, or NULL on error.
+ */
+ASN1_SEQUENCE_ANY *d2i_ASN1_SET_ANY(ASN1_SEQUENCE_ANY **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a stack of ASN1_TYPE values as an ASN.1 SET OF ANY in DER.
+ * @param a Stack to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_SET_ANY(const ASN1_SEQUENCE_ANY *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_SET_ANY.
+ * @return Pointer to the static ASN1_ITEM for ASN1_SET_ANY.
+ */
+const ASN1_ITEM *ASN1_SET_ANY_it(void);
+
+/**
+ * @brief Mapping of a named bit in an ASN.1 BIT STRING to its bit number.
+ *
+ * Tables of these entries are used when printing or looking up bits by
+ * long or short name (for example key-usage bits).
+ */
+typedef struct BIT_STRING_BITNAME_st {
+    /** Zero-based bit number within the BIT STRING. */
+    int bitnum;
+    /** Long human-readable name for the bit (may be NULL). */
+    const char *lname;
+    /** Short name or abbreviation for the bit (may be NULL). */
+    const char *sname;
+} BIT_STRING_BITNAME;
+
+#define B_ASN1_TIME \
+    B_ASN1_UTCTIME | B_ASN1_GENERALIZEDTIME
+
+#define B_ASN1_PRINTABLE \
+    B_ASN1_NUMERICSTRING | B_ASN1_PRINTABLESTRING | B_ASN1_T61STRING | B_ASN1_IA5STRING | B_ASN1_BIT_STRING | B_ASN1_UNIVERSALSTRING | B_ASN1_BMPSTRING | B_ASN1_UTF8STRING | B_ASN1_SEQUENCE | B_ASN1_UNKNOWN
+
+#define B_ASN1_DIRECTORYSTRING \
+    B_ASN1_PRINTABLESTRING | B_ASN1_TELETEXSTRING | B_ASN1_BMPSTRING | B_ASN1_UNIVERSALSTRING | B_ASN1_UTF8STRING
+
+#define B_ASN1_DISPLAYTEXT \
+    B_ASN1_IA5STRING | B_ASN1_VISIBLESTRING | B_ASN1_BMPSTRING | B_ASN1_UTF8STRING
+
+/**
+ * @brief Allocate an empty ASN.1 ANY / ASN1_TYPE container.
+ * @return New ASN1_TYPE, or NULL on allocation failure.
+ */
+ASN1_TYPE *ASN1_TYPE_new(void);
+/**
+ * @brief Free an ASN.1 ANY / ASN1_TYPE value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_TYPE_free(ASN1_TYPE *a);
+/**
+ * @brief Decode an ASN.1 ANY / ASN1_TYPE value from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_TYPE, or NULL on error.
+ */
+ASN1_TYPE *d2i_ASN1_TYPE(ASN1_TYPE **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN.1 ANY / ASN1_TYPE value to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_TYPE(const ASN1_TYPE *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN.1 ANY (ASN1_TYPE).
+ * @return Pointer to the static ASN1_ITEM for ASN1_ANY.
+ */
+const ASN1_ITEM *ASN1_ANY_it(void);
+
+/**
+ * @brief Return the type tag stored in an ASN1_TYPE, or 0 if unset or empty.
+ * @param a ANY value to query.
+ * @return V_ASN1_* type constant, or 0 when no value is present.
+ */
+int ASN1_TYPE_get(const ASN1_TYPE *a);
+/**
+ * @brief Set an ASN1_TYPE to @p type, taking ownership of @p value (no copy).
+ * @param a Destination ANY/CHOICE container to update.
+ * @param type ASN.1 type tag (V_ASN1_*); for V_ASN1_BOOLEAN, @p value may be NULL to mean FALSE.
+ * @param value Pointer to the typed value transferred into @p a, or NULL where the type allows it.
+ */
+void ASN1_TYPE_set(ASN1_TYPE *a, int type, void *value);
+/**
+ * @brief Set an ASN1_TYPE to @p type, storing a copy of @p value (unlike ASN1_TYPE_set).
+ * @param a Destination ANY/CHOICE container to update.
+ * @param type ASN.1 type tag (V_ASN1_*); for V_ASN1_BOOLEAN, @p value may be NULL to mean FALSE.
+ * @param value Pointer to the typed value to copy, or NULL where the type allows it.
+ * @return 1 on success, or 0 on failure.
+ */
+int ASN1_TYPE_set1(ASN1_TYPE *a, int type, const void *value);
+/**
+ * @brief Compare two ASN1_TYPE values for identical type and content.
+ * @param a First ANY value.
+ * @param b Second ANY value.
+ * @return 0 if @p a and @p b are identical, or nonzero otherwise.
+ */
+int ASN1_TYPE_cmp(const ASN1_TYPE *a, const ASN1_TYPE *b);
+
+/**
+ * @brief Encode a typed structure as a SEQUENCE and store it in an ASN1_TYPE.
+ * @param it ASN.1 item describing the SEQUENCE type of @p s.
+ * @param s Structure instance to encode (type implied by @p it).
+ * @param t Optional destination ASN1_TYPE pointer; when non-NULL, *@p t is reused or allocated.
+ * @return ASN1_TYPE holding the packed SEQUENCE, or NULL on error.
+ */
+ASN1_TYPE *ASN1_TYPE_pack_sequence(const ASN1_ITEM *it, void *s, ASN1_TYPE **t);
+/**
+ * @brief Decode the SEQUENCE contents of an ASN1_TYPE into a typed structure.
+ * @param it ASN.1 item describing the expected SEQUENCE type.
+ * @param t ASN1_TYPE whose value holds SEQUENCE octets (typically V_ASN1_SEQUENCE).
+ * @return Newly allocated structure of the type described by @p it, or NULL on error.
+ */
+void *ASN1_TYPE_unpack_sequence(const ASN1_ITEM *it, const ASN1_TYPE *t);
+
+/* clang-format off */
+{-
+    generate_stack_macros("ASN1_OBJECT");
+-}
+/* clang-format on */
+
+/**
+ * @brief Allocate an empty ASN.1 OBJECT identifier.
+ * @return New ASN1_OBJECT, or NULL on allocation failure.
+ */
+ASN1_OBJECT *ASN1_OBJECT_new(void);
+/**
+ * @brief Free an ASN.1 OBJECT identifier and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_OBJECT_free(ASN1_OBJECT *a);
+/**
+ * @brief Decode an ASN.1 OBJECT identifier from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_OBJECT, or NULL on error.
+ */
+ASN1_OBJECT *d2i_ASN1_OBJECT(ASN1_OBJECT **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN.1 OBJECT identifier to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_OBJECT(const ASN1_OBJECT *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_OBJECT.
+ * @return Pointer to the static ASN1_ITEM for ASN1_OBJECT.
+ */
+const ASN1_ITEM *ASN1_OBJECT_it(void);
+
+/**
+ * @brief Allocate an empty ASN1_STRING with default type V_ASN1_OCTET_STRING.
+ * @return New ASN1_STRING, or NULL on allocation failure.
+ */
+ASN1_STRING *ASN1_STRING_new(void);
+/**
+ * @brief Free an ASN.1 string and its contents.
+ * @param a String to free, or NULL.
+ */
+void ASN1_STRING_free(ASN1_STRING *a);
+/**
+ * @brief Zero the content octets then free an ASN.1 string.
+ * @param a String to cleanse and free, or NULL.
+ */
+void ASN1_STRING_clear_free(ASN1_STRING *a);
+/**
+ * @brief Copy type, data, and flags from @p str into @p dst.
+ * @param dst Destination string; must already be allocated.
+ * @param str Source ASN1_STRING whose contents are copied into @p dst.
+ * @return 1 on success, or 0 on failure (including when @p str is NULL).
+ *
+ * Preserves any ASN1_STRING_FLAG_EMBED bit already set on @p dst.
+ */
+int ASN1_STRING_copy(ASN1_STRING *dst, const ASN1_STRING *str);
+/**
+ * @brief Deep-copy an ASN.1 string (type, data, and flags).
+ * @param a Source string to duplicate.
+ * @return Newly allocated ASN1_STRING copy, or NULL on error; free with ASN1_STRING_free().
+ */
+ASN1_STRING *ASN1_STRING_dup(const ASN1_STRING *a);
+/**
+ * @brief Allocate an empty ASN1_STRING with the given ASN.1 string type.
+ * @param type ASN.1 tag such as V_ASN1_UTF8STRING or V_ASN1_OCTET_STRING.
+ * @return New ASN1_STRING, or NULL on allocation failure.
+ */
+ASN1_STRING *ASN1_STRING_type_new(int type);
+/**
+ * @brief Compare two ASN1_STRING values by type and content octets.
+ * @param a First string.
+ * @param b Second string.
+ * @return Negative, zero, or positive like memcmp(), considering type then data.
+ */
+int ASN1_STRING_cmp(const ASN1_STRING *a, const ASN1_STRING *b);
+/*
+ * Since this is used to store all sorts of things, via macros, for now,
+ * make its data void *
+ */
+/**
+ * @brief Copy @p data of length @p len into an ASN.1 string.
+ * @param str String whose content is replaced with a copy of @p data.
+ * @param data Bytes to copy; may be a C string when @p len is -1.
+ * @param len Number of bytes at @p data, or -1 to use strlen(@p data).
+ * @return 1 on success, or 0 on failure.
+ */
+int ASN1_STRING_set(ASN1_STRING *str, const void *data, int len);
+/**
+ * @brief Assign an ASN.1 string ownership of an existing data buffer.
+ * @param str String whose content pointer and length are replaced.
+ * @param data Buffer that @p str will own (freed by ASN1_STRING_free); may be NULL when @p len is 0.
+ * @param len Length of @p data in bytes.
+ */
+void ASN1_STRING_set0(ASN1_STRING *str, void *data, int len);
+/**
+ * @brief Return the content length of an ASN.1 string in bytes.
+ * @param x String to query.
+ * @return Number of content octets in @p x.
+ */
+int ASN1_STRING_length(const ASN1_STRING *x);
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+/**
+ * @brief Set the reported content length of an ASN.1 string without resizing its buffer (deprecated).
+ * @param x String whose length field is updated.
+ * @param n New length in bytes; the caller must ensure the data buffer is large enough.
+ *
+ * Prefer ASN1_STRING_set() or ASN1_STRING_set0(), which keep length and data consistent.
+ */
+OSSL_DEPRECATEDIN_3_0 void ASN1_STRING_length_set(ASN1_STRING *x, int n);
+#endif
+/**
+ * @brief Return the ASN.1 type tag stored in an ASN.1 string.
+ * @param x String to query.
+ * @return Type constant such as V_ASN1_OCTET_STRING.
+ */
+int ASN1_STRING_type(const ASN1_STRING *x);
+#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+/**
+ * @brief Return a mutable pointer to the raw octets stored in an ASN1_STRING (deprecated).
+ * @param x ASN.1 string to query.
+ * @return Pointer to internal data (may be NULL); prefer ASN1_STRING_get0_data().
+ */
+OSSL_DEPRECATEDIN_1_1_0 unsigned char *ASN1_STRING_data(ASN1_STRING *x);
+#endif
+/**
+ * @brief Return a const pointer to the raw content octets of an ASN.1 string.
+ * @param x String to query.
+ * @return Pointer to the internal data buffer (do not free), or NULL if unset.
+ */
+const unsigned char *ASN1_STRING_get0_data(const ASN1_STRING *x);
+
+/**
+ * @brief Allocate an empty ASN.1 BIT STRING.
+ * @return New ASN1_BIT_STRING, or NULL on allocation failure.
+ */
+ASN1_BIT_STRING *ASN1_BIT_STRING_new(void);
+/**
+ * @brief Free an ASN.1 BIT STRING and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_BIT_STRING_free(ASN1_BIT_STRING *a);
+/**
+ * @brief Decode an ASN.1 BIT STRING from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_BIT_STRING, or NULL on error.
+ */
+ASN1_BIT_STRING *d2i_ASN1_BIT_STRING(ASN1_BIT_STRING **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN.1 BIT STRING to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_BIT_STRING(const ASN1_BIT_STRING *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_BIT_STRING.
+ * @return Pointer to the static ASN1_ITEM for ASN1_BIT_STRING.
+ */
+const ASN1_ITEM *ASN1_BIT_STRING_it(void);
+/**
+ * @brief Replace the raw bit-string payload of an ASN1_BIT_STRING.
+ * @param a Bit string to update.
+ * @param d Bytes to copy into the string (treated as the bit-string content octets).
+ * @param length Number of bytes at @p d, or -1 to use strlen on @p d.
+ * @return 1 on success, or 0 on failure.
+ */
+int ASN1_BIT_STRING_set(ASN1_BIT_STRING *a, unsigned char *d, int length);
+/**
+ * @brief Set or clear a single bit in an ASN.1 BIT STRING.
+ * @param a Bit string to update (resized as needed).
+ * @param n Zero-based bit index to change.
+ * @param value Nonzero to set the bit, or 0 to clear it.
+ * @return 1 on success, or 0 on failure.
+ */
+int ASN1_BIT_STRING_set_bit(ASN1_BIT_STRING *a, int n, int value);
+/**
+ * @brief Test whether bit @p n is set in an ASN.1 BIT STRING.
+ * @param a Bit string to query; NULL or short strings are treated as clear.
+ * @param n Zero-based bit index.
+ * @return 1 if the bit is set, or 0 if clear / out of range / @p a is NULL.
+ */
+int ASN1_BIT_STRING_get_bit(const ASN1_BIT_STRING *a, int n);
+/**
+ * @brief Verify that every set bit in @p a is allowed by the @p flags mask.
+ * @param a Bit string to check; NULL or empty is treated as valid.
+ * @param flags Byte mask of permitted bits (1 = allowed).
+ * @param flags_len Length of @p flags in bytes.
+ * @return 1 if all set bits are allowed (or @p a is empty), or 0 if any disallowed bit is set.
+ */
+int ASN1_BIT_STRING_check(const ASN1_BIT_STRING *a,
+    const unsigned char *flags, int flags_len);
+
+/**
+ * @brief Print the long names of set bits from a BIT_STRING_BITNAME table.
+ * @param out BIO that receives the indented comma-separated names and a newline.
+ * @param bs Bit string whose set bits are looked up in @p tbl.
+ * @param tbl NULL-terminated table of bit numbers and long names.
+ * @param indent Number of spaces written before the first name.
+ * @return 1 on success.
+ */
+int ASN1_BIT_STRING_name_print(BIO *out, ASN1_BIT_STRING *bs,
+    BIT_STRING_BITNAME *tbl, int indent);
+/**
+ * @brief Look up the bit number for a named bit in a BIT_STRING_BITNAME table.
+ * @param name Short or long bit name to match.
+ * @param tbl NULL-terminated table of named bits (ends when @c lname is NULL).
+ * @return Matching bit number, or -1 if @p name is not found.
+ */
+int ASN1_BIT_STRING_num_asc(const char *name, BIT_STRING_BITNAME *tbl);
+/**
+ * @brief Set or clear a named bit in an ASN.1 bit string using a name table.
+ * @param bs Bit string to update.
+ * @param name Bit name to look up in @p tbl.
+ * @param value Non-zero to set the bit, or 0 to clear it.
+ * @param tbl Table of bit names and bit numbers (BIT_STRING_BITNAME entries).
+ * @return 1 on success, or 0 if @p name is not found in @p tbl.
+ */
+int ASN1_BIT_STRING_set_asc(ASN1_BIT_STRING *bs, const char *name, int value,
+    BIT_STRING_BITNAME *tbl);
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(ASN1_INTEGER) container type.
+ */
+struct stack_st_ASN1_INTEGER;
+{-
+    generate_stack_macros("ASN1_INTEGER");
+-}
+/* clang-format on */
+
+/**
+ * @brief Allocate an empty ASN.1 INTEGER.
+ * @return New ASN1_INTEGER, or NULL on allocation failure.
+ */
+ASN1_INTEGER *ASN1_INTEGER_new(void);
+/**
+ * @brief Free an ASN.1 INTEGER and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_INTEGER_free(ASN1_INTEGER *a);
+/**
+ * @brief Decode an ASN.1 INTEGER from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_INTEGER, or NULL on error.
+ */
+ASN1_INTEGER *d2i_ASN1_INTEGER(ASN1_INTEGER **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN.1 INTEGER to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_INTEGER(const ASN1_INTEGER *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_INTEGER.
+ * @return Pointer to the static ASN1_ITEM for ASN1_INTEGER.
+ */
+const ASN1_ITEM *ASN1_INTEGER_it(void);
+/**
+ * @brief Decode an ASN.1 INTEGER that must be treated as unsigned (no leading 0x00 ignored).
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param pp Address of a pointer to the DER input; advanced past the decoded value.
+ * @param length Number of bytes available at *@p pp.
+ * @return Decoded ASN1_INTEGER, or NULL on error.
+ */
+ASN1_INTEGER *d2i_ASN1_UINTEGER(ASN1_INTEGER **a, const unsigned char **pp,
+    long length);
+/**
+ * @brief Deep-copy an ASN.1 INTEGER.
+ * @param a INTEGER to duplicate.
+ * @return Newly allocated ASN1_INTEGER copy, or NULL on error; free with ASN1_INTEGER_free().
+ */
+ASN1_INTEGER *ASN1_INTEGER_dup(const ASN1_INTEGER *a);
+/**
+ * @brief Compare two ASN.1 INTEGER values numerically (including sign).
+ * @param x First INTEGER.
+ * @param y Second INTEGER.
+ * @return Negative, zero, or positive if @p x is less than, equal to, or greater than @p y.
+ */
+int ASN1_INTEGER_cmp(const ASN1_INTEGER *x, const ASN1_INTEGER *y);
+
+/**
+ * @brief Allocate an empty ASN.1 ENUMERATED value.
+ * @return New ASN1_ENUMERATED, or NULL on allocation failure.
+ */
+ASN1_ENUMERATED *ASN1_ENUMERATED_new(void);
+/**
+ * @brief Free an ASN.1 ENUMERATED value and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_ENUMERATED_free(ASN1_ENUMERATED *a);
+/**
+ * @brief Decode an ASN.1 ENUMERATED from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_ENUMERATED, or NULL on error.
+ */
+ASN1_ENUMERATED *d2i_ASN1_ENUMERATED(ASN1_ENUMERATED **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN.1 ENUMERATED to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_ENUMERATED(const ASN1_ENUMERATED *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_ENUMERATED.
+ * @return Pointer to the static ASN1_ITEM for ASN1_ENUMERATED.
+ */
+const ASN1_ITEM *ASN1_ENUMERATED_it(void);
+
+/**
+ * @brief Check that an ASN1_UTCTIME value has valid UTCTime syntax.
+ * @param a UTCTime value to validate.
+ * @return 1 if syntactically correct, or 0 otherwise.
+ */
+int ASN1_UTCTIME_check(const ASN1_UTCTIME *a);
+/**
+ * @brief Set an ASN1_UTCTIME to the calendar time @p t (allocating when @p s is NULL).
+ * @param s Existing UTCTIME to reuse, or NULL to allocate a new one.
+ * @param t POSIX time (seconds since the Epoch).
+ * @return The UTCTIME on success (possibly newly allocated), or NULL on error.
+ */
+ASN1_UTCTIME *ASN1_UTCTIME_set(ASN1_UTCTIME *s, time_t t);
+/**
+ * @brief Set an ASN1_UTCTIME from @p t adjusted by a day/second offset.
+ * @param s Existing UTCTIME to reuse, or NULL to allocate a new one.
+ * @param t Base calendar time (seconds since the Epoch).
+ * @param offset_day Days to add to @p t (may be negative).
+ * @param offset_sec Seconds to add after the day offset (may be negative).
+ * @return The UTCTIME on success (possibly newly allocated), or NULL on error.
+ */
+ASN1_UTCTIME *ASN1_UTCTIME_adj(ASN1_UTCTIME *s, time_t t,
+    int offset_day, long offset_sec);
+/**
+ * @brief Set an ASN1_UTCTIME from an ASN.1 UTCTime string (or only validate when @p s is NULL).
+ * @param s Destination UTCTIME, or NULL to format-check @p str only.
+ * @param str NUL-terminated UTCTime string such as YYMMDDHHMMSSZ.
+ * @return 1 on success, or 0 if the string is not a valid UTCTime.
+ */
+int ASN1_UTCTIME_set_string(ASN1_UTCTIME *s, const char *str);
+/**
+ * @brief Compare an ASN.1 UTCTime value with a calendar time_t.
+ * @param s UTCTime value to compare (must be a valid ASN1_UTCTIME).
+ * @param t POSIX time to compare against.
+ * @return -1 if @p s is before @p t, 0 if equal, 1 if after, or 0 on parse error (check ERR).
+ */
+int ASN1_UTCTIME_cmp_time_t(const ASN1_UTCTIME *s, time_t t);
+
+/**
+ * @brief Check that an ASN1_GENERALIZEDTIME value has valid GeneralizedTime syntax.
+ * @param a GeneralizedTime value to validate.
+ * @return 1 if syntactically correct, or 0 otherwise.
+ */
+int ASN1_GENERALIZEDTIME_check(const ASN1_GENERALIZEDTIME *a);
+/**
+ * @brief Set an ASN1_GENERALIZEDTIME to the calendar time @p t (allocating when @p s is NULL).
+ * @param s Existing GeneralizedTime to reuse, or NULL to allocate a new one.
+ * @param t POSIX time (seconds since the Epoch).
+ * @return The GeneralizedTime on success (possibly newly allocated), or NULL on error.
+ */
+ASN1_GENERALIZEDTIME *ASN1_GENERALIZEDTIME_set(ASN1_GENERALIZEDTIME *s,
+    time_t t);
+/**
+ * @brief Set an ASN.1 GeneralizedTime to @p t plus a day/second offset.
+ * @param s Destination time to reuse, or NULL to allocate a new one.
+ * @param t Base calendar time (seconds since the Epoch).
+ * @param offset_day Days to add to @p t (may be negative).
+ * @param offset_sec Seconds to add after @p offset_day (may be negative).
+ * @return Pointer to the result (same as @p s when non-NULL), or NULL on error.
+ */
+ASN1_GENERALIZEDTIME *ASN1_GENERALIZEDTIME_adj(ASN1_GENERALIZEDTIME *s,
+    time_t t, int offset_day,
+    long offset_sec);
+/**
+ * @brief Set an ASN1_GENERALIZEDTIME from an ASN.1 GeneralizedTime string (or only validate when @p s is NULL).
+ * @param s Destination GeneralizedTime, or NULL to format-check @p str only.
+ * @param str NUL-terminated GeneralizedTime string such as YYYYMMDDHHMMSSZ.
+ * @return 1 on success, or 0 if the string is not a valid GeneralizedTime.
+ */
+int ASN1_GENERALIZEDTIME_set_string(ASN1_GENERALIZEDTIME *s, const char *str);
+
+/**
+ * @brief Compute the day and second difference between two ASN.1 time values.
+ * @param pday Receives the whole-day difference (@p to minus @p from); may be NULL.
+ * @param psec Receives the remaining seconds difference beyond @p pday; may be NULL.
+ * @param from Starting time.
+ * @param to Ending time.
+ * @return 1 on success, or 0 if either time is invalid.
+ */
+int ASN1_TIME_diff(int *pday, int *psec,
+    const ASN1_TIME *from, const ASN1_TIME *to);
+
+/**
+ * @brief Allocate an empty ASN.1 OCTET STRING.
+ * @return New ASN1_OCTET_STRING, or NULL on allocation failure.
+ */
+ASN1_OCTET_STRING *ASN1_OCTET_STRING_new(void);
+/**
+ * @brief Free an ASN.1 OCTET STRING and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_OCTET_STRING_free(ASN1_OCTET_STRING *a);
+/**
+ * @brief Decode an ASN.1 OCTET STRING from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_OCTET_STRING, or NULL on error.
+ */
+ASN1_OCTET_STRING *d2i_ASN1_OCTET_STRING(ASN1_OCTET_STRING **a,
+    const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN.1 OCTET STRING to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_OCTET_STRING(const ASN1_OCTET_STRING *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_OCTET_STRING.
+ * @return Pointer to the static ASN1_ITEM for ASN1_OCTET_STRING.
+ */
+const ASN1_ITEM *ASN1_OCTET_STRING_it(void);
+/**
+ * @brief Deep-copy an ASN.1 OCTET STRING.
+ * @param a Octet string to duplicate.
+ * @return Newly allocated ASN1_OCTET_STRING copy, or NULL on error; free with ASN1_OCTET_STRING_free().
+ */
+ASN1_OCTET_STRING *ASN1_OCTET_STRING_dup(const ASN1_OCTET_STRING *a);
+/**
+ * @brief Compare two ASN.1 OCTET STRING values lexicographically by content.
+ * @param a First octet string.
+ * @param b Second octet string.
+ * @return Negative, zero, or positive like memcmp according to the content bytes.
+ */
+int ASN1_OCTET_STRING_cmp(const ASN1_OCTET_STRING *a,
+    const ASN1_OCTET_STRING *b);
+/**
+ * @brief Copy @p data of length @p len into an ASN.1 OCTET STRING.
+ * @param str Octet string whose content is replaced.
+ * @param data Bytes to copy into @p str.
+ * @param len Number of bytes at @p data.
+ * @return 1 on success, or 0 on failure.
+ */
+int ASN1_OCTET_STRING_set(ASN1_OCTET_STRING *str, const unsigned char *data,
+    int len);
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(ASN1_UTF8STRING) container type.
+ */
+struct stack_st_ASN1_UTF8STRING;
+{-
+    generate_stack_macros("ASN1_UTF8STRING");
+-}
+/* clang-format on */
+
+/**
+ * @brief Allocate an empty ASN.1 VisibleString.
+ * @return New ASN1_VISIBLESTRING, or NULL on allocation failure.
+ */
+ASN1_VISIBLESTRING *ASN1_VISIBLESTRING_new(void);
+/**
+ * @brief Free an ASN.1 VisibleString and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_VISIBLESTRING_free(ASN1_VISIBLESTRING *a);
+/**
+ * @brief Decode an ASN.1 VisibleString from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_VISIBLESTRING, or NULL on error.
+ */
+ASN1_VISIBLESTRING *d2i_ASN1_VISIBLESTRING(ASN1_VISIBLESTRING **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN.1 VisibleString to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_VISIBLESTRING(const ASN1_VISIBLESTRING *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_VISIBLESTRING.
+ * @return Pointer to the static ASN1_ITEM for ASN1_VISIBLESTRING.
+ */
+const ASN1_ITEM *ASN1_VISIBLESTRING_it(void);
+/**
+ * @brief Allocate an empty ASN.1 UniversalString.
+ * @return New ASN1_UNIVERSALSTRING, or NULL on allocation failure.
+ */
+ASN1_UNIVERSALSTRING *ASN1_UNIVERSALSTRING_new(void);
+/**
+ * @brief Free an ASN.1 UniversalString and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_UNIVERSALSTRING_free(ASN1_UNIVERSALSTRING *a);
+/**
+ * @brief Decode an ASN.1 UniversalString from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_UNIVERSALSTRING, or NULL on error.
+ */
+ASN1_UNIVERSALSTRING *d2i_ASN1_UNIVERSALSTRING(ASN1_UNIVERSALSTRING **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN.1 UniversalString to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_UNIVERSALSTRING(const ASN1_UNIVERSALSTRING *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_UNIVERSALSTRING.
+ * @return Pointer to the static ASN1_ITEM for ASN1_UNIVERSALSTRING.
+ */
+const ASN1_ITEM *ASN1_UNIVERSALSTRING_it(void);
+/**
+ * @brief Allocate an empty ASN.1 UTF8String.
+ * @return New ASN1_UTF8STRING, or NULL on allocation failure.
+ */
+ASN1_UTF8STRING *ASN1_UTF8STRING_new(void);
+/**
+ * @brief Free an ASN.1 UTF8String and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_UTF8STRING_free(ASN1_UTF8STRING *a);
+/**
+ * @brief Decode an ASN.1 UTF8String from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_UTF8STRING, or NULL on error.
+ */
+ASN1_UTF8STRING *d2i_ASN1_UTF8STRING(ASN1_UTF8STRING **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN.1 UTF8String to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_UTF8STRING(const ASN1_UTF8STRING *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_UTF8STRING.
+ * @return Pointer to the static ASN1_ITEM for ASN1_UTF8STRING.
+ */
+const ASN1_ITEM *ASN1_UTF8STRING_it(void);
+/**
+ * @brief Allocate an ASN.1 NULL value.
+ * @return New ASN1_NULL, or NULL on allocation failure.
+ */
+ASN1_NULL *ASN1_NULL_new(void);
+/**
+ * @brief Free an ASN.1 NULL value.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_NULL_free(ASN1_NULL *a);
+/**
+ * @brief Decode an ASN.1 NULL from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_NULL, or NULL on error.
+ */
+ASN1_NULL *d2i_ASN1_NULL(ASN1_NULL **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN.1 NULL to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_NULL(const ASN1_NULL *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_NULL.
+ * @return Pointer to the static ASN1_ITEM for ASN1_NULL.
+ */
+const ASN1_ITEM *ASN1_NULL_it(void);
+/**
+ * @brief Allocate an empty ASN.1 BMPString.
+ * @return New ASN1_BMPSTRING, or NULL on allocation failure.
+ */
+ASN1_BMPSTRING *ASN1_BMPSTRING_new(void);
+/**
+ * @brief Free a ASN.1 BMPString and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_BMPSTRING_free(ASN1_BMPSTRING *a);
+/**
+ * @brief Decode a ASN.1 BMPString from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_BMPSTRING, or NULL on error.
+ */
+ASN1_BMPSTRING *d2i_ASN1_BMPSTRING(ASN1_BMPSTRING **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a ASN.1 BMPString to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_BMPSTRING(const ASN1_BMPSTRING *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_BMPSTRING.
+ * @return Pointer to the static ASN1_ITEM for ASN1_BMPSTRING.
+ */
+const ASN1_ITEM *ASN1_BMPSTRING_it(void);
+
+/**
+ * @brief Decode one Unicode code point from a UTF-8 byte sequence.
+ * @param str Buffer holding UTF-8 octets.
+ * @param len Number of bytes available at @p str.
+ * @param val Receives the decoded code point on success.
+ * @return Number of bytes consumed on success, 0 if @p len is too small for a character,
+ *         or a negative value if the encoding is invalid.
+ */
+int UTF8_getc(const unsigned char *str, int len, unsigned long *val);
+/**
+ * @brief Encode one Unicode code point as UTF-8.
+ * @param str Destination buffer, or NULL to measure the required length only.
+ * @param len Capacity of @p str in bytes when @p str is non-NULL.
+ * @param value Code point to encode (U+0000 .. U+10FFFF, excluding surrogates).
+ * @return Number of UTF-8 bytes written (or that would be written), or -1 if @p str is too small.
+ */
+int UTF8_putc(unsigned char *str, int len, unsigned long value);
+
+/* clang-format off */
+/**
+ * @brief Opaque STACK_OF(ASN1_GENERALSTRING) container type.
+ */
+struct stack_st_ASN1_GENERALSTRING;
+{-
+    generate_stack_macros("ASN1_GENERALSTRING");
+-}
+/* clang-format on */
+
+/**
+ * @brief Allocate an empty ASN1_PRINTABLE string (PrintableString CHOICE wrapper).
+ * @return New ASN1_STRING used as ASN1_PRINTABLE, or NULL on allocation failure.
+ */
+ASN1_STRING *ASN1_PRINTABLE_new(void);
+/**
+ * @brief Free an ASN1_PRINTABLE string and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_PRINTABLE_free(ASN1_STRING *a);
+/**
+ * @brief Decode an ASN1_PRINTABLE string from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_PRINTABLE, or NULL on error.
+ */
+ASN1_STRING *d2i_ASN1_PRINTABLE(ASN1_STRING **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN1_PRINTABLE string to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_PRINTABLE(const ASN1_STRING *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_PRINTABLE.
+ * @return Pointer to the static ASN1_ITEM for ASN1_PRINTABLE.
+ */
+const ASN1_ITEM *ASN1_PRINTABLE_it(void);
+
+/**
+ * @brief Allocate an empty DirectoryString (ASN.1 string CHOICE wrapper).
+ * @return New ASN1_STRING used as a DirectoryString, or NULL on allocation failure.
+ */
+ASN1_STRING *DIRECTORYSTRING_new(void);
+/**
+ * @brief Free a DirectoryString and its contents.
+ * @param a Value to free, or NULL.
+ */
+void DIRECTORYSTRING_free(ASN1_STRING *a);
+/**
+ * @brief Decode a DirectoryString from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded DirectoryString, or NULL on error.
+ */
+ASN1_STRING *d2i_DIRECTORYSTRING(ASN1_STRING **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a DirectoryString to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_DIRECTORYSTRING(const ASN1_STRING *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for DirectoryString.
+ * @return Pointer to the static ASN1_ITEM for DirectoryString.
+ */
+const ASN1_ITEM *DIRECTORYSTRING_it(void);
+/**
+ * @brief Allocate an empty DisplayText (ASN.1 string CHOICE).
+ * @return New ASN1_STRING used as a DISPLAYTEXT, or NULL on allocation failure.
+ */
+ASN1_STRING *DISPLAYTEXT_new(void);
+/**
+ * @brief Free a DisplayText (ASN.1 string CHOICE) and its contents.
+ * @param a Value to free, or NULL.
+ */
+void DISPLAYTEXT_free(ASN1_STRING *a);
+/**
+ * @brief Decode a DisplayText (ASN.1 string CHOICE) from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded DISPLAYTEXT, or NULL on error.
+ */
+ASN1_STRING *d2i_DISPLAYTEXT(ASN1_STRING **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a DisplayText (ASN.1 string CHOICE) to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_DISPLAYTEXT(const ASN1_STRING *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for DISPLAYTEXT.
+ * @return Pointer to the static ASN1_ITEM for DISPLAYTEXT.
+ */
+const ASN1_ITEM *DISPLAYTEXT_it(void);
+/**
+ * @brief Allocate an empty ASN.1 PrintableString.
+ * @return New ASN1_PRINTABLESTRING, or NULL on allocation failure.
+ */
+ASN1_PRINTABLESTRING *ASN1_PRINTABLESTRING_new(void);
+/**
+ * @brief Free an ASN.1 PrintableString and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_PRINTABLESTRING_free(ASN1_PRINTABLESTRING *a);
+/**
+ * @brief Decode an ASN.1 PrintableString from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_PRINTABLESTRING, or NULL on error.
+ */
+ASN1_PRINTABLESTRING *d2i_ASN1_PRINTABLESTRING(ASN1_PRINTABLESTRING **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN.1 PrintableString to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_PRINTABLESTRING(const ASN1_PRINTABLESTRING *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_PRINTABLESTRING.
+ * @return Pointer to the static ASN1_ITEM for ASN1_PRINTABLESTRING.
+ */
+const ASN1_ITEM *ASN1_PRINTABLESTRING_it(void);
+/**
+ * @brief Allocate an empty ASN.1 TeletexString (T61String).
+ * @return New ASN1_T61STRING, or NULL on allocation failure.
+ */
+ASN1_T61STRING *ASN1_T61STRING_new(void);
+/**
+ * @brief Free a ASN.1 TeletexString (T61String) and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_T61STRING_free(ASN1_T61STRING *a);
+/**
+ * @brief Decode a ASN.1 TeletexString (T61String) from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_T61STRING, or NULL on error.
+ */
+ASN1_T61STRING *d2i_ASN1_T61STRING(ASN1_T61STRING **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a ASN.1 TeletexString (T61String) to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_T61STRING(const ASN1_T61STRING *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_T61STRING.
+ * @return Pointer to the static ASN1_ITEM for ASN1_T61STRING.
+ */
+const ASN1_ITEM *ASN1_T61STRING_it(void);
+/**
+ * @brief Allocate an empty ASN.1 IA5String.
+ * @return New ASN1_IA5STRING, or NULL on allocation failure.
+ */
+ASN1_IA5STRING *ASN1_IA5STRING_new(void);
+/**
+ * @brief Free an ASN.1 IA5String and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_IA5STRING_free(ASN1_IA5STRING *a);
+/**
+ * @brief Decode an ASN.1 IA5String from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_IA5STRING, or NULL on error.
+ */
+ASN1_IA5STRING *d2i_ASN1_IA5STRING(ASN1_IA5STRING **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN.1 IA5String to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_IA5STRING(const ASN1_IA5STRING *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_IA5STRING.
+ * @return Pointer to the static ASN1_ITEM for ASN1_IA5STRING.
+ */
+const ASN1_ITEM *ASN1_IA5STRING_it(void);
+/**
+ * @brief Allocate an empty ASN.1 GeneralString.
+ * @return New ASN1_GENERALSTRING, or NULL on allocation failure.
+ */
+ASN1_GENERALSTRING *ASN1_GENERALSTRING_new(void);
+/**
+ * @brief Free an ASN.1 GeneralString and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_GENERALSTRING_free(ASN1_GENERALSTRING *a);
+/**
+ * @brief Decode an ASN.1 GeneralString from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_GENERALSTRING, or NULL on error.
+ */
+ASN1_GENERALSTRING *d2i_ASN1_GENERALSTRING(ASN1_GENERALSTRING **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN.1 GeneralString to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_GENERALSTRING(const ASN1_GENERALSTRING *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_GENERALSTRING.
+ * @return Pointer to the static ASN1_ITEM for ASN1_GENERALSTRING.
+ */
+const ASN1_ITEM *ASN1_GENERALSTRING_it(void);
+/**
+ * @brief Allocate an empty ASN.1 UTCTime.
+ * @return New ASN1_UTCTIME, or NULL on allocation failure.
+ */
+ASN1_UTCTIME *ASN1_UTCTIME_new(void);
+/**
+ * @brief Free an ASN.1 UTCTime and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_UTCTIME_free(ASN1_UTCTIME *a);
+/**
+ * @brief Decode an ASN.1 UTCTime from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_UTCTIME, or NULL on error.
+ */
+ASN1_UTCTIME *d2i_ASN1_UTCTIME(ASN1_UTCTIME **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN.1 UTCTime to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_UTCTIME(const ASN1_UTCTIME *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_UTCTIME.
+ * @return Pointer to the static ASN1_ITEM for ASN1_UTCTIME.
+ */
+const ASN1_ITEM *ASN1_UTCTIME_it(void);
+/**
+ * @brief Allocate an empty ASN.1 GeneralizedTime.
+ * @return New ASN1_GENERALIZEDTIME, or NULL on allocation failure.
+ */
+ASN1_GENERALIZEDTIME *ASN1_GENERALIZEDTIME_new(void);
+/**
+ * @brief Free an ASN.1 GeneralizedTime and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_GENERALIZEDTIME_free(ASN1_GENERALIZEDTIME *a);
+/**
+ * @brief Decode an ASN.1 GeneralizedTime from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_GENERALIZEDTIME, or NULL on error.
+ */
+ASN1_GENERALIZEDTIME *d2i_ASN1_GENERALIZEDTIME(ASN1_GENERALIZEDTIME **a, const unsigned char **in, long len);
+/**
+ * @brief Encode an ASN.1 GeneralizedTime to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_GENERALIZEDTIME(const ASN1_GENERALIZEDTIME *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_GENERALIZEDTIME.
+ * @return Pointer to the static ASN1_ITEM for ASN1_GENERALIZEDTIME.
+ */
+const ASN1_ITEM *ASN1_GENERALIZEDTIME_it(void);
+/**
+ * @brief Allocate an empty ASN.1 time value (UTCTime or GeneralizedTime).
+ * @return New ASN1_TIME, or NULL on allocation failure.
+ */
+ASN1_TIME *ASN1_TIME_new(void);
+/**
+ * @brief Free a ASN.1 time value (UTCTime or GeneralizedTime) and its contents.
+ * @param a Value to free, or NULL.
+ */
+void ASN1_TIME_free(ASN1_TIME *a);
+/**
+ * @brief Decode a ASN.1 time value (UTCTime or GeneralizedTime) from DER.
+ * @param a Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @return Decoded ASN1_TIME, or NULL on error.
+ */
+ASN1_TIME *d2i_ASN1_TIME(ASN1_TIME **a, const unsigned char **in, long len);
+/**
+ * @brief Encode a ASN.1 time value (UTCTime or GeneralizedTime) to DER.
+ * @param a Value to encode.
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int i2d_ASN1_TIME(const ASN1_TIME *a, unsigned char **out);
+/**
+ * @brief Return the ASN.1 item descriptor for ASN1_TIME.
+ * @return Pointer to the static ASN1_ITEM for ASN1_TIME.
+ */
+const ASN1_ITEM *ASN1_TIME_it(void);
+
+/**
+ * @brief Duplicate an ASN1_TIME value (UTCTime or GeneralizedTime).
+ * @param a Source time to copy.
+ * @return Newly allocated ASN1_TIME copy, or NULL on error.
+ */
+ASN1_TIME *ASN1_TIME_dup(const ASN1_TIME *a);
+/**
+ * @brief Deep-copy an ASN1_UTCTIME value.
+ * @param a Source UTCTime to duplicate.
+ * @return Newly allocated ASN1_UTCTIME copy, or NULL on error.
+ */
+ASN1_UTCTIME *ASN1_UTCTIME_dup(const ASN1_UTCTIME *a);
+/**
+ * @brief Deep-copy an ASN1_GENERALIZEDTIME value.
+ * @param a Source GeneralizedTime to duplicate.
+ * @return Newly allocated ASN1_GENERALIZEDTIME copy, or NULL on error.
+ */
+ASN1_GENERALIZEDTIME *ASN1_GENERALIZEDTIME_dup(const ASN1_GENERALIZEDTIME *a);
+
+/**
+ * @brief Return the ASN.1 item descriptor for indefinite-length OCTET STRING (NDEF).
+ * @return Pointer to the static ASN1_ITEM for ASN1_OCTET_STRING_NDEF.
+ */
+const ASN1_ITEM *ASN1_OCTET_STRING_NDEF_it(void);
+
+/**
+ * @brief Set an ASN.1 Time to the given POSIX time (UTCTime or GeneralizedTime).
+ * @param s Existing ASN1_TIME to reuse, or NULL to allocate.
+ * @param t POSIX time to store.
+ * @return The updated or newly allocated ASN1_TIME, or NULL on error.
+ */
+ASN1_TIME *ASN1_TIME_set(ASN1_TIME *s, time_t t);
+/**
+ * @brief Set an ASN.1 Time to @p t plus a day/second offset (UTCTime or GeneralizedTime).
+ * @param s Existing ASN1_TIME to reuse, or NULL to allocate.
+ * @param t Base POSIX time before applying offsets.
+ * @param offset_day Days to add (may be negative).
+ * @param offset_sec Seconds to add after @p offset_day (may be negative).
+ * @return The resulting ASN1_TIME (possibly newly allocated), or NULL on error.
+ */
+ASN1_TIME *ASN1_TIME_adj(ASN1_TIME *s, time_t t,
+    int offset_day, long offset_sec);
+/**
+ * @brief Check that an ASN1_TIME value has valid UTCTime or GeneralizedTime syntax.
+ * @param t Time value to validate.
+ * @return 1 if the encoding is syntactically valid, or 0 otherwise.
+ */
+int ASN1_TIME_check(const ASN1_TIME *t);
+/**
+ * @brief Convert an ASN1_TIME to GeneralizedTime form.
+ * @param t Source time (UTCTime or GeneralizedTime).
+ * @param out Optional destination; if non-NULL and *@p out is non-NULL it is reused, otherwise a new value is allocated and returned via *@p out when @p out is non-NULL.
+ * @return Pointer to the GeneralizedTime result, or NULL on error.
+ */
+ASN1_GENERALIZEDTIME *ASN1_TIME_to_generalizedtime(const ASN1_TIME *t,
+    ASN1_GENERALIZEDTIME **out);
+/**
+ * @brief Set an ASN.1 time from an ASN.1 time string (UTCTime or GeneralizedTime form).
+ * @param s Destination time, or NULL to only validate @p str.
+ * @param str NUL-terminated time string such as YYMMDDHHMMSSZ or YYYYMMDDHHMMSSZ.
+ * @return 1 on success, or 0 if the string is not a valid ASN.1 time.
+ */
+int ASN1_TIME_set_string(ASN1_TIME *s, const char *str);
+/**
+ * @brief Set an ASN1_TIME from a string, preferring the X.509 UTCTime/GeneralizedTime rules.
+ * @param s Destination time object to update.
+ * @param str NUL-terminated time string in ASN.1 UTCTime or GeneralizedTime form.
+ * @return 1 on success, or 0 if @p str is not a valid X.509 time encoding.
+ */
+int ASN1_TIME_set_string_X509(ASN1_TIME *s, const char *str);
+/**
+ * @brief Convert an ASN.1 time value to a broken-down UTC struct tm.
+ * @param s ASN1_TIME (UTCTime or GeneralizedTime) to convert.
+ * @param tm Destination calendar time in UTC; may be NULL to only validate @p s.
+ * @return 1 on success, or 0 if @p s is invalid.
+ */
+int ASN1_TIME_to_tm(const ASN1_TIME *s, struct tm *tm);
+/**
+ * @brief Normalize an ASN1_TIME so it is suitable for certificates and consistent printing.
+ * @param s Time (UTCTime or GeneralizedTime) to convert to a canonical GMT form.
+ * @return 1 on success, or 0 on error.
+ */
+int ASN1_TIME_normalize(ASN1_TIME *s);
+/**
+ * @brief Compare an ASN.1 time value with a calendar time_t.
+ * @param s ASN1_TIME (UTCTime or GeneralizedTime) to compare.
+ * @param t POSIX time to compare against.
+ * @return -1 if @p s is before @p t, 0 if equal, 1 if after, or -2 on error.
+ */
+int ASN1_TIME_cmp_time_t(const ASN1_TIME *s, time_t t);
+/**
+ * @brief Compare two ASN.1 time values chronologically.
+ * @param a First time.
+ * @param b Second time.
+ * @return 1 if @p a is later than @p b, -1 if @p a is earlier, 0 if equal, or -2 if either time is invalid.
+ */
+int ASN1_TIME_compare(const ASN1_TIME *a, const ASN1_TIME *b);
+
+/**
+ * @brief Write an ASN.1 INTEGER to a BIO as hexadecimal ASCII text.
+ * @param bp BIO that receives the hex digits (with a leading '-' for negative values).
+ * @param a Integer to print; may be NULL.
+ * @return Number of characters written, or -1 on error.
+ */
+int i2a_ASN1_INTEGER(BIO *bp, const ASN1_INTEGER *a);
+/**
+ * @brief Read a colon-separated hex INTEGER from @p bp into @p bs (PEM helper).
+ * @param bp Input BIO supplying ASCII hex digits (and optional colon separators).
+ * @param bs Destination INTEGER updated with the parsed value.
+ * @param buf Scratch buffer of length @p size used while reading lines.
+ * @param size Capacity of @p buf in bytes.
+ * @return 1 on success, or 0 on parse/I/O error.
+ */
+int a2i_ASN1_INTEGER(BIO *bp, ASN1_INTEGER *bs, char *buf, int size);
+/**
+ * @brief Write an ASN.1 ENUMERATED to a BIO as hexadecimal ASCII text.
+ * @param bp BIO that receives the hex digits (with a leading '-' for negative values).
+ * @param a Enumerated value to print; may be NULL.
+ * @return Number of characters written, or -1 on error.
+ */
+int i2a_ASN1_ENUMERATED(BIO *bp, const ASN1_ENUMERATED *a);
+/**
+ * @brief Read a colon-separated hex ENUMERATED from @p bp into @p bs (PEM helper).
+ * @param bp Input BIO supplying ASCII hex digits (and optional colon separators).
+ * @param bs Destination ENUMERATED updated with the parsed value.
+ * @param buf Scratch buffer of length @p size used while reading lines.
+ * @param size Capacity of @p buf in bytes.
+ * @return 1 on success, or 0 on parse/I/O error.
+ */
+int a2i_ASN1_ENUMERATED(BIO *bp, ASN1_ENUMERATED *bs, char *buf, int size);
+/**
+ * @brief Write an OBJECT IDENTIFIER to a BIO as a dotted name or numeric OID text.
+ * @param bp BIO that receives the textual OID (or the literal "NULL").
+ * @param a Object identifier to print; may be NULL.
+ * @return Number of characters written, or a negative value on error.
+ */
+int i2a_ASN1_OBJECT(BIO *bp, const ASN1_OBJECT *a);
+/**
+ * @brief Read a colon-separated hex ASN.1 string from @p bp into @p bs (PEM helper).
+ * @param bp Input BIO supplying ASCII hex digits (and optional colon separators).
+ * @param bs Destination ASN1_STRING updated with the parsed octets.
+ * @param buf Scratch buffer of length @p size used while reading lines.
+ * @param size Capacity of @p buf in bytes.
+ * @return 1 on success, or 0 on parse/I/O error.
+ */
+int a2i_ASN1_STRING(BIO *bp, ASN1_STRING *bs, char *buf, int size);
+/**
+ * @brief Write an ASN.1 string's content to a BIO as uppercase hexadecimal digits.
+ * @param bp BIO that receives the hex text (with newlines every 35 octets).
+ * @param a String whose content octets are printed; may be NULL.
+ * @param type Unused historical parameter (kept for API compatibility).
+ * @return Number of characters written, or 0 if @p a is NULL / empty, or -1 on I/O error.
+ */
+int i2a_ASN1_STRING(BIO *bp, const ASN1_STRING *a, int type);
+/**
+ * @brief Format an ASN.1 OBJECT IDENTIFIER into a textual OID name or dotted decimal form.
+ * @param buf Destination buffer for the NUL-terminated text, or NULL to measure length only.
+ * @param buf_len Capacity of @p buf in bytes when @p buf is non-NULL.
+ * @param a Object identifier to format.
+ * @return Number of characters written (excluding NUL), or the required length when @p buf is NULL.
+ */
+int i2t_ASN1_OBJECT(char *buf, int buf_len, const ASN1_OBJECT *a);
+
+/**
+ * @brief Encode a dotted-decimal OID string into DER content octets.
+ * @param out Buffer that receives the DER OID content, or NULL to measure length only.
+ * @param olen Capacity of @p out in bytes when @p out is non-NULL.
+ * @param buf ASCII OID such as "1.2.840.113549" (numeric arcs only).
+ * @param num Number of bytes at @p buf, or -1 to use strlen(@p buf).
+ * @return Number of content octets written (or that would be written), or 0 on error.
+ */
+int a2d_ASN1_OBJECT(unsigned char *out, int olen, const char *buf, int num);
+/**
+ * @brief Allocate a dynamically owned ASN1_OBJECT from DER content and optional names.
+ * @param nid NID to assign (or NID_undef for an unnamed object).
+ * @param data DER OID content octets (ownership transferred to the object on success).
+ * @param len Length of @p data in bytes.
+ * @param sn Optional short name string (ownership transferred), or NULL.
+ * @param ln Optional long name string (ownership transferred), or NULL.
+ * @return New ASN1_OBJECT, or NULL on error.
+ */
+ASN1_OBJECT *ASN1_OBJECT_create(int nid, unsigned char *data, int len,
+    const char *sn, const char *ln);
+
+/**
+ * @brief Convert an ASN.1 INTEGER to a host int64_t.
+ * @param pr Receives the signed value on success.
+ * @param a INTEGER to convert; must fit in int64_t.
+ * @return 1 on success, or 0 if @p a is NULL or out of int64_t range.
+ */
+int ASN1_INTEGER_get_int64(int64_t *pr, const ASN1_INTEGER *a);
+/**
+ * @brief Set an ASN.1 INTEGER to a signed 64-bit value.
+ * @param a Integer to update.
+ * @param r Value to store.
+ * @return 1 on success, or 0 on error.
+ */
+int ASN1_INTEGER_set_int64(ASN1_INTEGER *a, int64_t r);
+/**
+ * @brief Convert an ASN.1 INTEGER to a host uint64_t (must be non-negative and in range).
+ * @param pr Receives the unsigned value on success.
+ * @param a INTEGER to convert.
+ * @return 1 on success, or 0 if @p a is NULL, negative, or out of uint64_t range.
+ */
+int ASN1_INTEGER_get_uint64(uint64_t *pr, const ASN1_INTEGER *a);
+/**
+ * @brief Set an ASN.1 INTEGER to an unsigned 64-bit value.
+ * @param a Integer to update.
+ * @param r Value to store.
+ * @return 1 on success, or 0 on error.
+ */
+int ASN1_INTEGER_set_uint64(ASN1_INTEGER *a, uint64_t r);
+
+/**
+ * @brief Set an ASN.1 INTEGER to a C long value.
+ * @param a Integer to update.
+ * @param v Value to store.
+ * @return 1 on success, or 0 on failure.
+ */
+int ASN1_INTEGER_set(ASN1_INTEGER *a, long v);
+/**
+ * @brief Return the value of an ASN.1 INTEGER as a C long.
+ * @param a INTEGER to read.
+ * @return The integer value, or 0xffffffffL if @p a is NULL or out of long range.
+ */
+long ASN1_INTEGER_get(const ASN1_INTEGER *a);
+/**
+ * @brief Convert a BIGNUM to an ASN.1 INTEGER (allocating or reusing @p ai).
+ * @param bn Source big integer (may be negative).
+ * @param ai Existing ASN1_INTEGER to reuse, or NULL to allocate.
+ * @return Pointer to the INTEGER result (possibly newly allocated), or NULL on error.
+ */
+ASN1_INTEGER *BN_to_ASN1_INTEGER(const BIGNUM *bn, ASN1_INTEGER *ai);
+/**
+ * @brief Convert an ASN.1 INTEGER to a BIGNUM (allocating or reusing @p bn).
+ * @param ai Source INTEGER (may be negative).
+ * @param bn Existing BIGNUM to reuse, or NULL to allocate.
+ * @return Pointer to the BIGNUM result (possibly newly allocated), or NULL on error.
+ */
+BIGNUM *ASN1_INTEGER_to_BN(const ASN1_INTEGER *ai, BIGNUM *bn);
+
+/**
+ * @brief Convert an ASN1_ENUMERATED to a signed 64-bit integer.
+ * @param pr Receives the converted value on success.
+ * @param a ASN.1 ENUMERATED value to convert.
+ * @return 1 on success, or 0 if @p a is NULL or the value does not fit in int64_t.
+ */
+int ASN1_ENUMERATED_get_int64(int64_t *pr, const ASN1_ENUMERATED *a);
+/**
+ * @brief Set an ASN.1 ENUMERATED to a signed 64-bit value.
+ * @param a Enumerated value to update.
+ * @param r Value to store.
+ * @return 1 on success, or 0 on error.
+ */
+int ASN1_ENUMERATED_set_int64(ASN1_ENUMERATED *a, int64_t r);
+
+/**
+ * @brief Set an ASN.1 ENUMERATED to a C long value.
+ * @param a Enumerated value to update.
+ * @param v Value to store.
+ * @return 1 on success, or 0 on failure.
+ */
+int ASN1_ENUMERATED_set(ASN1_ENUMERATED *a, long v);
+/**
+ * @brief Return the value of an ASN.1 ENUMERATED as a long (legacy; prefer ASN1_ENUMERATED_get_int64).
+ * @param a Enumerated value to read; NULL is treated as 0.
+ * @return Converted long value, or 0 if @p a is NULL or the value does not fit in a long.
+ */
+long ASN1_ENUMERATED_get(const ASN1_ENUMERATED *a);
+/**
+ * @brief Convert a BIGNUM to an ASN.1 ENUMERATED value.
+ * @param bn Integer to convert.
+ * @param ai Destination ENUMERATED to reuse, or NULL to allocate a new one.
+ * @return Pointer to the ENUMERATED result (possibly newly allocated), or NULL on error.
+ */
+ASN1_ENUMERATED *BN_to_ASN1_ENUMERATED(const BIGNUM *bn, ASN1_ENUMERATED *ai);
+/**
+ * @brief Convert an ASN.1 ENUMERATED value to a BIGNUM.
+ * @param ai Source ENUMERATED.
+ * @param bn Existing BIGNUM to reuse, or NULL to allocate.
+ * @return Pointer to the BIGNUM result (possibly newly allocated), or NULL on error.
+ */
+BIGNUM *ASN1_ENUMERATED_to_BN(const ASN1_ENUMERATED *ai, BIGNUM *bn);
+
+/* General */
+/**
+ * @brief Choose a PrintableString / IA5String / T61String type that can hold @p s.
+ * @param s Bytes to classify; NULL is treated as PrintableString.
+ * @param max Number of bytes at @p s, or a negative value to use strlen(@p s).
+ * @return V_ASN1_PRINTABLESTRING, V_ASN1_IA5STRING, or V_ASN1_T61STRING.
+ */
+int ASN1_PRINTABLE_type(const unsigned char *s, int max);
+
+/**
+ * @brief Map an ASN.1 universal tag number to the corresponding B_ASN1_* bit mask.
+ * @param tag ASN.1 tag number such as V_ASN1_UTF8STRING.
+ * @return Matching B_ASN1_* bit, or 0 if @p tag has no string-type bit mapping.
+ */
+unsigned long ASN1_tag2bit(int tag);
+
+/* SPECIALS */
+/**
+ * @brief Parse the ASN.1 identifier and length octets at *@p pp.
+ * @param pp Address of the input cursor; advanced past the header on success.
+ * @param plength Receives the content length in bytes (or -1 for indefinite length).
+ * @param ptag Receives the tag number.
+ * @param pclass Receives the class (V_ASN1_UNIVERSAL, CONTEXT_SPECIFIC, …).
+ * @param omax Maximum number of bytes available from *@p pp.
+ * @return Bitmask including 0x80 on error, 0x01 if constructed, 0x20 if indefinite length.
+ */
+int ASN1_get_object(const unsigned char **pp, long *plength, int *ptag,
+    int *pclass, long omax);
+/**
+ * @brief Check for an indefinite-length end-of-contents (EOC) marker without consuming it.
+ * @param p Address of the input cursor pointing at candidate EOC octets.
+ * @param len Remaining bytes available at *@p p.
+ * @return Non-zero if an EOC is present (or @p len indicates end), or 0 otherwise.
+ */
+int ASN1_check_infinite_end(unsigned char **p, long len);
+/**
+ * @brief Consume an indefinite-length end-of-contents (EOC) marker of two zero octets.
+ * @param p Address of the input cursor; advanced past EOC when present.
+ * @param len Remaining bytes available at *@p p.
+ * @return 1 if EOC was found (or @p len is too small / exhausted), or 0 otherwise.
+ */
+int ASN1_const_check_infinite_end(const unsigned char **p, long len);
+/**
+ * @brief Write an ASN.1 identifier and length octet(s) at *@p pp and advance the pointer.
+ * @param pp Address of the output cursor; updated past the written header.
+ * @param constructed Non-zero to set the constructed bit in the identifier.
+ * @param length Content length in bytes, or 0 when writing an indefinite-length header.
+ * @param tag Tag number to encode.
+ * @param xclass Class bits (universal, application, context-specific, or private).
+ */
+void ASN1_put_object(unsigned char **pp, int constructed, int length,
+    int tag, int xclass);
+/**
+ * @brief Write a two-octet ASN.1 end-of-contents (0x00 0x00) marker and advance @p pp.
+ * @param pp Address of the output cursor; updated past the written EOC.
+ * @return 2 (number of bytes written).
+ */
+int ASN1_put_eoc(unsigned char **pp);
+/**
+ * @brief Compute the total DER size of a tagged ASN.1 value given its content length.
+ * @param constructed Non-zero if the encoding uses a constructed form.
+ * @param length Number of content octets (or -1 for indefinite length).
+ * @param tag Tag number to encode (universal/application/context-specific as used by callers).
+ * @return Total number of octets for tag, length, and content, or a negative value on error.
+ */
+int ASN1_object_size(int constructed, int length, int tag);
+
+/**
+ * @brief Deep-copy an ASN.1 value by encoding with @p i2d then decoding with @p d2i.
+ * @param i2d Encoder that serializes @p x to DER (or returns the required length).
+ * @param d2i Decoder that rebuilds a heap object from that DER.
+ * @param x Source object to duplicate.
+ * @return Newly allocated copy, or NULL on error.
+ */
+void *ASN1_dup(i2d_of_void *i2d, d2i_of_void *d2i, const void *x);
+
+#define ASN1_dup_of(type, i2d, d2i, x)           \
+    ((type *)ASN1_dup(CHECKED_I2D_OF(type, i2d), \
+        CHECKED_D2I_OF(type, d2i),               \
+        CHECKED_PTR_OF(const type, x)))
+
+/**
+ * @brief Deep-copy an ASN.1 value described by @p it.
+ * @param it ASN.1 item describing the type of @p x.
+ * @param x Value to duplicate.
+ * @return Newly allocated copy, or NULL on error; free with ASN1_item_free.
+ */
+void *ASN1_item_dup(const ASN1_ITEM *it, const void *x);
+/**
+ * @brief Sign the DER encoding of @p data using @p it and write AlgorithmIdentifier(s) plus the signature.
+ * @param it ASN.1 item describing @p data.
+ * @param algor1 First AlgorithmIdentifier to fill (for example signatureAlgorithm), or NULL.
+ * @param algor2 Optional second AlgorithmIdentifier to fill, or NULL.
+ * @param signature BIT STRING that receives the signature bytes.
+ * @param data Object whose DER encoding is signed.
+ * @param id Optional ASN.1 OCTET STRING identity / SM2-id parameter, or NULL.
+ * @param pkey Private key used to create the signature.
+ * @param md Digest method, or NULL to use the key-type default.
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query for algorithm fetches, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int ASN1_item_sign_ex(const ASN1_ITEM *it, X509_ALGOR *algor1,
+    X509_ALGOR *algor2, ASN1_BIT_STRING *signature,
+    const void *data, const ASN1_OCTET_STRING *id,
+    EVP_PKEY *pkey, const EVP_MD *md, OSSL_LIB_CTX *libctx,
+    const char *propq);
+/**
+ * @brief Verify @p signature over the DER encoding of @p data described by @p it.
+ * @param it ASN.1 item describing the type of @p data.
+ * @param alg Signature AlgorithmIdentifier.
+ * @param signature BIT STRING holding the signature bytes.
+ * @param data Object whose DER encoding is verified.
+ * @param id Optional ASN.1 OCTET STRING identity / SM2-id parameter, or NULL.
+ * @param pkey Public key used to verify the signature.
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query for algorithm fetches, or NULL.
+ * @return 1 on success, 0 on failure, or -1 on a more serious error.
+ */
+int ASN1_item_verify_ex(const ASN1_ITEM *it, const X509_ALGOR *alg,
+    const ASN1_BIT_STRING *signature, const void *data,
+    const ASN1_OCTET_STRING *id, EVP_PKEY *pkey,
+    OSSL_LIB_CTX *libctx, const char *propq);
+
+/* ASN1 alloc/free macros for when a type is only used internally */
+
+#define M_ASN1_new_of(type) (type *)ASN1_item_new(ASN1_ITEM_rptr(type))
+#define M_ASN1_free_of(x, type) \
+    ASN1_item_free(CHECKED_PTR_OF(type, x), ASN1_ITEM_rptr(type))
+
+#ifndef OPENSSL_NO_STDIO
+/**
+ * @brief Decode an ASN.1 value from a FILE using allocator and d2i callbacks.
+ * @param xnew Allocator returning a new empty object (for example TYPE_new).
+ * @param d2i Decoder of type d2i_of_void that parses DER into the object.
+ * @param in Input FILE positioned at DER (or BER) encoding.
+ * @param x Optional destination pointer updated to the decoded object, or NULL.
+ * @return Decoded object pointer, or NULL on error.
+ */
+void *ASN1_d2i_fp(void *(*xnew)(void), d2i_of_void *d2i, FILE *in, void **x);
+
+#define ASN1_d2i_fp_of(type, xnew, d2i, in, x)       \
+    ((type *)ASN1_d2i_fp(CHECKED_NEW_OF(type, xnew), \
+        CHECKED_D2I_OF(type, d2i),                   \
+        in,                                          \
+        CHECKED_PPTR_OF(type, x)))
+
+/**
+ * @brief Decode an ASN.1 value described by @p it from a FILE, with library context.
+ * @param it ASN.1 item describing the type to decode.
+ * @param in Open FILE positioned at DER input.
+ * @param x Optional existing object to reuse, or NULL to allocate.
+ * @param libctx Library context for algorithm fetches during decode, or NULL for the default.
+ * @param propq Property query for algorithm fetches, or NULL.
+ * @return Decoded object pointer, or NULL on error.
+ */
+void *ASN1_item_d2i_fp_ex(const ASN1_ITEM *it, FILE *in, void *x,
+    OSSL_LIB_CTX *libctx, const char *propq);
+/**
+ * @brief Decode an ASN.1 value described by @p it from a FILE (default library context).
+ * @param it ASN.1 item describing the type to decode.
+ * @param in Open FILE positioned at DER input.
+ * @param x Optional existing object to reuse, or NULL to allocate.
+ * @return Decoded object pointer, or NULL on error.
+ */
+void *ASN1_item_d2i_fp(const ASN1_ITEM *it, FILE *in, void *x);
+/**
+ * @brief Encode an ASN.1 value to a FILE using a type-specific i2d function.
+ * @param i2d Encoder such as i2d_X509.
+ * @param out Output FILE that receives the DER encoding.
+ * @param x Object to encode; must match the type expected by @p i2d.
+ * @return 1 on success, or 0 on failure.
+ */
+int ASN1_i2d_fp(i2d_of_void *i2d, FILE *out, const void *x);
+
+#define ASN1_i2d_fp_of(type, i2d, out, x)   \
+    (ASN1_i2d_fp(CHECKED_I2D_OF(type, i2d), \
+        out,                                \
+        CHECKED_PTR_OF(const type, x)))
+
+/**
+ * @brief Encode an ASN.1 item to DER and write the encoding to a FILE stream.
+ * @param it ASN.1 item descriptor for the type of @p x.
+ * @param out Output stream that receives the DER encoding.
+ * @param x Value to encode (type implied by @p it).
+ * @return 1 on success, or 0 on failure.
+ */
+int ASN1_item_i2d_fp(const ASN1_ITEM *it, FILE *out, const void *x);
+/**
+ * @brief Print an ASN.1 string to a FILE with ASN1_STRING_print_ex() formatting flags.
+ * @param fp Output stream.
+ * @param str String to print.
+ * @param flags ASN1_STRFLGS_* formatting flags.
+ * @return 1 on success, or 0 on error.
+ */
+int ASN1_STRING_print_ex_fp(FILE *fp, const ASN1_STRING *str, unsigned long flags);
+#endif
+
+/**
+ * @brief Convert an ASN.1 string to a newly allocated UTF-8 byte sequence.
+ * @param out On success, set to a buffer allocated with OPENSSL_malloc() holding UTF-8 octets (caller frees).
+ * @param in Source ASN.1 string of any supported string type.
+ * @return Number of UTF-8 bytes written to *@p out on success, or a negative value on error.
+ */
+int ASN1_STRING_to_UTF8(unsigned char **out, const ASN1_STRING *in);
+
+/**
+ * @brief Decode an ASN.1 value from a BIO using allocator and d2i callbacks.
+ * @param xnew Allocator returning a new empty object (for example TYPE_new).
+ * @param d2i Decoder of type d2i_of_void that parses DER into the object.
+ * @param in BIO positioned at DER (or BER) encoding.
+ * @param x Optional destination pointer updated to the decoded object, or NULL.
+ * @return Decoded object pointer, or NULL on error.
+ */
+void *ASN1_d2i_bio(void *(*xnew)(void), d2i_of_void *d2i, BIO *in, void **x);
+
+#define ASN1_d2i_bio_of(type, xnew, d2i, in, x)       \
+    ((type *)ASN1_d2i_bio(CHECKED_NEW_OF(type, xnew), \
+        CHECKED_D2I_OF(type, d2i),                    \
+        in,                                           \
+        CHECKED_PPTR_OF(type, x)))
+
+/**
+ * @brief Decode an ASN.1 value described by @p it from a BIO, with library context.
+ * @param it ASN.1 item describing the type to decode.
+ * @param in BIO positioned at DER input.
+ * @param pval Optional existing object to reuse, or NULL to allocate.
+ * @param libctx Library context for algorithm fetches during decode, or NULL for the default.
+ * @param propq Property query for algorithm fetches, or NULL.
+ * @return Decoded object pointer, or NULL on error.
+ */
+void *ASN1_item_d2i_bio_ex(const ASN1_ITEM *it, BIO *in, void *pval,
+    OSSL_LIB_CTX *libctx, const char *propq);
+/**
+ * @brief Decode an ASN.1 value described by @p it from a BIO (default library context).
+ * @param it ASN.1 item describing the type to decode.
+ * @param in BIO positioned at DER input.
+ * @param pval Optional existing object to reuse, or NULL to allocate.
+ * @return Decoded object pointer, or NULL on error.
+ */
+void *ASN1_item_d2i_bio(const ASN1_ITEM *it, BIO *in, void *pval);
+/**
+ * @brief Encode an ASN.1 value to a BIO using a type-specific i2d function.
+ * @param i2d Encoder such as i2d_X509 (passed through CHECKED_I2D_OF helpers).
+ * @param out BIO that receives the DER encoding.
+ * @param x Object to encode; must match the type expected by @p i2d.
+ * @return 1 on success, or 0 on failure.
+ */
+int ASN1_i2d_bio(i2d_of_void *i2d, BIO *out, const void *x);
+
+#define ASN1_i2d_bio_of(type, i2d, out, x)   \
+    (ASN1_i2d_bio(CHECKED_I2D_OF(type, i2d), \
+        out,                                 \
+        CHECKED_PTR_OF(const type, x)))
+
+/**
+ * @brief Encode an ASN.1 value to DER and write it to a BIO using an ASN1_ITEM.
+ * @param it Item descriptor identifying the type of @p x.
+ * @param out BIO that receives the DER encoding.
+ * @param x Value to encode; must match the type described by @p it.
+ * @return 1 on success, or 0 on failure.
+ */
+int ASN1_item_i2d_bio(const ASN1_ITEM *it, BIO *out, const void *x);
+/**
+ * @brief Encode an ASN.1 value described by @p it into a newly allocated memory BIO.
+ * @param it ASN.1 item descriptor for the type of @p val.
+ * @param val Value to encode (may be NULL for some optional types).
+ * @return Memory BIO holding the DER encoding, or NULL on error; free with BIO_free().
+ */
+BIO *ASN1_item_i2d_mem_bio(const ASN1_ITEM *it, const ASN1_VALUE *val);
+/**
+ * @brief Print an ASN.1 UTCTime to a BIO in human-readable form.
+ * @param fp BIO that receives text such as "Feb  3 00:55:52 2015 GMT".
+ * @param a UTCTime value to print.
+ * @return 1 on success, or 0 on I/O or format error.
+ */
+int ASN1_UTCTIME_print(BIO *fp, const ASN1_UTCTIME *a);
+/**
+ * @brief Print an ASN.1 GeneralizedTime to a BIO in a human-readable form.
+ * @param fp BIO that receives the formatted timestamp text.
+ * @param a GeneralizedTime value to print.
+ * @return 1 on success, or 0 on error.
+ */
+int ASN1_GENERALIZEDTIME_print(BIO *fp, const ASN1_GENERALIZEDTIME *a);
+/**
+ * @brief Print an ASN.1 Time (UTCTime or GeneralizedTime) to a BIO in a human-readable form.
+ * @param bp BIO that receives the formatted timestamp text.
+ * @param tm Time value to print; must be a valid ASN1_TIME (UTCTIME or GENERALIZEDTIME).
+ * @return 1 on success, or 0 on error.
+ */
+int ASN1_TIME_print(BIO *bp, const ASN1_TIME *tm);
+/**
+ * @brief Print an ASN.1 Time to a BIO with ASN1_DTFLGS_* formatting flags.
+ * @param bp Output BIO.
+ * @param tm Time value (UTCTime or GeneralizedTime).
+ * @param flags Combination of ASN1_DTFLGS_* (for example ASN1_DTFLGS_ISO8601).
+ * @return 1 on success, or 0 on error.
+ */
+int ASN1_TIME_print_ex(BIO *bp, const ASN1_TIME *tm, unsigned long flags);
+/**
+ * @brief Print an ASN.1 string to a BIO, replacing unprintable bytes with '.'.
+ * @param bp BIO that receives the printable text.
+ * @param v String to print; may be NULL.
+ * @return 1 on success, or 0 on error.
+ */
+int ASN1_STRING_print(BIO *bp, const ASN1_STRING *v);
+/**
+ * @brief Print an ASN.1 string to a BIO using ASN1_STRFLGS_* formatting options.
+ * @param out BIO that receives the formatted text.
+ * @param str String to print.
+ * @param flags Combination of ASN1_STRFLGS_* flags (for example ASN1_STRFLGS_RFC2253).
+ * @return 1 on success, or 0 on error.
+ */
+int ASN1_STRING_print_ex(BIO *out, const ASN1_STRING *str, unsigned long flags);
+/**
+ * @brief Print a byte buffer as colon-separated hex to a BIO with indentation.
+ * @param bp BIO that receives the formatted output.
+ * @param buf Bytes to print.
+ * @param buflen Number of bytes at @p buf.
+ * @param off Indentation depth in spaces.
+ * @return 1 on success, or 0 on error.
+ */
+int ASN1_buf_print(BIO *bp, const unsigned char *buf, size_t buflen, int off);
+/**
+ * @brief Print a labeled BIGNUM to a BIO in hex, with indentation.
+ * @param bp BIO that receives the formatted output.
+ * @param number Label printed before the value (for example a field name).
+ * @param num Big integer to print; NULL prints nothing and returns success.
+ * @param buf Unused historical parameter (ignored; may be NULL).
+ * @param off Indentation depth in spaces.
+ * @return 1 on success, or 0 on error.
+ */
+int ASN1_bn_print(BIO *bp, const char *number, const BIGNUM *num,
+    unsigned char *buf, int off);
+/**
+ * @brief Recursively dump a DER ASN.1 structure to a BIO as indented text.
+ * @param bp BIO that receives the human-readable parse tree.
+ * @param pp DER encoding to parse.
+ * @param len Number of bytes at @p pp.
+ * @param indent Indentation depth in spaces for the top-level element.
+ * @return 1 on success, or 0 on parse error.
+ */
+int ASN1_parse(BIO *bp, const unsigned char *pp, long len, int indent);
+/**
+ * @brief Recursively dump a DER ASN.1 structure to a BIO, optionally hex-dumping string contents.
+ * @param bp BIO that receives the human-readable parse tree.
+ * @param pp DER encoding to parse.
+ * @param len Number of bytes at @p pp.
+ * @param indent Indentation depth in spaces for the top-level element.
+ * @param dump If nonzero, print hex dumps of OCTET STRING and similar contents.
+ * @return 1 on success, or 0 on parse error.
+ */
+int ASN1_parse_dump(BIO *bp, const unsigned char *pp, long len, int indent,
+    int dump);
+/**
+ * @brief Return a human-readable name for an ASN.1 universal tag number.
+ * @param tag Tag such as V_ASN1_UTF8STRING or V_ASN1_SEQUENCE.
+ * @return Static string name for @p tag (do not free).
+ */
+const char *ASN1_tag2str(int tag);
+
+/* Used to load and write Netscape format cert */
+
+/**
+ * @brief Convert a UniversalString that holds only Latin-1 code points into a Printable/IA5/T61 string in place.
+ * @param s UniversalString whose four-byte code units are collapsed to single octets when possible.
+ * @return 1 on success (type and data updated), or 0 if @p s is not a convertible UniversalString.
+ */
+int ASN1_UNIVERSALSTRING_to_string(ASN1_UNIVERSALSTRING *s);
+
+/**
+ * @brief Set an ASN1_TYPE to an OCTET STRING containing a copy of @p data.
+ * @param a ANY value to update.
+ * @param data Octets to store.
+ * @param len Number of bytes at @p data.
+ * @return 1 on success, or 0 on failure.
+ */
+int ASN1_TYPE_set_octetstring(ASN1_TYPE *a, unsigned char *data, int len);
+/**
+ * @brief Copy the OCTET STRING contents of an ASN1_TYPE into @p data.
+ * @param a ASN1_TYPE that must hold V_ASN1_OCTET_STRING.
+ * @param data Buffer that receives up to @p max_len content octets.
+ * @param max_len Capacity of @p data in bytes.
+ * @return Full OCTET STRING length on success, or -1 on type/content error.
+ */
+int ASN1_TYPE_get_octetstring(const ASN1_TYPE *a, unsigned char *data, int max_len);
+/**
+ * @brief Set an ASN1_TYPE to the SEQUENCE { INTEGER, OCTET STRING } pair used by some algorithm parameters.
+ * @param a ANY value to update.
+ * @param num INTEGER component.
+ * @param data OCTET STRING content to embed.
+ * @param len Number of bytes at @p data.
+ * @return 1 on success, or 0 on failure.
+ */
+int ASN1_TYPE_set_int_octetstring(ASN1_TYPE *a, long num,
+    unsigned char *data, int len);
+/**
+ * @brief Extract the INTEGER and OCTET STRING from an ASN1_TYPE holding that SEQUENCE pair.
+ * @param a ASN1_TYPE previously set with ASN1_TYPE_set_int_octetstring().
+ * @param num Receives the INTEGER value when non-NULL.
+ * @param data Optional buffer that receives up to @p max_len OCTET STRING bytes.
+ * @param max_len Capacity of @p data in bytes.
+ * @return Length of the OCTET STRING on success, or -1 on error (including when @p data is too small).
+ */
+int ASN1_TYPE_get_int_octetstring(const ASN1_TYPE *a, long *num,
+    unsigned char *data, int max_len);
+
+/**
+ * @brief Decode the DER content of an OCTET STRING / ASN1_STRING using item @p it.
+ * @param oct String whose content octets are treated as DER input.
+ * @param it ASN.1 item descriptor for the type to decode.
+ * @return Newly allocated typed value, or NULL on error; free with ASN1_item_free.
+ */
+void *ASN1_item_unpack(const ASN1_STRING *oct, const ASN1_ITEM *it);
+/**
+ * @brief Decode DER from an ASN1_STRING using @p it, with library context for algorithm fetches.
+ * @param oct String whose content octets are treated as DER input.
+ * @param it ASN.1 item descriptor for the type to decode.
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query for algorithm fetches, or NULL.
+ * @return Newly allocated typed value, or NULL on error; free with ASN1_item_free.
+ */
+void *ASN1_item_unpack_ex(const ASN1_STRING *oct, const ASN1_ITEM *it,
+    OSSL_LIB_CTX *libctx, const char *propq);
+
+/**
+ * @brief Encode @p obj with @p it and store the DER result in an OCTET STRING.
+ * @param obj Typed ASN.1 value to encode.
+ * @param it ASN.1 item descriptor for @p obj.
+ * @param oct Optional destination OCTET STRING pointer; if NULL or *@p oct is NULL a new string is allocated.
+ * @return The OCTET STRING holding the encoded bytes, or NULL on error.
+ */
+ASN1_STRING *ASN1_item_pack(void *obj, const ASN1_ITEM *it,
+    ASN1_OCTET_STRING **oct);
+
+/**
+ * @brief Set the process-wide default B_ASN1_* mask used when selecting ASN.1 string types.
+ * @param mask Bitmask of permitted string types (for example B_ASN1_UTF8STRING).
+ */
+void ASN1_STRING_set_default_mask(unsigned long mask);
+/**
+ * @brief Set the default ASN.1 string type mask from an ASCII name or mask expression.
+ * @param p Mask description such as "utf8only", "default", or a numeric bitmask string.
+ * @return 1 on success, or 0 if @p p is not recognized.
+ */
+int ASN1_STRING_set_default_mask_asc(const char *p);
+/**
+ * @brief Return the process-wide default ASN.1 string type mask.
+ * @return Mask of B_ASN1_* bits previously set with ASN1_STRING_set_default_mask().
+ */
+unsigned long ASN1_STRING_get_default_mask(void);
+/**
+ * @brief Convert multibyte input into an ASN.1 string, choosing a type allowed by @p mask.
+ * @param out Destination; if NULL a new string is allocated, otherwise *@p out may be reused.
+ * @param in Input bytes in the encoding given by @p inform.
+ * @param len Length of @p in in bytes, or -1 if @p in is NUL-terminated.
+ * @param inform Input encoding (MBSTRING_ASC, MBSTRING_BMP, MBSTRING_UNIV, or MBSTRING_UTF8).
+ * @param mask B_ASN1_* bitmask of permitted output string types (0 selects the default mask).
+ * @return Positive ASN.1 string type on success, or a negative value on error.
+ */
+int ASN1_mbstring_copy(ASN1_STRING **out, const unsigned char *in, int len,
+    int inform, unsigned long mask);
+/**
+ * @brief Like ASN1_mbstring_copy(), also enforcing minimum and maximum character counts.
+ * @param out Destination; if NULL a new string is allocated, otherwise *@p out may be reused.
+ * @param in Input bytes in the encoding given by @p inform.
+ * @param len Length of @p in in bytes, or -1 if @p in is NUL-terminated.
+ * @param inform Input encoding (MBSTRING_ASC, MBSTRING_BMP, MBSTRING_UNIV, or MBSTRING_UTF8).
+ * @param mask B_ASN1_* bitmask of permitted output string types (0 selects the default mask).
+ * @param minsize Minimum character count (0 disables the check).
+ * @param maxsize Maximum character count (0 disables the check).
+ * @return Positive ASN.1 string type on success, or a negative value on error.
+ */
+int ASN1_mbstring_ncopy(ASN1_STRING **out, const unsigned char *in, int len,
+    int inform, unsigned long mask,
+    long minsize, long maxsize);
+
+/**
+ * @brief Create or update an ASN.1 string from multibyte input using the string table for @p nid.
+ * @param out Optional destination; if NULL a new string is allocated and returned.
+ * @param in Input bytes in the encoding given by @p inform.
+ * @param inlen Length of @p in in bytes, or -1 if @p in is NUL-terminated.
+ * @param inform Input encoding (MBSTRING_ASC, MBSTRING_BMP, MBSTRING_UNIV, or MBSTRING_UTF8).
+ * @param nid Object NID whose ASN1_STRING_TABLE entry selects allowed string types and size limits.
+ * @return Resulting ASN1_STRING, or NULL on error.
+ */
+ASN1_STRING *ASN1_STRING_set_by_NID(ASN1_STRING **out,
+    const unsigned char *in, int inlen,
+    int inform, int nid);
+/**
+ * @brief Look up the ASN1_STRING_TABLE entry for a string-valued NID.
+ * @param nid Object identifier NID whose string encoding policy is requested.
+ * @return Pointer to the table entry (do not free), or NULL if none is registered.
+ */
+ASN1_STRING_TABLE *ASN1_STRING_TABLE_get(int nid);
+/**
+ * @brief Add or update a local ASN1_STRING_TABLE entry for @p nid.
+ * @param nid Object identifier NID whose string policy is registered or updated.
+ * @param minsize Minimum size in characters (>= 0 to update; negative leaves unchanged).
+ * @param maxsize Maximum size in characters (>= 0 to update; negative leaves unchanged).
+ * @param mask B_ASN1_* type mask (nonzero to update; 0 leaves unchanged).
+ * @param flags STABLE_FLAGS_* bits (nonzero to update; 0 leaves unchanged).
+ * @return 1 on success, or 0 on error.
+ */
+int ASN1_STRING_TABLE_add(int nid, long minsize, long maxsize,
+    unsigned long mask, unsigned long flags);
+/**
+ * @brief Free dynamically registered ASN1_STRING_TABLE entries added at run time.
+ *
+ * Built-in table entries are left in place. Call during application teardown if
+ * ASN1_STRING_TABLE_add() was used.
+ */
+void ASN1_STRING_TABLE_cleanup(void);
+
+/* ASN1 template functions */
+
+/* Old API compatible functions */
+/**
+ * @brief Allocate a new ASN.1 value described by @p it using the default library context.
+ * @param it ASN.1 item template for the type to create.
+ * @return Newly allocated ASN1_VALUE, or NULL on error; free with ASN1_item_free.
+ */
+ASN1_VALUE *ASN1_item_new(const ASN1_ITEM *it);
+/**
+ * @brief Allocate a new ASN.1 value described by @p it, with library context for algorithm fetches.
+ * @param it ASN.1 item template for the type to create.
+ * @param libctx Library context for any algorithm fetches during construction, or NULL for the default.
+ * @param propq Property query for those fetches, or NULL.
+ * @return Newly allocated ASN1_VALUE, or NULL on error; free with ASN1_item_free.
+ */
+ASN1_VALUE *ASN1_item_new_ex(const ASN1_ITEM *it, OSSL_LIB_CTX *libctx,
+    const char *propq);
+/**
+ * @brief Free an ASN.1 value described by an ASN1_ITEM.
+ * @param val Value to free, or NULL.
+ * @param it ASN.1 item descriptor matching @p val.
+ */
+void ASN1_item_free(ASN1_VALUE *val, const ASN1_ITEM *it);
+/**
+ * @brief Decode a DER-encoded ASN.1 value using an item descriptor and library context.
+ * @param val Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @param it ASN.1 item descriptor for the type to decode.
+ * @param libctx Library context for algorithm fetches during decode, or NULL for the default.
+ * @param propq Property query for algorithm fetches, or NULL.
+ * @return Decoded ASN1_VALUE, or NULL on error.
+ */
+ASN1_VALUE *ASN1_item_d2i_ex(ASN1_VALUE **val, const unsigned char **in,
+    long len, const ASN1_ITEM *it,
+    OSSL_LIB_CTX *libctx, const char *propq);
+/**
+ * @brief Decode a DER-encoded ASN.1 value using an item descriptor (default library context).
+ * @param val Optional destination pointer updated to the result, or NULL.
+ * @param in Address of a pointer to the DER input; advanced past the decoded value.
+ * @param len Number of bytes available at *@p in.
+ * @param it ASN.1 item descriptor for the type to decode.
+ * @return Decoded ASN1_VALUE, or NULL on error.
+ *
+ * Equivalent to ASN1_item_d2i_ex() with a NULL library context and property query.
+ */
+ASN1_VALUE *ASN1_item_d2i(ASN1_VALUE **val, const unsigned char **in,
+    long len, const ASN1_ITEM *it);
+/**
+ * @brief Encode an ASN.1 value described by @p it to DER.
+ * @param val Value to encode (typed according to @p it).
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @param it ASN.1 item descriptor for the type of @p val.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int ASN1_item_i2d(const ASN1_VALUE *val, unsigned char **out, const ASN1_ITEM *it);
+/**
+ * @brief Encode an ASN.1 value to DER/BER using indefinite-length (NDEF) constructed form where applicable.
+ * @param val Value to encode (typed according to @p it).
+ * @param out Destination pointer updated like a standard i2d encoder, or NULL to measure length.
+ * @param it ASN.1 item descriptor for the type of @p val.
+ * @return Number of bytes encoded, or a negative value on error.
+ */
+int ASN1_item_ndef_i2d(const ASN1_VALUE *val, unsigned char **out,
+    const ASN1_ITEM *it);
+
+/**
+ * @brief Register the built-in CONF module that loads OID name mappings from an "oid_section".
+ */
+void ASN1_add_oid_module(void);
+/**
+ * @brief Register the built-in ASN.1 string-table (STABLE) configuration module.
+ *
+ * Enables the "asn1_string_table" CONF module used to override default string
+ * type masks and size limits for OIDs.
+ */
+void ASN1_add_stable_module(void);
+
+/**
+ * @brief Build an ASN1_TYPE from an ASN.1 generation string, resolving CONF macros.
+ * @param str Generation template (ASN1_generate_nconf(3) syntax).
+ * @param nconf Optional CONF providing name/value substitutions, or NULL.
+ * @return Newly allocated ASN1_TYPE, or NULL on error; free with ASN1_TYPE_free().
+ */
+ASN1_TYPE *ASN1_generate_nconf(const char *str, CONF *nconf);
+/**
+ * @brief Build an ASN1_TYPE from an ASN.1 generation string, resolving extras via an X509V3_CTX.
+ * @param str Generation string describing the ASN.1 value to encode.
+ * @param cnf Optional X.509v3 context supplying configuration for additional string references, or NULL.
+ * @return Encoded ASN1_TYPE, or NULL on error.
+ */
+ASN1_TYPE *ASN1_generate_v3(const char *str, X509V3_CTX *cnf);
+/**
+ * @brief Parse a pipe-separated list of ASN1_STRFLGS_* flag names into a mask.
+ * @param str Flag names such as "utf8|esc_ctrl" (case-insensitive).
+ * @param pmask Receives the combined flag mask on success.
+ * @return 1 on success, or 0 if @p str contains an unknown name.
+ */
+int ASN1_str2mask(const char *str, unsigned long *pmask);
+
+/* ASN1 Print flags */
+
+/* Indicate missing OPTIONAL fields */
+#define ASN1_PCTX_FLAGS_SHOW_ABSENT 0x001
+/* Mark start and end of SEQUENCE */
+#define ASN1_PCTX_FLAGS_SHOW_SEQUENCE 0x002
+/* Mark start and end of SEQUENCE/SET OF */
+#define ASN1_PCTX_FLAGS_SHOW_SSOF 0x004
+/* Show the ASN1 type of primitives */
+#define ASN1_PCTX_FLAGS_SHOW_TYPE 0x008
+/* Don't show ASN1 type of ANY */
+#define ASN1_PCTX_FLAGS_NO_ANY_TYPE 0x010
+/* Don't show ASN1 type of MSTRINGs */
+#define ASN1_PCTX_FLAGS_NO_MSTRING_TYPE 0x020
+/* Don't show field names in SEQUENCE */
+#define ASN1_PCTX_FLAGS_NO_FIELD_NAME 0x040
+/* Show structure names of each SEQUENCE field */
+#define ASN1_PCTX_FLAGS_SHOW_FIELD_STRUCT_NAME 0x080
+/* Don't show structure name even at top level */
+#define ASN1_PCTX_FLAGS_NO_STRUCT_NAME 0x100
+
+/**
+ * @brief Pretty-print an ASN.1 value described by @p it to a BIO.
+ * @param out Output BIO.
+ * @param ifld Value to print (typed according to @p it).
+ * @param indent Initial indentation depth in spaces.
+ * @param it ASN.1 item descriptor for the type of @p ifld.
+ * @param pctx Print context with ASN1_PCTX_FLAGS_*, or NULL for defaults.
+ * @return 1 on success, or 0 on error.
+ */
+int ASN1_item_print(BIO *out, const ASN1_VALUE *ifld, int indent,
+    const ASN1_ITEM *it, const ASN1_PCTX *pctx);
+/**
+ * @brief Allocate a new ASN.1 print context with default formatting flags.
+ * @return New ASN1_PCTX, or NULL on allocation failure.
+ */
+ASN1_PCTX *ASN1_PCTX_new(void);
+/**
+ * @brief Free an ASN1_PCTX allocated by ASN1_PCTX_new().
+ * @param p Print context to free, or NULL (no-op).
+ */
+void ASN1_PCTX_free(ASN1_PCTX *p);
+/**
+ * @brief Return the general ASN1_PCTX_FLAGS_* print-control flags from a print context.
+ * @param p Print context to query.
+ * @return Current flag mask.
+ */
+unsigned long ASN1_PCTX_get_flags(const ASN1_PCTX *p);
+/**
+ * @brief Set the general ASN1_PCTX_FLAGS_* print-control flags on a print context.
+ * @param p Print context to update.
+ * @param flags New flag mask (replaces the previous flags entirely).
+ */
+void ASN1_PCTX_set_flags(ASN1_PCTX *p, unsigned long flags);
+/**
+ * @brief Return the name-printing flags from an ASN.1 print context.
+ * @param p Print context to query.
+ * @return XN_FLAG_* / ASN1_STRFLGS_* mask controlling how names are rendered.
+ */
+unsigned long ASN1_PCTX_get_nm_flags(const ASN1_PCTX *p);
+/**
+ * @brief Set name-printing flags for an ASN.1 print context.
+ * @param p Print context to update.
+ * @param flags XN_FLAG_* / ASN1_STRFLGS_* mask controlling how names are rendered.
+ */
+void ASN1_PCTX_set_nm_flags(ASN1_PCTX *p, unsigned long flags);
+/**
+ * @brief Return the certificate-field print flags stored in a print context.
+ * @param p Print context to query.
+ * @return Flag mask previously set with ASN1_PCTX_set_cert_flags().
+ */
+unsigned long ASN1_PCTX_get_cert_flags(const ASN1_PCTX *p);
+/**
+ * @brief Set certificate-field print flags on an ASN.1 print context.
+ * @param p Print context to update.
+ * @param flags Mask controlling which certificate-related fields are shown.
+ */
+void ASN1_PCTX_set_cert_flags(ASN1_PCTX *p, unsigned long flags);
+/**
+ * @brief Return the OID print flags currently set on an ASN.1 print context.
+ * @param p Print context to query.
+ * @return ASN1_STRFLGS_* style flags controlling OID formatting.
+ */
+unsigned long ASN1_PCTX_get_oid_flags(const ASN1_PCTX *p);
+/**
+ * @brief Set ASN1_STRFLGS_* flags controlling how object identifiers are printed.
+ * @param p Print context to update.
+ * @param flags OID print flags (same family as ASN1_STRING_print_ex flags for OIDs).
+ */
+void ASN1_PCTX_set_oid_flags(ASN1_PCTX *p, unsigned long flags);
+/**
+ * @brief Return the ASN1_STRFLGS_* flags controlling how string fields are printed.
+ * @param p Print context to query.
+ * @return String print flags (same family as ASN1_STRING_print_ex).
+ */
+unsigned long ASN1_PCTX_get_str_flags(const ASN1_PCTX *p);
+/**
+ * @brief Set ASN1_STRFLGS_* flags controlling how string fields are printed.
+ * @param p Print context to update.
+ * @param flags String print flags (same family as ASN1_STRING_print_ex).
+ */
+void ASN1_PCTX_set_str_flags(ASN1_PCTX *p, unsigned long flags);
+
+/**
+ * @brief Allocate an ASN.1 scan context with the given per-field scan callback.
+ * @param scan_cb Callback invoked while scanning ASN.1 templates, or NULL.
+ * @return New ASN1_SCTX, or NULL on allocation failure; free with ASN1_SCTX_free().
+ */
+ASN1_SCTX *ASN1_SCTX_new(int (*scan_cb)(ASN1_SCTX *ctx));
+/**
+ * @brief Free an ASN.1 scan context previously created with ASN1_SCTX_new().
+ * @param p Context to free, or NULL.
+ */
+void ASN1_SCTX_free(ASN1_SCTX *p);
+/**
+ * @brief Return the ASN1_ITEM currently being scanned by an ASN.1 scan context.
+ * @param p Scan context created for a custom ASN.1 item scan/callback.
+ * @return ASN.1 item associated with @p p, or NULL if none is set.
+ */
+const ASN1_ITEM *ASN1_SCTX_get_item(ASN1_SCTX *p);
+/**
+ * @brief Return the ASN1_TEMPLATE currently being scanned by an ASN.1 scan context.
+ * @param p Scan context created for a custom ASN.1 item scan/callback.
+ * @return Template associated with @p p, or NULL if none is set.
+ */
+const ASN1_TEMPLATE *ASN1_SCTX_get_template(ASN1_SCTX *p);
+/**
+ * @brief Return scan flags for the current field in an ASN.1 scan context.
+ * @param p Scan context to query.
+ * @return Flag word stored on @p p (ASN1_SCAN_* and related bits).
+ */
+unsigned long ASN1_SCTX_get_flags(ASN1_SCTX *p);
+/**
+ * @brief Store an application pointer on an ASN.1 scan context for use by the scan callback.
+ * @param p Scan context to update.
+ * @param data Opaque pointer retrieved later with ASN1_SCTX_get_app_data().
+ */
+void ASN1_SCTX_set_app_data(ASN1_SCTX *p, void *data);
+/**
+ * @brief Return the application pointer previously stored on an ASN.1 scan context.
+ * @param p Scan context to query.
+ * @return Pointer passed to ASN1_SCTX_set_app_data(), or NULL if none was set.
+ */
+void *ASN1_SCTX_get_app_data(ASN1_SCTX *p);
+
+/**
+ * @brief Return the filter BIO_METHOD that encodes ASN.1 values to a downstream BIO.
+ * @return Pointer to the ASN.1 filter method used with BIO_new() / BIO_new_NDEF().
+ */
+const BIO_METHOD *BIO_f_asn1(void);
+
+/**
+ * @brief Create a streaming BIO that encodes @p val in indefinite-length (NDEF) DER form.
+ * @param out Downstream BIO that receives the encoded output.
+ * @param val ASN.1 value to stream-encode (not const because streaming may update state).
+ * @param it ASN.1 item descriptor for @p val.
+ * @return New filter BIO chained to @p out, or NULL on error.
+ *
+ * Used for CMS/SMIME streaming; cannot constify @p val because of CMS_stream().
+ */
+BIO *BIO_new_NDEF(BIO *out, ASN1_VALUE *val, const ASN1_ITEM *it);
+
+/**
+ * @brief Stream-encode an ASN.1 value to @p out, optionally pulling content from @p in.
+ * @param out BIO that receives the encoded ASN.1 output.
+ * @param val ASN.1 value to encode (not const because streaming may update state).
+ * @param in Optional content BIO for indefinite-length / streaming payloads, or NULL.
+ * @param flags SMIME/CMS streaming flags (for example SMIME_STREAM).
+ * @param it ASN.1 item descriptor for @p val.
+ * @return 1 on success, or 0 on failure.
+ */
+int i2d_ASN1_bio_stream(BIO *out, ASN1_VALUE *val, BIO *in, int flags,
+    const ASN1_ITEM *it);
+/**
+ * @brief Stream-encode an ASN.1 value as a PEM object, optionally pulling content from @p in.
+ * @param out BIO that receives the PEM output.
+ * @param val ASN.1 value to encode (not const because streaming may update state).
+ * @param in Optional content BIO for indefinite-length / streaming payloads, or NULL.
+ * @param flags SMIME/CMS streaming flags (for example SMIME_STREAM).
+ * @param hdr PEM header label such as "CMS" or "PKCS7" (without BEGIN/END).
+ * @param it ASN.1 item descriptor for @p val.
+ * @return 1 on success, or 0 on failure.
+ */
+int PEM_write_bio_ASN1_stream(BIO *out, ASN1_VALUE *val, BIO *in, int flags,
+    const char *hdr, const ASN1_ITEM *it);
+/* cannot constify val because of CMS_dataFinal() */
+/**
+ * @brief Write an ASN.1 CMS/PKCS#7 value as an S/MIME message (default library context).
+ * @param bio BIO that receives the S/MIME output.
+ * @param val CMS_ContentInfo or PKCS7 value to wrap (not const because streaming may update state).
+ * @param data Optional content BIO when streaming / detached content is used, or NULL.
+ * @param flags CMS_* / SMIME_* flags (for example CMS_DETACHED, CMS_TEXT, CMS_STREAM).
+ * @param ctype_nid NID of the content type.
+ * @param econt_nid NID of the embedded content type.
+ * @param mdalgs Digest algorithms for SignedData, or NULL when unused.
+ * @param it Item descriptor such as ASN1_ITEM_rptr(CMS_ContentInfo) or ASN1_ITEM_rptr(PKCS7).
+ * @return 1 on success, or 0 on failure.
+ */
+int SMIME_write_ASN1(BIO *bio, ASN1_VALUE *val, BIO *data, int flags,
+    int ctype_nid, int econt_nid,
+    STACK_OF(X509_ALGOR) *mdalgs, const ASN1_ITEM *it);
+/**
+ * @brief Write an ASN.1 CMS/PKCS#7 value as an S/MIME message with library context.
+ * @param bio BIO that receives the S/MIME output.
+ * @param val CMS_ContentInfo or PKCS7 value to wrap (not const because streaming may update state).
+ * @param data Optional content BIO when streaming / detached content is used, or NULL.
+ * @param flags CMS_* / SMIME_* flags (for example CMS_DETACHED, CMS_TEXT, CMS_STREAM).
+ * @param ctype_nid NID of the content type.
+ * @param econt_nid NID of the embedded content type.
+ * @param mdalgs Digest algorithms for SignedData, or NULL when unused.
+ * @param it Item descriptor such as ASN1_ITEM_rptr(CMS_ContentInfo) or ASN1_ITEM_rptr(PKCS7).
+ * @param libctx Library context for algorithm fetches, or NULL for the default.
+ * @param propq Property query for those fetches, or NULL.
+ * @return 1 on success, or 0 on failure.
+ */
+int SMIME_write_ASN1_ex(BIO *bio, ASN1_VALUE *val, BIO *data, int flags,
+    int ctype_nid, int econt_nid,
+    STACK_OF(X509_ALGOR) *mdalgs, const ASN1_ITEM *it,
+    OSSL_LIB_CTX *libctx, const char *propq);
+/**
+ * @brief Parse an S/MIME message into an ASN.1 structure described by @p it (flags=0).
+ * @param bio BIO that supplies the S/MIME input.
+ * @param bcont If non-NULL, set to a memory BIO holding cleartext signed content, or NULL when absent.
+ * @param it Item descriptor such as ASN1_ITEM_rptr(CMS_ContentInfo) or ASN1_ITEM_rptr(PKCS7).
+ * @return Parsed ASN1_VALUE, or NULL on error.
+ */
+ASN1_VALUE *SMIME_read_ASN1(BIO *bio, BIO **bcont, const ASN1_ITEM *it);
+/**
+ * @brief Parse an S/MIME message into an ASN.1 structure described by @p it.
+ * @param bio BIO that supplies the S/MIME input.
+ * @param flags CMS_BINARY and/or SMIME_ASCIICRLF control binary vs canonical text handling.
+ * @param bcont If non-NULL, set to a memory BIO holding cleartext signed content, or NULL when absent.
+ * @param it Item descriptor such as ASN1_ITEM_rptr(CMS_ContentInfo) or ASN1_ITEM_rptr(PKCS7).
+ * @param x Optional existing ASN1_VALUE of type @p it to reuse, or NULL to allocate a new one.
+ * @param libctx Library context for algorithm fetches during parsing, or NULL for the default.
+ * @param propq Property query for those fetches, or NULL.
+ * @return Parsed ASN1_VALUE, or NULL on error.
+ */
+ASN1_VALUE *SMIME_read_ASN1_ex(BIO *bio, int flags, BIO **bcont,
+    const ASN1_ITEM *it, ASN1_VALUE **x,
+    OSSL_LIB_CTX *libctx, const char *propq);
+/**
+ * @brief Copy @p in to @p out applying S/MIME canonical CRLF line endings when appropriate.
+ * @param in Source BIO.
+ * @param out Destination BIO (often buffered for streaming).
+ * @param flags SMIME/CMS flags controlling text vs binary handling (for example SMIME_BINARY).
+ * @return 1 on success, or 0 on failure.
+ */
+int SMIME_crlf_copy(BIO *in, BIO *out, int flags);
+/**
+ * @brief Strip MIME headers from a text/plain S/MIME part and copy the body to @p out.
+ * @param in BIO positioned at a MIME message (headers then body).
+ * @param out BIO that receives the message body after headers are removed.
+ * @return 1 on success, or 0 if headers cannot be parsed or Content-Type is not text/plain.
+ */
+int SMIME_text(BIO *in, BIO *out);
+
+/**
+ * @brief Look up a built-in ASN1_ITEM by its structure name.
+ * @param name ASN.1 item name string.
+ * @return Matching ASN1_ITEM, or NULL if not found / on error.
+ */
+const ASN1_ITEM *ASN1_ITEM_lookup(const char *name);
+/**
+ * @brief Return the built-in ASN1_ITEM at index @p i.
+ * @param i Zero-based index into the static ASN1_ITEM table.
+ * @return ASN1_ITEM at @p i, or NULL if @p i is out of range.
+ */
+const ASN1_ITEM *ASN1_ITEM_get(size_t i);
+
+/* Legacy compatibility */
+#define DECLARE_ASN1_FUNCTIONS_fname(type, itname, name) \
+    DECLARE_ASN1_ALLOC_FUNCTIONS_name(type, name)        \
+    DECLARE_ASN1_ENCODE_FUNCTIONS(type, itname, name)
+#define DECLARE_ASN1_FUNCTIONS_const(type) DECLARE_ASN1_FUNCTIONS(type)
+#define DECLARE_ASN1_ENCODE_FUNCTIONS_const(type, name) \
+    DECLARE_ASN1_ENCODE_FUNCTIONS(type, name)
+#define I2D_OF_const(type) I2D_OF(type)
+#define ASN1_dup_of_const(type, i2d, d2i, x) ASN1_dup_of(type, i2d, d2i, x)
+#define ASN1_i2d_fp_of_const(type, i2d, out, x) ASN1_i2d_fp_of(type, i2d, out, x)
+#define ASN1_i2d_bio_of_const(type, i2d, out, x) ASN1_i2d_bio_of(type, i2d, out, x)
+
+#ifdef __cplusplus
+}
+#endif
+#endif

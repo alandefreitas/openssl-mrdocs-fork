@@ -1,0 +1,57 @@
+=== batch 18a: asn1 + bio ===
+  OK: asn1.h :: asn1_string_table_st nid/minsize
+  OK: asn1.h.in :: asn1_string_table_st nid/minsize
+  OK: asn1.h :: asn1_type_st.type
+  OK: asn1.h.in :: asn1_type_st.type
+  OK: asn1.h :: generalstring
+  OK: asn1.h.in :: generalstring
+  OK: asn1.h :: ASN1_TYPE_set
+  OK: asn1.h.in :: ASN1_TYPE_set
+  OK: asn1.h :: ASN1_TYPE_pack_sequence
+  OK: asn1.h.in :: ASN1_TYPE_pack_sequence
+  OK: asn1.h :: ASN1_STRING_cmp
+  OK: asn1.h.in :: ASN1_STRING_cmp
+  OK: asn1.h :: stack_st_ASN1_UTF8STRING
+  MISS: asn1.h.in :: stack_st_ASN1_UTF8STRING
+  OK: asn1.h :: stack_st_ASN1_GENERALSTRING
+  MISS: asn1.h.in :: stack_st_ASN1_GENERALSTRING
+  OK: asn1.h :: ASN1_TIME_set
+  OK: asn1.h.in :: ASN1_TIME_set
+  OK: asn1.h :: i2t_ASN1_OBJECT
+  OK: asn1.h.in :: i2t_ASN1_OBJECT
+  OK: asn1.h :: ASN1_check_infinite_end
+  OK: asn1.h.in :: ASN1_check_infinite_end
+  OK: asn1.h :: ASN1_object_size
+  OK: asn1.h.in :: ASN1_object_size
+  OK: asn1.h :: ASN1_item_i2d_fp
+  OK: asn1.h.in :: ASN1_item_i2d_fp
+  OK: asn1.h :: ASN1_GENERALIZEDTIME_print
+  OK: asn1.h.in :: ASN1_GENERALIZEDTIME_print
+  OK: asn1.h :: ASN1_PCTX_get_flags
+  OK: asn1.h.in :: ASN1_PCTX_get_flags
+  OK: asn1.h :: ASN1_PCTX_get_nm_flags
+  OK: asn1.h.in :: ASN1_PCTX_get_nm_flags
+  OK: asn1.h :: ASN1_PCTX_get_str_flags
+  OK: asn1.h.in :: ASN1_PCTX_get_str_flags
+  OK: bio.h :: BIO_get_new_index
+  OK: bio.h.in :: BIO_get_new_index
+  OK: bio.h :: BIO_set_ex_data
+  OK: bio.h.in :: BIO_set_ex_data
+  OK: bio.h :: BIO_next
+  OK: bio.h.in :: BIO_next
+  OK: bio.h :: BIO_f_linebuffer
+  OK: bio.h.in :: BIO_f_linebuffer
+  OK: bio.h :: BIO_new_dgram
+  OK: bio.h.in :: BIO_new_dgram
+  OK: bio.h :: BIO_wait
+  OK: bio.h.in :: BIO_wait
+  OK: bio.h :: BIO_lookup_ex+BIO_sock_error
+  OK: bio.h.in :: BIO_lookup_ex+BIO_sock_error
+  OK: bio.h :: BIO_new_fd
+  OK: bio.h.in :: BIO_new_fd
+  OK: bio.h :: BIO_printf
+  OK: bio.h.in :: BIO_printf
+
+OK=50 MISS=2
+  missing: asn1.h.in:stack_st_ASN1_UTF8STRING
+  missing: asn1.h.in:stack_st_ASN1_GENERALSTRING

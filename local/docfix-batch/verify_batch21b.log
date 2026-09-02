@@ -1,0 +1,919 @@
+[0;37m/opt/homebrew/opt/llvm/bin/clang -v -E -x c++ -
+[0m[0;37mExtracting declarations
+[0m[0;37mmax-errors=200: found enough documentation problems; translation units not yet started will be skipped
+[0m[0;37mFinalizing corpus
+[0m/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:650:1:
+    1) OSSL_CMP_get1_rootCaKeyUpdate: function is undocumented
+  650 | int OSSL_CMP_get1_rootCaKeyUpdate(OSSL_CMP_CTX *ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:649:1:
+    1) OSSL_CMP_get1_caCerts: function is undocumented
+  649 | int OSSL_CMP_get1_caCerts(OSSL_CMP_CTX *ctx, STACK_OF(X509) **out);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:646:1:
+    1) OSSL_CMP_exec_GENM_ses: function is undocumented
+  646 | STACK_OF(OSSL_CMP_ITAV) *OSSL_CMP_exec_GENM_ses(OSSL_CMP_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:643:1:
+    1) OSSL_CMP_try_certreq: function is undocumented
+  643 | int OSSL_CMP_try_certreq(OSSL_CMP_CTX *ctx, int req_type,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:627:1:
+    1) OSSL_CMP_exec_certreq: function is undocumented
+  627 | X509 *OSSL_CMP_exec_certreq(OSSL_CMP_CTX *ctx, int req_type,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:623:1:
+    1) OSSL_CMP_SRV_CTX_set_grant_implicit_confirm: function is undocumented
+  623 | int OSSL_CMP_SRV_CTX_set_grant_implicit_confirm(OSSL_CMP_SRV_CTX *srv_ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:622:1:
+    1) OSSL_CMP_SRV_CTX_set_accept_raverified: function is undocumented
+  622 | int OSSL_CMP_SRV_CTX_set_accept_raverified(OSSL_CMP_SRV_CTX *srv_ctx, int val);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:621:1:
+    1) OSSL_CMP_SRV_CTX_set_accept_unprotected: function is undocumented
+  621 | int OSSL_CMP_SRV_CTX_set_accept_unprotected(OSSL_CMP_SRV_CTX *srv_ctx, int val);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:619:1:
+    1) OSSL_CMP_SRV_CTX_set_send_unprotected_errors: function is undocumented
+  619 | int OSSL_CMP_SRV_CTX_set_send_unprotected_errors(OSSL_CMP_SRV_CTX *srv_ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:617:1:
+    1) OSSL_CMP_SRV_CTX_get0_cmp_ctx: function is undocumented
+  617 | OSSL_CMP_CTX *OSSL_CMP_SRV_CTX_get0_cmp_ctx(const OSSL_CMP_SRV_CTX *srv_ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:612:1:
+    1) OSSL_CMP_SRV_clean_transaction_cb_t: typedef is undocumented
+  612 | typedef int (*OSSL_CMP_SRV_clean_transaction_cb_t)(OSSL_CMP_SRV_CTX *srv_ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:610:1:
+    1) OSSL_CMP_SRV_delayed_delivery_cb_t: typedef is undocumented
+  610 | typedef int (*OSSL_CMP_SRV_delayed_delivery_cb_t)(OSSL_CMP_SRV_CTX *srv_ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:594:1:
+    1) OSSL_CMP_SRV_certConf_cb_t: typedef is undocumented
+  594 | typedef int (*OSSL_CMP_SRV_certConf_cb_t)(OSSL_CMP_SRV_CTX *srv_ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:589:1:
+    1) OSSL_CMP_SRV_error_cb_t: typedef is undocumented
+  589 | typedef void (*OSSL_CMP_SRV_error_cb_t)(OSSL_CMP_SRV_CTX *srv_ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:585:1:
+    1) OSSL_CMP_SRV_genm_cb_t: typedef is undocumented
+  585 | typedef int (*OSSL_CMP_SRV_genm_cb_t)(OSSL_CMP_SRV_CTX *srv_ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:578:1:
+    1) OSSL_CMP_SRV_cert_request_cb_t: typedef is undocumented
+  578 | typedef OSSL_CMP_PKISI *(*OSSL_CMP_SRV_cert_request_cb_t)(OSSL_CMP_SRV_CTX *srv_ctx, const OSSL_CMP_MSG *req, int certReqId,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:576:1:
+    1) OSSL_CMP_SRV_CTX_new: function is undocumented
+  576 | OSSL_CMP_SRV_CTX *OSSL_CMP_SRV_CTX_new(OSSL_LIB_CTX *libctx, const char *propq);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:574:1:
+    1) OSSL_CMP_CTX_server_perform: function is undocumented
+  574 | OSSL_CMP_MSG *OSSL_CMP_CTX_server_perform(OSSL_CMP_CTX *client_ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:572:1:
+    1) OSSL_CMP_SRV_process_request: function is undocumented
+  572 | OSSL_CMP_MSG *OSSL_CMP_SRV_process_request(OSSL_CMP_SRV_CTX *srv_ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:571:9:
+    1) ossl_cmp_srv_ctx_st: record is undocumented
+  571 | typedef struct ossl_cmp_srv_ctx_st OSSL_CMP_SRV_CTX;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:571:1:
+    1) OSSL_CMP_SRV_CTX: typedef is undocumented
+  571 | typedef struct ossl_cmp_srv_ctx_st OSSL_CMP_SRV_CTX;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:557:1:
+    1) i2d_OSSL_CMP_MSG_bio: function is undocumented
+  557 | int i2d_OSSL_CMP_MSG_bio(BIO *bio, const OSSL_CMP_MSG *msg);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:556:1:
+    1) d2i_OSSL_CMP_MSG_bio: function is undocumented
+  556 | OSSL_CMP_MSG *d2i_OSSL_CMP_MSG_bio(BIO *bio, OSSL_CMP_MSG **msg);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:553:1:
+    1) OSSL_CMP_MSG_read: function is undocumented
+  553 | OSSL_CMP_MSG *OSSL_CMP_MSG_read(const char *file, OSSL_LIB_CTX *libctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:548:1:
+    1) OSSL_CMP_MSG_get_bodytype: function is undocumented
+  548 | int OSSL_CMP_MSG_get_bodytype(const OSSL_CMP_MSG *msg);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:543:1:
+    1) OSSL_CMP_HDR_get0_geninfo_ITAVs: function is undocumented
+  543 | STACK_OF(OSSL_CMP_ITAV)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:542:1:
+    1) OSSL_CMP_HDR_get0_recipNonce: function is undocumented
+  542 | ASN1_OCTET_STRING *OSSL_CMP_HDR_get0_recipNonce(const OSSL_CMP_PKIHEADER *hdr);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:541:1:
+    1) OSSL_CMP_HDR_get0_transactionID: function is undocumented
+  541 | ASN1_OCTET_STRING *OSSL_CMP_HDR_get0_transactionID(const OSSL_CMP_PKIHEADER *hdr);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:533:1:
+    1) OSSL_CMP_CTX_snprint_PKIStatus: function is undocumented
+  533 | char *OSSL_CMP_CTX_snprint_PKIStatus(const OSSL_CMP_CTX *ctx, char *buf,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:529:1:
+    1) OSSL_CMP_CTX_set1_senderNonce: function is undocumented
+  529 | int OSSL_CMP_CTX_set1_senderNonce(OSSL_CMP_CTX *ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:527:1:
+    1) OSSL_CMP_CTX_set1_transactionID: function is undocumented
+  527 | int OSSL_CMP_CTX_set1_transactionID(OSSL_CMP_CTX *ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:525:1:
+    1) OSSL_CMP_CTX_get1_caPubs: function is undocumented
+  525 | STACK_OF(X509) *OSSL_CMP_CTX_get1_caPubs(const OSSL_CMP_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:524:1:
+    1) OSSL_CMP_CTX_get1_newChain: function is undocumented
+  524 | STACK_OF(X509) *OSSL_CMP_CTX_get1_newChain(const OSSL_CMP_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:523:1:
+    1) OSSL_CMP_CTX_get0_newCert: function is undocumented
+  523 | X509 *OSSL_CMP_CTX_get0_newCert(const OSSL_CMP_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:522:1:
+    1) OSSL_CMP_CTX_get0_validatedSrvCert: function is undocumented
+  522 | X509 *OSSL_CMP_CTX_get0_validatedSrvCert(const OSSL_CMP_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:520:1:
+    1) OSSL_CMP_CTX_get_failInfoCode: function is undocumented
+  520 | int OSSL_CMP_CTX_get_failInfoCode(const OSSL_CMP_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:519:1:
+    1) OSSL_CMP_CTX_get0_statusString: function is undocumented
+  519 | OSSL_CMP_PKIFREETEXT *OSSL_CMP_CTX_get0_statusString(const OSSL_CMP_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:516:1:
+    1) OSSL_CMP_CTX_get_certConf_cb_arg: function is undocumented
+  516 | void *OSSL_CMP_CTX_get_certConf_cb_arg(const OSSL_CMP_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:515:1:
+    1) OSSL_CMP_CTX_set_certConf_cb_arg: function is undocumented
+  515 | int OSSL_CMP_CTX_set_certConf_cb_arg(OSSL_CMP_CTX *ctx, void *arg);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:510:1:
+    1) OSSL_CMP_certConf_cb_t: typedef is undocumented
+  510 | typedef int (*OSSL_CMP_certConf_cb_t)(OSSL_CMP_CTX *ctx, X509 *cert,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:508:1:
+    1) OSSL_CMP_CTX_push0_genm_ITAV: function is undocumented
+  508 | int OSSL_CMP_CTX_push0_genm_ITAV(OSSL_CMP_CTX *ctx, OSSL_CMP_ITAV *itav);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:506:1:
+    1) OSSL_CMP_CTX_set1_p10CSR: function is undocumented
+  506 | int OSSL_CMP_CTX_set1_p10CSR(OSSL_CMP_CTX *ctx, const X509_REQ *csr);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:505:1:
+    1) OSSL_CMP_CTX_set1_oldCert: function is undocumented
+  505 | int OSSL_CMP_CTX_set1_oldCert(OSSL_CMP_CTX *ctx, X509 *cert);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:504:1:
+    1) OSSL_CMP_CTX_push0_policy: function is undocumented
+  504 | int OSSL_CMP_CTX_push0_policy(OSSL_CMP_CTX *ctx, POLICYINFO *pinfo);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:503:1:
+    1) OSSL_CMP_CTX_reqExtensions_have_SAN: function is undocumented
+  503 | int OSSL_CMP_CTX_reqExtensions_have_SAN(OSSL_CMP_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:502:1:
+    1) OSSL_CMP_CTX_set0_reqExtensions: function is undocumented
+  502 | int OSSL_CMP_CTX_set0_reqExtensions(OSSL_CMP_CTX *ctx, X509_EXTENSIONS *exts);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:499:1:
+    1) OSSL_CMP_CTX_set1_subjectName: function is undocumented
+  499 | int OSSL_CMP_CTX_set1_subjectName(OSSL_CMP_CTX *ctx, const X509_NAME *name);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:498:1:
+    1) OSSL_CMP_CTX_set1_serialNumber: function is undocumented
+  498 | int OSSL_CMP_CTX_set1_serialNumber(OSSL_CMP_CTX *ctx, const ASN1_INTEGER *sn);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:497:1:
+    1) OSSL_CMP_CTX_set1_issuer: function is undocumented
+  497 | int OSSL_CMP_CTX_set1_issuer(OSSL_CMP_CTX *ctx, const X509_NAME *name);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:496:1:
+    1) OSSL_CMP_CTX_get0_newPkey: function is undocumented
+  496 | EVP_PKEY *OSSL_CMP_CTX_get0_newPkey(const OSSL_CMP_CTX *ctx, int priv);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:495:1:
+    1) OSSL_CMP_CTX_set0_newPkey: function is undocumented
+  495 | int OSSL_CMP_CTX_set0_newPkey(OSSL_CMP_CTX *ctx, int priv, EVP_PKEY *pkey);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:492:1:
+    1) OSSL_CMP_CTX_set1_extraCertsOut: function is undocumented
+  492 | int OSSL_CMP_CTX_set1_extraCertsOut(OSSL_CMP_CTX *ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:488:1:
+    1) OSSL_CMP_CTX_push0_geninfo_ITAV: function is undocumented
+  488 | int OSSL_CMP_CTX_push0_geninfo_ITAV(OSSL_CMP_CTX *ctx, OSSL_CMP_ITAV *itav);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:487:1:
+    1) OSSL_CMP_CTX_set1_recipient: function is undocumented
+  487 | int OSSL_CMP_CTX_set1_recipient(OSSL_CMP_CTX *ctx, const X509_NAME *name);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:484:1:
+    1) OSSL_CMP_CTX_set1_secretValue: function is undocumented
+  484 | int OSSL_CMP_CTX_set1_secretValue(OSSL_CMP_CTX *ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:482:1:
+    1) OSSL_CMP_CTX_set1_referenceValue: function is undocumented
+  482 | int OSSL_CMP_CTX_set1_referenceValue(OSSL_CMP_CTX *ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:481:1:
+    1) OSSL_CMP_CTX_set1_pkey: function is undocumented
+  481 | int OSSL_CMP_CTX_set1_pkey(OSSL_CMP_CTX *ctx, EVP_PKEY *pkey);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:479:1:
+    1) OSSL_CMP_CTX_build_cert_chain: function is undocumented
+  479 | int OSSL_CMP_CTX_build_cert_chain(OSSL_CMP_CTX *ctx, X509_STORE *own_trusted,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:471:1:
+    1) OSSL_CMP_CTX_set0_trustedStore: function is undocumented
+  471 | int OSSL_CMP_CTX_set0_trustedStore(OSSL_CMP_CTX *ctx, X509_STORE *store);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:469:1:
+    1) OSSL_CMP_CTX_set1_srvCert: function is undocumented
+  469 | int OSSL_CMP_CTX_set1_srvCert(OSSL_CMP_CTX *ctx, X509 *cert);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:467:1:
+    1) OSSL_CMP_CTX_get_transfer_cb_arg: function is undocumented
+  467 | void *OSSL_CMP_CTX_get_transfer_cb_arg(const OSSL_CMP_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:463:1:
+    1) OSSL_CMP_transfer_cb_t: typedef is undocumented
+  463 | typedef OSSL_CMP_MSG *(*OSSL_CMP_transfer_cb_t)(OSSL_CMP_CTX *ctx,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:461:1:
+    1) OSSL_CMP_CTX_get_http_cb_arg: function is undocumented
+  461 | void *OSSL_CMP_CTX_get_http_cb_arg(const OSSL_CMP_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:460:1:
+    1) OSSL_CMP_CTX_set_http_cb_arg: function is undocumented
+  460 | int OSSL_CMP_CTX_set_http_cb_arg(OSSL_CMP_CTX *ctx, void *arg);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:459:1:
+    1) OSSL_CMP_CTX_set_http_cb: function is undocumented
+  459 | int OSSL_CMP_CTX_set_http_cb(OSSL_CMP_CTX *ctx, OSSL_HTTP_bio_cb_t cb);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:451:1:
+    1) OSSL_CMP_CTX_print_errors: function is undocumented
+  451 | void OSSL_CMP_CTX_print_errors(const OSSL_CMP_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:448:1:
+    1) OSSL_CMP_CTX_set_log_cb: function is undocumented
+  448 | int OSSL_CMP_CTX_set_log_cb(OSSL_CMP_CTX *ctx, OSSL_CMP_log_cb_t cb);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:446:1:
+    1) OSSL_CMP_CTX_get_option: function is undocumented
+  446 | int OSSL_CMP_CTX_get_option(const OSSL_CMP_CTX *ctx, int opt);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:419:1:
+    1) OSSL_CMP_CTX_get0_propq: function is undocumented
+  419 | const char *OSSL_CMP_CTX_get0_propq(const OSSL_CMP_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:418:1:
+    1) OSSL_CMP_CTX_get0_libctx: function is undocumented
+  418 | OSSL_LIB_CTX *OSSL_CMP_CTX_get0_libctx(const OSSL_CMP_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:416:1:
+    1) OSSL_CMP_CTX_free: function is undocumented
+  416 | void OSSL_CMP_CTX_free(OSSL_CMP_CTX *ctx);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:415:1:
+    1) OSSL_CMP_CTX_new: function is undocumented
+  415 | OSSL_CMP_CTX *OSSL_CMP_CTX_new(OSSL_LIB_CTX *libctx, const char *propq);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:407:1:
+    1) OSSL_CMP_ITAV_get0_rootCaKeyUpdate: function is undocumented
+  407 | int OSSL_CMP_ITAV_get0_rootCaKeyUpdate(const OSSL_CMP_ITAV *itav,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:404:1:
+    1) OSSL_CMP_ITAV_new_rootCaKeyUpdate: function is undocumented
+  404 | OSSL_CMP_ITAV *OSSL_CMP_ITAV_new_rootCaKeyUpdate(const X509 *newWithNew,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:403:1:
+    1) OSSL_CMP_ITAV_get0_rootCaCert: function is undocumented
+  403 | int OSSL_CMP_ITAV_get0_rootCaCert(const OSSL_CMP_ITAV *itav, X509 **out);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:402:1:
+    1) OSSL_CMP_ITAV_new_rootCaCert: function is undocumented
+  402 | OSSL_CMP_ITAV *OSSL_CMP_ITAV_new_rootCaCert(const X509 *rootCaCert);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:400:1:
+    1) OSSL_CMP_ITAV_get0_caCerts: function is undocumented
+  400 | int OSSL_CMP_ITAV_get0_caCerts(const OSSL_CMP_ITAV *itav, STACK_OF(X509) **out);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:399:1:
+    1) OSSL_CMP_ITAV_new_caCerts: function is undocumented
+  399 | OSSL_CMP_ITAV *OSSL_CMP_ITAV_new_caCerts(const STACK_OF(X509) *caCerts);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:395:1:
+    1) OSSL_CMP_ITAV_new0_certProfile: function is undocumented
+  395 | OSSL_CMP_ITAV *OSSL_CMP_ITAV_new0_certProfile(STACK_OF(ASN1_UTF8STRING)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:391:1:
+    1) OSSL_CMP_ITAV_push0_stack_item: function is undocumented
+  391 | int OSSL_CMP_ITAV_push0_stack_item(STACK_OF(OSSL_CMP_ITAV) **itav_sk_p,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:389:1:
+    1) OSSL_CMP_ITAV_get0_type: function is undocumented
+  389 | ASN1_OBJECT *OSSL_CMP_ITAV_get0_type(const OSSL_CMP_ITAV *itav);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:387:1:
+    1) OSSL_CMP_ITAV_set0: function is undocumented
+  387 | void OSSL_CMP_ITAV_set0(OSSL_CMP_ITAV *itav, ASN1_OBJECT *type,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:386:1:
+    1) OSSL_CMP_ITAV_create: function is undocumented
+  386 | OSSL_CMP_ITAV *OSSL_CMP_ITAV_create(ASN1_OBJECT *type, ASN1_TYPE *value);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:351:1:
+    1) stack_st_OSSL_CMP_CERTRESPONSE: record is undocumented
+  351 | SKM_DEFINE_STACK_OF_INTERNAL(OSSL_CMP_CERTRESPONSE, OSSL_CMP_CERTRESPONSE, OSSL_CMP_CERTRESPONSE)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:349:1:
+    1) OSSL_CMP_CERTRESPONSE: typedef is undocumented
+  349 | typedef struct ossl_cmp_certresponse_st OSSL_CMP_CERTRESPONSE;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:348:1:
+    1) OSSL_CMP_POLLREPCONTENT: typedef is undocumented
+  348 | typedef STACK_OF(OSSL_CMP_POLLREP) OSSL_CMP_POLLREPCONTENT;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:347:9:
+    1) ossl_cmp_pollrep_st: record is undocumented
+  347 | typedef struct ossl_cmp_pollrep_st OSSL_CMP_POLLREP;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:347:1:
+    1) OSSL_CMP_POLLREP: typedef is undocumented
+  347 | typedef struct ossl_cmp_pollrep_st OSSL_CMP_POLLREP;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:319:1:
+    1) stack_st_OSSL_CMP_CERTREPMESSAGE: record is undocumented
+  319 | SKM_DEFINE_STACK_OF_INTERNAL(OSSL_CMP_CERTREPMESSAGE, OSSL_CMP_CERTREPMESSAGE, OSSL_CMP_CERTREPMESSAGE)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:317:9:
+    1) ossl_cmp_certrepmessage_st: record is undocumented
+  317 | typedef struct ossl_cmp_certrepmessage_st OSSL_CMP_CERTREPMESSAGE;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:317:1:
+    1) OSSL_CMP_CERTREPMESSAGE: typedef is undocumented
+  317 | typedef struct ossl_cmp_certrepmessage_st OSSL_CMP_CERTREPMESSAGE;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:287:1:
+    1) OSSL_CMP_PKISI_dup: function is undocumented
+  287 | DECLARE_ASN1_DUP_FUNCTION(OSSL_CMP_PKISI)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:286:1:
+    1) i2d_OSSL_CMP_PKISI: function is undocumented
+    2) d2i_OSSL_CMP_PKISI: function is undocumented
+  286 | DECLARE_ASN1_FUNCTIONS(OSSL_CMP_PKISI)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:285:9:
+    1) ossl_cmp_pkisi_st: record is undocumented
+  285 | typedef struct ossl_cmp_pkisi_st OSSL_CMP_PKISI;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:285:1:
+    1) OSSL_CMP_PKISI: typedef is undocumented
+  285 | typedef struct ossl_cmp_pkisi_st OSSL_CMP_PKISI;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:284:9:
+    1) ossl_cmp_revrepcontent_st: record is undocumented
+  284 | typedef struct ossl_cmp_revrepcontent_st OSSL_CMP_REVREPCONTENT;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:284:1:
+    1) OSSL_CMP_REVREPCONTENT: typedef is undocumented
+  284 | typedef struct ossl_cmp_revrepcontent_st OSSL_CMP_REVREPCONTENT;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:254:1:
+    1) OSSL_CMP_ITAV_dup: function is undocumented
+  254 | DECLARE_ASN1_DUP_FUNCTION(OSSL_CMP_ITAV)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:253:9:
+    1) ossl_cmp_itav_st: record is undocumented
+  253 | typedef struct ossl_cmp_itav_st OSSL_CMP_ITAV;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:253:1:
+    1) OSSL_CMP_ITAV: typedef is undocumented
+  253 | typedef struct ossl_cmp_itav_st OSSL_CMP_ITAV;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:223:1:
+    1) OSSL_CMP_CERTSTATUS: typedef is undocumented
+  223 | typedef struct ossl_cmp_certstatus_st OSSL_CMP_CERTSTATUS;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:220:9:
+    1) ossl_cmp_msg_st: record is undocumented
+  220 | typedef struct ossl_cmp_msg_st OSSL_CMP_MSG;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:220:1:
+    1) OSSL_CMP_MSG: typedef is undocumented
+  220 | typedef struct ossl_cmp_msg_st OSSL_CMP_MSG;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:219:1:
+    1) OSSL_CMP_PKIHEADER_it: function is undocumented
+    2) i2d_OSSL_CMP_PKIHEADER: function is undocumented
+    3) OSSL_CMP_PKIHEADER_new: function is undocumented
+    4) OSSL_CMP_PKIHEADER_free: function is undocumented
+  219 | DECLARE_ASN1_FUNCTIONS(OSSL_CMP_PKIHEADER)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:218:9:
+    1) ossl_cmp_pkiheader_st: record is undocumented
+  218 | typedef struct ossl_cmp_pkiheader_st OSSL_CMP_PKIHEADER;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:218:1:
+    1) OSSL_CMP_PKIHEADER: typedef is undocumented
+  218 | typedef struct ossl_cmp_pkiheader_st OSSL_CMP_PKIHEADER;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:217:1:
+    1) OSSL_CMP_CTX: typedef is undocumented
+  217 | typedef struct ossl_cmp_ctx_st OSSL_CMP_CTX;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:211:1:
+    1) OSSL_CMP_PKISTATUS_it: function is undocumented
+  211 | DECLARE_ASN1_ITEM(OSSL_CMP_PKISTATUS)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:209:1:
+    1) OSSL_CMP_PKISTATUS: typedef is undocumented
+  209 | typedef ASN1_INTEGER OSSL_CMP_PKISTATUS;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp.h:144:1:
+    1) OSSL_CMP_PKIFAILUREINFO: typedef is undocumented
+  144 | typedef ASN1_BIT_STRING OSSL_CMP_PKIFAILUREINFO;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp_util.h:50:1:
+    1) OSSL_CMP_print_errors_cb: function is undocumented
+  50 | void OSSL_CMP_print_errors_cb(OSSL_CMP_log_cb_t log_fn);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp_util.h:47:1:
+    1) OSSL_CMP_print_to_bio: function is undocumented
+  47 | int OSSL_CMP_print_to_bio(BIO *bio, const char *component, const char *file,
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp_util.h:33:1:
+    1) OSSL_CMP_severity: typedef is undocumented
+  33 | typedef int OSSL_CMP_severity;
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp_util.h:27:1:
+    1) OSSL_CMP_log_close: function is undocumented
+  27 | void OSSL_CMP_log_close(void);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/cmp_util.h:26:1:
+    1) OSSL_CMP_log_open: function is undocumented
+  26 | int OSSL_CMP_log_open(void);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:220:1:
+    1) OSSL_CRMF_ENCRYPTEDVALUE_get1_encCert: function is undocumented
+  220 | X509 *OSSL_CRMF_ENCRYPTEDVALUE_get1_encCert(const OSSL_CRMF_ENCRYPTEDVALUE *ecert,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:214:1:
+    1) OSSL_CRMF_CERTID_get0_serialNumber: function is undocumented
+  214 | const ASN1_INTEGER *OSSL_CRMF_CERTID_get0_serialNumber(const OSSL_CRMF_CERTID *cid);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:211:1:
+    1) OSSL_CRMF_CERTTEMPLATE_get0_extensions: function is undocumented
+  211 | X509_EXTENSIONS
+      | ^~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:206:1:
+    1) OSSL_CRMF_CERTTEMPLATE_get0_publicKey: function is undocumented
+  206 | X509_PUBKEY
+      | ^~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:202:1:
+    1) OSSL_CRMF_MSGS_verify_popo: function is undocumented
+  202 | int OSSL_CRMF_MSGS_verify_popo(const OSSL_CRMF_MSGS *reqs,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:199:1:
+    1) OSSL_CRMF_MSG_create_popo: function is undocumented
+  199 | int OSSL_CRMF_MSG_create_popo(int meth, OSSL_CRMF_MSG *crm,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:191:1:
+    1) OSSL_CRMF_MSG_set0_extensions: function is undocumented
+  191 | int OSSL_CRMF_MSG_set0_extensions(OSSL_CRMF_MSG *crm, X509_EXTENSIONS *exts);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:190:1:
+    1) OSSL_CRMF_MSG_get_certReqId: function is undocumented
+  190 | int OSSL_CRMF_MSG_get_certReqId(const OSSL_CRMF_MSG *crm);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:182:1:
+    1) OSSL_CRMF_MSG_set1_regInfo_certReq: function is undocumented
+  182 | int OSSL_CRMF_MSG_set1_regInfo_certReq(OSSL_CRMF_MSG *msg,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:180:1:
+    1) OSSL_CRMF_MSG_get0_regInfo_utf8Pairs: function is undocumented
+  180 | ASN1_UTF8STRING
+      | ^~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:178:1:
+    1) OSSL_CRMF_MSG_set1_regInfo_utf8Pairs: function is undocumented
+  178 | int OSSL_CRMF_MSG_set1_regInfo_utf8Pairs(OSSL_CRMF_MSG *msg,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:175:1:
+    1) OSSL_CRMF_CERTID_gen: function is undocumented
+  175 | OSSL_CRMF_CERTID *OSSL_CRMF_CERTID_gen(const X509_NAME *issuer,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:173:1:
+    1) OSSL_CRMF_MSG_get0_regCtrl_oldCertID: function is undocumented
+  173 | OSSL_CRMF_CERTID
+      | ^~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:169:1:
+    1) OSSL_CRMF_MSG_get0_regCtrl_protocolEncrKey: function is undocumented
+  169 | X509_PUBKEY
+      | ^~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:167:1:
+    1) OSSL_CRMF_MSG_set1_regCtrl_protocolEncrKey: function is undocumented
+  167 | int OSSL_CRMF_MSG_set1_regCtrl_protocolEncrKey(OSSL_CRMF_MSG *msg,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:165:1:
+    1) OSSL_CRMF_MSG_get0_regCtrl_pkiPublicationInfo: function is undocumented
+  165 | OSSL_CRMF_PKIPUBLICATIONINFO
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:163:1:
+    1) OSSL_CRMF_MSG_set1_regCtrl_pkiPublicationInfo: function is undocumented
+  163 | int OSSL_CRMF_MSG_set1_regCtrl_pkiPublicationInfo(OSSL_CRMF_MSG *msg,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:161:1:
+    1) OSSL_CRMF_MSG_set_PKIPublicationInfo_action: function is undocumented
+  161 | int OSSL_CRMF_MSG_set_PKIPublicationInfo_action(OSSL_CRMF_PKIPUBLICATIONINFO *pi,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:151:1:
+    1) OSSL_CRMF_MSG_PKIPublicationInfo_push0_SinglePubInfo: function is undocumented
+  151 | int OSSL_CRMF_MSG_PKIPublicationInfo_push0_SinglePubInfo(OSSL_CRMF_PKIPUBLICATIONINFO *pi,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:149:1:
+    1) OSSL_CRMF_MSG_get0_regCtrl_authenticator: function is undocumented
+  149 | ASN1_UTF8STRING
+      | ^~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:147:1:
+    1) OSSL_CRMF_MSG_set1_regCtrl_authenticator: function is undocumented
+  147 | int OSSL_CRMF_MSG_set1_regCtrl_authenticator(OSSL_CRMF_MSG *msg,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:143:1:
+    1) OSSL_CRMF_MSG_set1_regCtrl_regToken: function is undocumented
+  143 | int OSSL_CRMF_MSG_set1_regCtrl_regToken(OSSL_CRMF_MSG *msg,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:128:1:
+    1) OSSL_CRMF_MSGS_it: function is undocumented
+    2) d2i_OSSL_CRMF_MSGS: function is undocumented
+    3) OSSL_CRMF_MSGS_new: function is undocumented
+    4) i2d_OSSL_CRMF_MSGS: function is undocumented
+    5) OSSL_CRMF_MSGS_free: function is undocumented
+  128 | DECLARE_ASN1_FUNCTIONS(OSSL_CRMF_MSGS)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:126:1:
+    1) d2i_OSSL_CRMF_CERTTEMPLATE: function is undocumented
+    2) OSSL_CRMF_CERTTEMPLATE_it: function is undocumented
+  126 | DECLARE_ASN1_FUNCTIONS(OSSL_CRMF_CERTTEMPLATE)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:125:9:
+    1) ossl_crmf_certtemplate_st: record is undocumented
+  125 | typedef struct ossl_crmf_certtemplate_st OSSL_CRMF_CERTTEMPLATE;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:125:1:
+    1) OSSL_CRMF_CERTTEMPLATE: typedef is undocumented
+  125 | typedef struct ossl_crmf_certtemplate_st OSSL_CRMF_CERTTEMPLATE;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:124:1:
+    1) OSSL_CRMF_SINGLEPUBINFO_new: function is undocumented
+    2) OSSL_CRMF_SINGLEPUBINFO_free: function is undocumented
+    3) d2i_OSSL_CRMF_SINGLEPUBINFO: function is undocumented
+    4) i2d_OSSL_CRMF_SINGLEPUBINFO: function is undocumented
+    5) OSSL_CRMF_SINGLEPUBINFO_it: function is undocumented
+  124 | DECLARE_ASN1_FUNCTIONS(OSSL_CRMF_SINGLEPUBINFO)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:123:1:
+    1) OSSL_CRMF_SINGLEPUBINFO: typedef is undocumented
+  123 | typedef struct ossl_crmf_singlepubinfo_st OSSL_CRMF_SINGLEPUBINFO;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:122:1:
+    1) OSSL_CRMF_PKIPUBLICATIONINFO_it: function is undocumented
+    2) OSSL_CRMF_PKIPUBLICATIONINFO_new: function is undocumented
+  122 | DECLARE_ASN1_FUNCTIONS(OSSL_CRMF_PKIPUBLICATIONINFO)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:121:9:
+    1) ossl_crmf_pkipublicationinfo_st: record is undocumented
+  121 | typedef struct ossl_crmf_pkipublicationinfo_st OSSL_CRMF_PKIPUBLICATIONINFO;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:121:1:
+    1) OSSL_CRMF_PKIPUBLICATIONINFO: typedef is undocumented
+  121 | typedef struct ossl_crmf_pkipublicationinfo_st OSSL_CRMF_PKIPUBLICATIONINFO;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:92:1:
+    1) stack_st_OSSL_CRMF_CERTID: record is undocumented
+  92 | SKM_DEFINE_STACK_OF_INTERNAL(OSSL_CRMF_CERTID, OSSL_CRMF_CERTID, OSSL_CRMF_CERTID)
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:90:1:
+    1) OSSL_CRMF_CERTID_dup: function is undocumented
+  90 | DECLARE_ASN1_DUP_FUNCTION(OSSL_CRMF_CERTID)
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:89:1:
+    1) OSSL_CRMF_CERTID_new: function is undocumented
+    2) d2i_OSSL_CRMF_CERTID: function is undocumented
+    3) i2d_OSSL_CRMF_CERTID: function is undocumented
+  89 | DECLARE_ASN1_FUNCTIONS(OSSL_CRMF_CERTID)
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:88:9:
+    1) ossl_crmf_certid_st: record is undocumented
+  88 | typedef struct ossl_crmf_certid_st OSSL_CRMF_CERTID;
+     |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:86:9:
+    1) ossl_crmf_poposigningkey_st: record is undocumented
+  86 | typedef struct ossl_crmf_poposigningkey_st OSSL_CRMF_POPOSIGNINGKEY;
+     |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:86:1:
+    1) OSSL_CRMF_POPOSIGNINGKEY: typedef is undocumented
+  86 | typedef struct ossl_crmf_poposigningkey_st OSSL_CRMF_POPOSIGNINGKEY;
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:85:1:
+    1) OSSL_CRMF_PBMPARAMETER_new: function is undocumented
+    2) OSSL_CRMF_PBMPARAMETER_free: function is undocumented
+    3) OSSL_CRMF_PBMPARAMETER_it: function is undocumented
+  85 | DECLARE_ASN1_FUNCTIONS(OSSL_CRMF_PBMPARAMETER)
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:84:9:
+    1) ossl_crmf_pbmparameter_st: record is undocumented
+  84 | typedef struct ossl_crmf_pbmparameter_st OSSL_CRMF_PBMPARAMETER;
+     |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:84:1:
+    1) OSSL_CRMF_PBMPARAMETER: typedef is undocumented
+  84 | typedef struct ossl_crmf_pbmparameter_st OSSL_CRMF_PBMPARAMETER;
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:83:9:
+    1) ossl_crmf_attributetypeandvalue_st: record is undocumented
+  83 | typedef struct ossl_crmf_attributetypeandvalue_st OSSL_CRMF_ATTRIBUTETYPEANDVALUE;
+     |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:83:1:
+    1) OSSL_CRMF_ATTRIBUTETYPEANDVALUE: typedef is undocumented
+  83 | typedef struct ossl_crmf_attributetypeandvalue_st OSSL_CRMF_ATTRIBUTETYPEANDVALUE;
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:52:1:
+    1) OSSL_CRMF_MSG_free: function is undocumented
+    2) i2d_OSSL_CRMF_MSG: function is undocumented
+    3) OSSL_CRMF_MSG_new: function is undocumented
+  52 | DECLARE_ASN1_FUNCTIONS(OSSL_CRMF_MSG)
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:51:9:
+    1) ossl_crmf_msg_st: record is undocumented
+  51 | typedef struct ossl_crmf_msg_st OSSL_CRMF_MSG;
+     |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:51:1:
+    1) OSSL_CRMF_MSG: typedef is undocumented
+  51 | typedef struct ossl_crmf_msg_st OSSL_CRMF_MSG;
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:50:1:
+    1) OSSL_CRMF_ENCRYPTEDVALUE_new: function is undocumented
+    2) d2i_OSSL_CRMF_ENCRYPTEDVALUE: function is undocumented
+    3) i2d_OSSL_CRMF_ENCRYPTEDVALUE: function is undocumented
+    4) OSSL_CRMF_ENCRYPTEDVALUE_it: function is undocumented
+  50 | DECLARE_ASN1_FUNCTIONS(OSSL_CRMF_ENCRYPTEDVALUE)
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/crmf.h:48:9:
+    1) ossl_crmf_encryptedvalue_st: record is undocumented
+  48 | typedef struct ossl_crmf_encryptedvalue_st OSSL_CRMF_ENCRYPTEDVALUE;
+     |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/decoder.h:123:1:
+    1) OSSL_DECODER_CTX_new_for_pkey: function is undocumented
+  123 | OSSL_DECODER_CTX *
+      | ^~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/ec.h:1857:1:
+    1) EC_KEY_METHOD_set_init: function is undocumented
+  1857 | OSSL_DEPRECATEDIN_3_0 void EC_KEY_METHOD_set_init(EC_KEY_METHOD *meth,
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs12.h:354:1:
+    1) i2d_PKCS12_bio: function is undocumented
+  354 | int i2d_PKCS12_bio(BIO *bp, const PKCS12 *p12);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs12.h:319:1:
+    1) PKCS12_create_cb: typedef is undocumented
+  319 | typedef int PKCS12_create_cb(PKCS12_SAFEBAG *bag, void *cbarg);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs12.h:310:1:
+    1) i2d_PKCS12_SAFEBAG: function is undocumented
+  310 | DECLARE_ASN1_FUNCTIONS(PKCS12_SAFEBAG)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs12.h:229:1:
+    1) PKCS12_SAFEBAG_get0_attrs: function is undocumented
+  229 | const STACK_OF(X509_ATTRIBUTE) *
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/pkcs12.h:153:1:
+    1) PKCS12_SAFEBAG_create0_p8inf: function is undocumented
+  153 | PKCS12_SAFEBAG *PKCS12_SAFEBAG_create0_p8inf(PKCS8_PRIV_KEY_INFO *p8);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/trace.h:154:1:
+    1) OSSL_trace_end: function is undocumented
+  154 | void OSSL_trace_end(int category, BIO *channel);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/trace.h:153:1:
+    1) OSSL_trace_begin: function is undocumented
+  153 | BIO *OSSL_trace_begin(int category);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/trace.h:134:1:
+    1) OSSL_trace_enabled: function is undocumented
+  134 | int OSSL_trace_enabled(int category);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/trace.h:125:1:
+    1) OSSL_trace_set_callback: function is undocumented
+  125 | int OSSL_trace_set_callback(int category, OSSL_trace_cb callback, void *data);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/trace.h:67:1:
+    1) OSSL_trace_get_category_name: function is undocumented
+  67 | const char *OSSL_trace_get_category_name(int num);
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/txt_db.h:37:1:
+    1) sk_OPENSSL_PSTRING_shift: function is undocumented
+  37 | DEFINE_SPECIAL_STACK_OF(OPENSSL_PSTRING, OPENSSL_STRING)
+     | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:493:9:
+    1) X509_POLICY_TREE_st: record is undocumented
+  493 | typedef struct X509_POLICY_TREE_st X509_POLICY_TREE;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Users/alandefreitas/Documents/Code/C++/mrdocs/local/demo-forks/openssl/include/openssl/types.h:463:1:
+    1) UI: typedef is undocumented
+  463 | typedef struct ui_st UI;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~
+
+error limit reached (max-errors=200); the report is incomplete. Rerun with --max-errors=0 for the full report.
+[0;37mExtracted 6718 declarations in 1s 727ms
+[0m[0;37m  - regular symbols: 6680
+[0m[0;37m  - dependency symbols: 38
+[0m[0;37mGenerating docs
+[0m[0;37mGenerated noop documentation in 0ms
+[0m

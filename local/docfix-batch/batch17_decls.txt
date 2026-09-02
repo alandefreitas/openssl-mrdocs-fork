@@ -1,0 +1,1091 @@
+===== asn1.h:2713 ASN1_SCTX_get_flags =====
+2711|const ASN1_ITEM *ASN1_SCTX_get_item(ASN1_SCTX *p);
+2712|const ASN1_TEMPLATE *ASN1_SCTX_get_template(ASN1_SCTX *p);
+2713|unsigned long ASN1_SCTX_get_flags(ASN1_SCTX *p);
+
+===== asn1.h:2712 ASN1_SCTX_get_template =====
+2710| */
+2711|const ASN1_ITEM *ASN1_SCTX_get_item(ASN1_SCTX *p);
+2712|const ASN1_TEMPLATE *ASN1_SCTX_get_template(ASN1_SCTX *p);
+
+===== asn1.h:1941 ASN1_OBJECT_create =====
+1939| */
+1940|int a2d_ASN1_OBJECT(unsigned char *out, int olen, const char *buf, int num);
+1941|ASN1_OBJECT *ASN1_OBJECT_create(int nid, unsigned char *data, int len,
+1942|    const char *sn, const char *ln);
+
+===== asn1.h:1921 a2i_ASN1_STRING =====
+1919| */
+1920|int i2a_ASN1_OBJECT(BIO *bp, const ASN1_OBJECT *a);
+1921|int a2i_ASN1_STRING(BIO *bp, ASN1_STRING *bs, char *buf, int size);
+
+===== asn1.h:1913 a2i_ASN1_ENUMERATED =====
+1911| */
+1912|int i2a_ASN1_ENUMERATED(BIO *bp, const ASN1_ENUMERATED *a);
+1913|int a2i_ASN1_ENUMERATED(BIO *bp, ASN1_ENUMERATED *bs, char *buf, int size);
+
+===== asn1.h:1199 ASN1_GENERALIZEDTIME_set_string =====
+1197|    time_t t, int offset_day,
+1198|    long offset_sec);
+1199|int ASN1_GENERALIZEDTIME_set_string(ASN1_GENERALIZEDTIME *s, const char *str);
+
+===== asn1.h:1186 ASN1_GENERALIZEDTIME_set =====
+1184| */
+1185|int ASN1_GENERALIZEDTIME_check(const ASN1_GENERALIZEDTIME *a);
+1186|ASN1_GENERALIZEDTIME *ASN1_GENERALIZEDTIME_set(ASN1_GENERALIZEDTIME *s,
+1187|    time_t t);
+
+===== asn1.h:757 ASN1_TYPE_get =====
+755|const ASN1_ITEM *ASN1_ANY_it(void);
+756|
+757|int ASN1_TYPE_get(const ASN1_TYPE *a);
+
+===== asn1.h:588 printablestring =====
+586|        /** OCTET STRING value when type is V_ASN1_OCTET_STRING. */
+587|        ASN1_OCTET_STRING *octet_string;
+588|        ASN1_PRINTABLESTRING *printablestring;
+
+===== asn1.h:585 bit_string =====
+583|        /** ENUMERATED value when type is V_ASN1_ENUMERATED. */
+584|        ASN1_ENUMERATED *enumerated;
+585|        ASN1_BIT_STRING *bit_string;
+
+===== async.h:160 ASYNC_WAIT_CTX_get_changed_fds =====
+158| */
+159|int ASYNC_WAIT_CTX_get_status(ASYNC_WAIT_CTX *ctx);
+160|int ASYNC_WAIT_CTX_get_changed_fds(ASYNC_WAIT_CTX *ctx, OSSL_ASYNC_FD *addfd,
+161|    size_t *numaddfds, OSSL_ASYNC_FD *delfd,
+162|    size_t *numdelfds);
+
+===== bio.h:1231 BIO_meth_get_create =====
+1229|int BIO_meth_set_ctrl(BIO_METHOD *biom,
+1230|    long (*ctrl)(BIO *, int, long, void *));
+1231|int (*BIO_meth_get_create(const BIO_METHOD *bion))(BIO *);
+
+===== bio.h:1187 BIO_meth_get_write_ex =====
+1185|void BIO_meth_free(BIO_METHOD *biom);
+1186|int (*BIO_meth_get_write(const BIO_METHOD *biom))(BIO *, const char *, int);
+1187|int (*BIO_meth_get_write_ex(const BIO_METHOD *biom))(BIO *, const char *, size_t,
+1188|    size_t *);
+
+===== bio.h:1136 BIO_new_bio_pair =====
+1134|BIO *BIO_new_fd(int fd, int close_flag);
+1135|
+1136|int BIO_new_bio_pair(BIO **bio1, size_t writebuf1,
+1137|    BIO **bio2, size_t writebuf2);
+
+===== bio.h:1129 BIO_new_socket =====
+1127|int BIO_closesocket(int sock);
+1128|
+1129|BIO *BIO_new_socket(int sock, int close_flag);
+
+===== bio.h:1112 BIO_sock_info =====
+1110|    BIO_SOCK_INFO_ADDRESS
+1111|};
+1112|int BIO_sock_info(int sock,
+1113|    enum BIO_sock_info_type type, union BIO_sock_info_u *info);
+
+===== bio.h:1095 BIO_get_host_ip =====
+1093|OSSL_DEPRECATEDIN_1_1_0 struct hostent *BIO_gethostbyname(const char *name);
+1094|OSSL_DEPRECATEDIN_1_1_0 int BIO_get_port(const char *str, unsigned short *port_ptr);
+1095|OSSL_DEPRECATEDIN_1_1_0 int BIO_get_host_ip(const char *str, unsigned char *ip);
+
+===== bio.h:1094 BIO_get_port =====
+1092|#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+1093|OSSL_DEPRECATEDIN_1_1_0 struct hostent *BIO_gethostbyname(const char *name);
+1094|OSSL_DEPRECATEDIN_1_1_0 int BIO_get_port(const char *str, unsigned short *port_ptr);
+
+===== bio.h:1078 BIO_socket_nbio =====
+1076| */
+1077|int BIO_socket_ioctl(int fd, long type, void *arg);
+1078|int BIO_socket_nbio(int fd, int mode);
+
+===== bio.h:1018 BIO_ADDR_clear =====
+1016| */
+1017|void BIO_ADDR_free(BIO_ADDR *ap);
+1018|void BIO_ADDR_clear(BIO_ADDR *ap);
+
+===== bio.h:939 BIO_f_readbuffer =====
+937|const BIO_METHOD *BIO_f_null(void);
+938|const BIO_METHOD *BIO_f_buffer(void);
+939|const BIO_METHOD *BIO_f_readbuffer(void);
+
+===== bio.h:904 BIO_nwrite =====
+902|int BIO_nread(BIO *bio, char **buf, int num);
+903|int BIO_nwrite0(BIO *bio, char **buf);
+904|int BIO_nwrite(BIO *bio, char **buf, int num);
+
+===== bio.h:890 BIO_get_retry_reason =====
+888|void BIO_set_next(BIO *b, BIO *next);
+889|BIO *BIO_get_retry_BIO(BIO *bio, int *reason);
+890|int BIO_get_retry_reason(BIO *bio);
+
+===== bio.h:889 BIO_get_retry_BIO =====
+887| */
+888|void BIO_set_next(BIO *b, BIO *next);
+889|BIO *BIO_get_retry_BIO(BIO *bio, int *reason);
+
+===== bio.h:880 BIO_free_all =====
+878|BIO *BIO_push(BIO *b, BIO *append);
+879|BIO *BIO_pop(BIO *b);
+880|void BIO_free_all(BIO *a);
+
+===== bio.h:879 BIO_pop =====
+877|long BIO_int_ctrl(BIO *bp, int cmd, long larg, int iarg);
+878|BIO *BIO_push(BIO *b, BIO *append);
+879|BIO *BIO_pop(BIO *b);
+
+===== bio.h:877 BIO_int_ctrl =====
+875|long BIO_callback_ctrl(BIO *b, int cmd, BIO_info_cb *fp);
+876|void *BIO_ptr_ctrl(BIO *bp, int cmd, long larg);
+877|long BIO_int_ctrl(BIO *bp, int cmd, long larg, int iarg);
+
+===== bio.h:858 BIO_get_wpoll_descriptor =====
+856|    size_t *msgs_processed);
+857|__owur int BIO_get_rpoll_descriptor(BIO *b, BIO_POLL_DESCRIPTOR *desc);
+858|__owur int BIO_get_wpoll_descriptor(BIO *b, BIO_POLL_DESCRIPTOR *desc);
+
+===== bio.h:857 BIO_get_rpoll_descriptor =====
+855|    size_t stride, size_t num_msg, uint64_t flags,
+856|    size_t *msgs_processed);
+857|__owur int BIO_get_rpoll_descriptor(BIO *b, BIO_POLL_DESCRIPTOR *desc);
+
+===== bio.h:853 BIO_write_ex =====
+851|int BIO_get_line(BIO *bio, char *buf, int size);
+852|int BIO_write(BIO *b, const void *data, int dlen);
+853|int BIO_write_ex(BIO *b, const void *data, size_t dlen, size_t *written);
+
+===== bio.h:852 BIO_write =====
+850|int BIO_gets(BIO *bp, char *buf, int size);
+851|int BIO_get_line(BIO *bio, char *buf, int size);
+852|int BIO_write(BIO *b, const void *data, int dlen);
+
+===== bio.h:851 BIO_get_line =====
+849|    size_t *msgs_processed);
+850|int BIO_gets(BIO *bp, char *buf, int size);
+851|int BIO_get_line(BIO *bio, char *buf, int size);
+
+===== bio.h:850 BIO_gets =====
+848|    size_t stride, size_t num_msg, uint64_t flags,
+849|    size_t *msgs_processed);
+850|int BIO_gets(BIO *bp, char *buf, int size);
+
+===== bio.h:829 BIO_up_ref =====
+827|int BIO_get_shutdown(BIO *a);
+828|void BIO_vfree(BIO *a);
+829|int BIO_up_ref(BIO *a);
+
+===== bio.h:828 BIO_vfree =====
+826|void BIO_set_shutdown(BIO *a, int shut);
+827|int BIO_get_shutdown(BIO *a);
+828|void BIO_vfree(BIO *a);
+
+===== bio.h:820 BIO_get_init =====
+818|void *BIO_get_data(BIO *a);
+819|void BIO_set_init(BIO *a, int init);
+820|int BIO_get_init(BIO *a);
+
+===== bio.h:819 BIO_set_init =====
+817|void BIO_set_data(BIO *a, void *ptr);
+818|void *BIO_get_data(BIO *a);
+819|void BIO_set_init(BIO *a, int init);
+
+===== bio.h:818 BIO_get_data =====
+816| */
+817|void BIO_set_data(BIO *a, void *ptr);
+818|void *BIO_get_data(BIO *a);
+
+===== bio.h:801 BIO_new_fp =====
+799|BIO *BIO_new_from_core_bio(OSSL_LIB_CTX *libctx, OSSL_CORE_BIO *corebio);
+800|#ifndef OPENSSL_NO_STDIO
+801|BIO *BIO_new_fp(FILE *stream, int close_flag);
+
+===== bio.h:799 BIO_new_from_core_bio =====
+797|const BIO_METHOD *BIO_s_file(void);
+798|BIO *BIO_new_file(const char *filename, const char *mode);
+799|BIO *BIO_new_from_core_bio(OSSL_LIB_CTX *libctx, OSSL_CORE_BIO *corebio);
+
+===== bio.h:798 BIO_new_file =====
+796|
+797|const BIO_METHOD *BIO_s_file(void);
+798|BIO *BIO_new_file(const char *filename, const char *mode);
+
+===== bio.h:792 BIO_asn1_set_suffix =====
+790|int BIO_asn1_get_prefix(BIO *b, asn1_ps_func **pprefix,
+791|    asn1_ps_func **pprefix_free);
+792|int BIO_asn1_set_suffix(BIO *b, asn1_ps_func *suffix,
+793|    asn1_ps_func *suffix_free);
+
+===== bio.h:788 BIO_asn1_set_prefix =====
+786|
+787|/* For BIO_f_asn1() */
+788|int BIO_asn1_set_prefix(BIO *b, asn1_ps_func *prefix,
+789|    asn1_ps_func *prefix_free);
+
+===== bio.h:779 BIO_number_read =====
+777|int BIO_set_ex_data(BIO *bio, int idx, void *data);
+778|void *BIO_get_ex_data(const BIO *bio, int idx);
+779|uint64_t BIO_number_read(BIO *bio);
+
+===== bio.h:699 BIO_ctrl_wpending =====
+697|/* ...pending macros have inappropriate return type */
+698|size_t BIO_ctrl_pending(BIO *b);
+699|size_t BIO_ctrl_wpending(BIO *b);
+
+===== bio.h:454 msg =====
+452|
+453|typedef struct bio_mmsg_cb_args_st {
+454|    BIO_MSG *msg;
+
+===== bio.h:453 bio_mmsg_cb_args_st =====
+451|} BIO_MSG;
+452|
+453|typedef struct bio_mmsg_cb_args_st {
+454|    BIO_MSG *msg;
+
+===== bio.h:453 BIO_MMSG_CB_ARGS =====
+451|} BIO_MSG;
+452|
+453|typedef struct bio_mmsg_cb_args_st {
+454|    BIO_MSG *msg;
+
+===== bio.h:450 flags =====
+448|    /** Local socket address associated with this message, or NULL if unused. */
+449|    BIO_ADDR *local;
+450|    uint64_t flags;
+
+===== bio.h:443 bio_msg_st =====
+441|
+442|/* BIO_sendmmsg/BIO_recvmmsg-related definitions */
+443|typedef struct bio_msg_st {
+444|    void *data;
+
+===== bio.h:369 bio_info_cb =====
+367|
+368|typedef int BIO_info_cb(BIO *, int, int);
+369|typedef BIO_info_cb bio_info_cb; /* backward compatibility */
+370|
+371|/* clang-format off */
+372|/**
+373| * @brief Opaque STACK_OF(BIO) container type.
+374| */
+375|SKM_DEFINE_STACK_OF_INTERNAL(BIO, BIO, BIO)
+376|#define sk_BIO_num(sk) OPENSSL_sk_num(ossl_check_const_BIO_sk_type(sk))
+
+===== bio.h:368 BIO_info_cb =====
+366|int BIO_method_type(const BIO *b);
+367|
+368|typedef int BIO_info_cb(BIO *, int, int);
+
+===== bio.h:353 BIO_set_callback_arg =====
+351|
+352|char *BIO_get_callback_arg(const BIO *b);
+353|void BIO_set_callback_arg(BIO *b, char *arg);
+
+===== bio.h:336 BIO_set_callback_ex =====
+334|    long argl, int ret, size_t *processed);
+335|BIO_callback_fn_ex BIO_get_callback_ex(const BIO *b);
+336|void BIO_set_callback_ex(BIO *b, BIO_callback_fn_ex callback);
+
+===== bio.h:332 BIO_callback_fn_ex =====
+330|#endif
+331|
+332|typedef long (*BIO_callback_fn_ex)(BIO *b, int oper, const char *argp,
+333|    size_t len, int argi,
+334|    long argl, int ret, size_t *processed);
+
+===== bio.h:327 BIO_debug_callback =====
+325|OSSL_DEPRECATEDIN_3_0 BIO_callback_fn BIO_get_callback(const BIO *b);
+326|OSSL_DEPRECATEDIN_3_0 void BIO_set_callback(BIO *b, BIO_callback_fn callback);
+327|OSSL_DEPRECATEDIN_3_0 long BIO_debug_callback(BIO *bio, int cmd,
+328|    const char *argp, int argi,
+329|    long argl, long ret);
+
+===== bio.h:323 BIO_callback_fn =====
+321|
+322|#ifndef OPENSSL_NO_DEPRECATED_3_0
+323|typedef long (*BIO_callback_fn)(BIO *b, int oper, const char *argp, int argi,
+324|    long argl, long ret);
+
+===== bio.h:264 BIO_clear_flags =====
+262| */
+263|int BIO_test_flags(const BIO *b, int flags);
+264|void BIO_clear_flags(BIO *b, int flags);
+
+===== bio.h:244 BIO_ADDR =====
+242|/* the BIO FLAGS values 0x1000 to 0x8000 are reserved for internal KTLS flags */
+243|
+244|typedef union bio_addr_st BIO_ADDR;
+
+===== bn.h:767 BN_GF2m_arr2poly =====
+765|    const int p[], BN_CTX *ctx);
+766|int BN_GF2m_poly2arr(const BIGNUM *a, int p[], int max);
+767|int BN_GF2m_arr2poly(const int p[], BIGNUM *a);
+
+===== bn.h:638 BN_BLINDING_create_param =====
+636| */
+637|void BN_BLINDING_set_flags(BN_BLINDING *b, unsigned long flags);
+638|BN_BLINDING *BN_BLINDING_create_param(BN_BLINDING *b,
+639|    const BIGNUM *e, BIGNUM *m, BN_CTX *ctx,
+640|    int (*bn_mod_exp)(BIGNUM *r,
+641|        const BIGNUM *a,
+642|        const BIGNUM *p,
+643|        const BIGNUM *m,
+644|        BN_CTX *ctx,
+645|        BN_MONT_CTX *m_ctx),
+
+===== bn.h:627 BN_BLINDING_set_current_thread =====
+625|
+626|int BN_BLINDING_is_current_thread(BN_BLINDING *b);
+627|void BN_BLINDING_set_current_thread(BN_BLINDING *b);
+
+===== bn.h:620 BN_BLINDING_convert =====
+618|void BN_BLINDING_free(BN_BLINDING *b);
+619|int BN_BLINDING_update(BN_BLINDING *b, BN_CTX *ctx);
+620|int BN_BLINDING_convert(BIGNUM *n, BN_BLINDING *b, BN_CTX *ctx);
+
+===== bn.h:546 BN_generate_prime_ex2 =====
+544|#endif
+545|/* Newer versions */
+546|int BN_generate_prime_ex2(BIGNUM *ret, int bits, int safe,
+547|    const BIGNUM *add, const BIGNUM *rem, BN_GENCB *cb,
+548|    BN_CTX *ctx);
+
+===== bn.h:480 BN_dec2bn =====
+478|char *BN_bn2dec(const BIGNUM *a);
+479|int BN_hex2bn(BIGNUM **a, const char *str);
+480|int BN_dec2bn(BIGNUM **a, const char *str);
+
+===== bn.h:444 BN_mod_exp =====
+442|int BN_exp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx);
+443|
+444|int BN_mod_exp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
+445|    const BIGNUM *m, BN_CTX *ctx);
+
+===== bn.h:343 BN_mul =====
+341|int BN_uadd(BIGNUM *r, const BIGNUM *a, const BIGNUM *b);
+342|int BN_add(BIGNUM *r, const BIGNUM *a, const BIGNUM *b);
+343|int BN_mul(BIGNUM *r, const BIGNUM *a, const BIGNUM *b, BN_CTX *ctx);
+
+===== bn.h:289 BN_secure_new =====
+287|int BN_security_bits(int L, int N);
+288|BIGNUM *BN_new(void);
+289|BIGNUM *BN_secure_new(void);
+
+===== bn.h:234 BN_CTX_secure_new_ex =====
+232| */
+233|BN_CTX *BN_CTX_new(void);
+234|BN_CTX *BN_CTX_secure_new_ex(OSSL_LIB_CTX *ctx);
+
+===== cms.h:1191 CMS_add_standard_smimecap =====
+1189|int CMS_add_simple_smimecap(STACK_OF(X509_ALGOR) **algs,
+1190|    int algnid, int keysize);
+1191|int CMS_add_standard_smimecap(STACK_OF(X509_ALGOR) **smcap);
+
+===== cms.h:398 BIO_new_CMS =====
+396|int i2d_CMS_bio(BIO *bp, CMS_ContentInfo *cms);
+397|
+398|BIO *BIO_new_CMS(BIO *out, CMS_ContentInfo *cms);
+
+===== conf.h:305 CONF_module_set_usr_data =====
+303| */
+304|void *CONF_module_get_usr_data(CONF_MODULE *pmod);
+305|void CONF_module_set_usr_data(CONF_MODULE *pmod, void *usr_data);
+
+===== conf.h:292 CONF_imodule_get_flags =====
+290|void CONF_imodule_set_usr_data(CONF_IMODULE *md, void *usr_data);
+291|CONF_MODULE *CONF_imodule_get_module(const CONF_IMODULE *md);
+292|unsigned long CONF_imodule_get_flags(const CONF_IMODULE *md);
+
+===== conf.h:171 CONF_dump_bio =====
+169|int CONF_dump_fp(LHASH_OF(CONF_VALUE) *conf, FILE *out);
+170|#endif
+171|int CONF_dump_bio(LHASH_OF(CONF_VALUE) *conf, BIO *out);
+
+===== conf.h:93 CONF_METHOD =====
+91|struct conf_st;
+92|struct conf_method_st;
+93|typedef struct conf_method_st CONF_METHOD;
+
+===== conftypes.h:25 init =====
+23|    /** Allocate a new CONF object for this method (may be NULL). */
+24|    CONF *(*create)(CONF_METHOD *meth);
+25|    int (*init)(CONF *conf);
+
+===== conftypes.h:21 conf_method_st =====
+19| * The contents of this file are deprecated and will be made opaque
+20| */
+21|struct conf_method_st {
+22|    const char *name;
+
+===== core.h:38 ossl_core_bio_st =====
+36| */
+37|typedef struct openssl_core_ctx_st OPENSSL_CORE_CTX;
+38|typedef struct ossl_core_bio_st OSSL_CORE_BIO;
+
+===== crypto.h:677 OSSL_LIB_CTX_new_from_dispatch =====
+675|
+676|OSSL_LIB_CTX *OSSL_LIB_CTX_new(void);
+677|OSSL_LIB_CTX *OSSL_LIB_CTX_new_from_dispatch(const OSSL_CORE_HANDLE *handle,
+678|    const OSSL_DISPATCH *in);
+
+===== crypto.h:668 CRYPTO_THREAD_init_local =====
+666|int CRYPTO_THREAD_run_once(CRYPTO_ONCE *once, void (*init)(void));
+667|
+668|int CRYPTO_THREAD_init_local(CRYPTO_THREAD_LOCAL *key, void (*cleanup)(void *));
+
+===== crypto.h:647 CRYPTO_THREAD_LOCAL =====
+645|#endif
+646|typedef pthread_once_t CRYPTO_ONCE;
+647|typedef pthread_key_t CRYPTO_THREAD_LOCAL;
+
+===== crypto.h:604 OPENSSL_thread_stop =====
+602| */
+603|int OPENSSL_atexit(void (*handler)(void));
+604|void OPENSSL_thread_stop(void);
+
+===== crypto.h:185 OpenSSL_version =====
+183|
+184|unsigned long OpenSSL_version_num(void);
+185|const char *OpenSSL_version(int type);
+
+===== crypto.h:180 OPENSSL_version_patch =====
+178|unsigned int OPENSSL_version_major(void);
+179|unsigned int OPENSSL_version_minor(void);
+180|unsigned int OPENSSL_version_patch(void);
+
+===== cryptoerr_legacy.h:87 ERR_load_TS_strings =====
+85|OSSL_DEPRECATEDIN_3_0 int ERR_load_OSSL_STORE_strings(void);
+86|#ifndef OPENSSL_NO_TS
+87|OSSL_DEPRECATEDIN_3_0 int ERR_load_TS_strings(void);
+
+===== dh.h:712 DH_meth_get0_name =====
+710| */
+711|OSSL_DEPRECATEDIN_3_0 DH_METHOD *DH_meth_dup(const DH_METHOD *dhm);
+712|OSSL_DEPRECATEDIN_3_0 const char *DH_meth_get0_name(const DH_METHOD *dhm);
+
+===== dh.h:700 DH_meth_new =====
+698|OSSL_DEPRECATEDIN_3_0 int DH_set_length(DH *dh, long length);
+699|
+700|OSSL_DEPRECATEDIN_3_0 DH_METHOD *DH_meth_new(const char *name, int flags);
+
+===== dsa.h:581 DSA_test_flags =====
+579| */
+580|OSSL_DEPRECATEDIN_3_0 void DSA_clear_flags(DSA *d, int flags);
+581|OSSL_DEPRECATEDIN_3_0 int DSA_test_flags(const DSA *d, int flags);
+
+===== ec.h:1659 ECDH_compute_key =====
+1657|    size_t sinfolen, const EVP_MD *md);
+1658|
+1659|OSSL_DEPRECATEDIN_3_0 int ECDH_compute_key(void *out, size_t outlen,
+1660|    const EC_POINT *pub_key,
+1661|    const EC_KEY *ecdh,
+1662|    void *(*KDF)(const void *in,
+1663|        size_t inlen, void *out,
+1664|        size_t *outlen));
+
+===== ec.h:1386 EC_KEY_get_conv_form =====
+1384| */
+1385|OSSL_DEPRECATEDIN_3_0 void EC_KEY_set_enc_flags(EC_KEY *eckey, unsigned int flags);
+1386|OSSL_DEPRECATEDIN_3_0 point_conversion_form_t EC_KEY_get_conv_form(const EC_KEY *key);
+
+===== err.h:586 OSSL_ERR_STATE_free =====
+584|void OSSL_ERR_STATE_save_to_mark(ERR_STATE *es);
+585|void OSSL_ERR_STATE_restore(const ERR_STATE *es);
+586|void OSSL_ERR_STATE_free(ERR_STATE *es);
+
+===== err.h:585 OSSL_ERR_STATE_restore =====
+583|void OSSL_ERR_STATE_save(ERR_STATE *es);
+584|void OSSL_ERR_STATE_save_to_mark(ERR_STATE *es);
+585|void OSSL_ERR_STATE_restore(const ERR_STATE *es);
+
+===== err.h:584 OSSL_ERR_STATE_save_to_mark =====
+582| */
+583|void OSSL_ERR_STATE_save(ERR_STATE *es);
+584|void OSSL_ERR_STATE_save_to_mark(ERR_STATE *es);
+
+===== err.h:578 OSSL_ERR_STATE_new =====
+576|int ERR_pop(void);
+577|
+578|ERR_STATE *OSSL_ERR_STATE_new(void);
+
+===== err.h:576 ERR_pop =====
+574| */
+575|int ERR_count_to_mark(void);
+576|int ERR_pop(void);
+
+===== err.h:564 ERR_set_mark =====
+562|int ERR_get_next_error_library(void);
+563|
+564|int ERR_set_mark(void);
+
+===== err.h:555 ERR_get_state =====
+553|#endif
+554|#ifndef OPENSSL_NO_DEPRECATED_3_0
+555|OSSL_DEPRECATEDIN_3_0 ERR_STATE *ERR_get_state(void);
+
+===== err.h:545 ERR_remove_thread_state =====
+543|#endif
+544|#ifndef OPENSSL_NO_DEPRECATED_1_1_0
+545|OSSL_DEPRECATEDIN_1_1_0 void ERR_remove_thread_state(void *);
+
+===== err.h:535 ERR_unload_strings =====
+533| */
+534|int ERR_load_strings_const(const ERR_STRING_DATA *str);
+535|int ERR_unload_strings(int lib, ERR_STRING_DATA *str);
+
+===== err.h:528 ERR_load_strings =====
+526|void ERR_add_error_mem_bio(const char *sep, BIO *bio);
+527|
+528|int ERR_load_strings(int lib, ERR_STRING_DATA *str);
+
+===== err.h:526 ERR_add_error_mem_bio =====
+524|void ERR_add_error_vdata(int num, va_list args);
+525|void ERR_add_error_txt(const char *sepr, const char *txt);
+526|void ERR_add_error_mem_bio(const char *sep, BIO *bio);
+
+===== err.h:525 ERR_add_error_txt =====
+523| */
+524|void ERR_add_error_vdata(int num, va_list args);
+525|void ERR_add_error_txt(const char *sepr, const char *txt);
+
+===== err.h:516 ERR_add_error_data =====
+514|void ERR_print_errors(BIO *bp);
+515|
+516|void ERR_add_error_data(int num, ...);
+
+===== err.h:508 ERR_print_errors_fp =====
+506|    void *u);
+507|#ifndef OPENSSL_NO_STDIO
+508|void ERR_print_errors_fp(FILE *fp);
+
+===== err.h:505 ERR_print_errors_cb =====
+503|const char *ERR_reason_error_string(unsigned long e);
+504|
+505|void ERR_print_errors_cb(int (*cb)(const char *str, size_t len, void *u),
+506|    void *u);
+
+===== err.h:503 ERR_reason_error_string =====
+501|OSSL_DEPRECATEDIN_3_0 const char *ERR_func_error_string(unsigned long e);
+502|#endif
+503|const char *ERR_reason_error_string(unsigned long e);
+
+===== err.h:501 ERR_func_error_string =====
+499|const char *ERR_lib_error_string(unsigned long e);
+500|#ifndef OPENSSL_NO_DEPRECATED_3_0
+501|OSSL_DEPRECATEDIN_3_0 const char *ERR_func_error_string(unsigned long e);
+
+===== err.h:486 ERR_error_string =====
+484|void ERR_clear_error(void);
+485|
+486|char *ERR_error_string(unsigned long e, char *buf);
+
+===== err.h:467 ERR_peek_last_error_all =====
+465|unsigned long ERR_peek_last_error_func(const char **func);
+466|unsigned long ERR_peek_last_error_data(const char **data, int *flags);
+467|unsigned long ERR_peek_last_error_all(const char **file, int *line,
+468|    const char **func,
+469|    const char **data, int *flags);
+
+===== err.h:466 ERR_peek_last_error_data =====
+464| */
+465|unsigned long ERR_peek_last_error_func(const char **func);
+466|unsigned long ERR_peek_last_error_data(const char **data, int *flags);
+
+===== err.h:454 ERR_peek_error_line_data =====
+452|    const char **data, int *flags);
+453|#ifndef OPENSSL_NO_DEPRECATED_3_0
+454|OSSL_DEPRECATEDIN_3_0
+455|unsigned long ERR_peek_error_line_data(const char **file, int *line,
+456|    const char **data, int *flags);
+
+===== err.h:448 ERR_peek_error_func =====
+446|unsigned long ERR_peek_error(void);
+447|unsigned long ERR_peek_error_line(const char **file, int *line);
+448|unsigned long ERR_peek_error_func(const char **func);
+
+===== err.h:446 ERR_peek_error =====
+444|    const char **data, int *flags);
+445|#endif
+446|unsigned long ERR_peek_error(void);
+
+===== err.h:442 ERR_get_error_line_data =====
+440|OSSL_DEPRECATEDIN_3_0
+441|unsigned long ERR_get_error_line(const char **file, int *line);
+442|OSSL_DEPRECATEDIN_3_0
+443|unsigned long ERR_get_error_line_data(const char **file, int *line,
+444|    const char **data, int *flags);
+
+===== err.h:440 ERR_get_error_line =====
+438|    const char **data, int *flags);
+439|#ifndef OPENSSL_NO_DEPRECATED_3_0
+440|OSSL_DEPRECATEDIN_3_0
+441|unsigned long ERR_get_error_line(const char **file, int *line);
+
+===== err.h:436 ERR_get_error_all =====
+434| */
+435|unsigned long ERR_get_error(void);
+436|unsigned long ERR_get_error_all(const char **file, int *line,
+437|    const char **func,
+438|    const char **data, int *flags);
+
+===== err.h:429 ERR_set_error_data =====
+427|#endif
+428|
+429|void ERR_set_error_data(char *data, int flags);
+
+===== err.h:411 ERR_set_error =====
+409|void ERR_new(void);
+410|void ERR_set_debug(const char *file, int line, const char *func);
+411|void ERR_set_error(int lib, int reason, const char *fmt, ...);
+
+===== err.h:410 ERR_set_debug =====
+408|/* Building blocks */
+409|void ERR_new(void);
+410|void ERR_set_debug(const char *file, int line, const char *func);
+
+===== err.h:258 ERR_GET_REASON =====
+256|}
+257|
+258|static ossl_unused ossl_inline int ERR_GET_REASON(unsigned long errcode)
+259|{
+260|    if (ERR_SYSTEM_ERROR(errcode))
+261|        return errcode & ERR_SYSTEM_MASK;
+
+===== err.h:244 ERR_GET_LIB =====
+242|#define ERR_SYSTEM_ERROR(errcode) (((errcode) & ERR_SYSTEM_FLAG) != 0)
+243|
+244|static ossl_unused ossl_inline int ERR_GET_LIB(unsigned long errcode)
+245|{
+246|    if (ERR_SYSTEM_ERROR(errcode))
+247|        return ERR_LIB_SYS;
+
+===== err.h:69 top =====
+67|    int err_line[ERR_NUM_ERRORS];
+68|    char *err_func[ERR_NUM_ERRORS];
+69|    int top, bottom;
+
+===== err.h:67 err_line =====
+65|    int err_data_flags[ERR_NUM_ERRORS];
+66|    char *err_file[ERR_NUM_ERRORS];
+67|    int err_line[ERR_NUM_ERRORS];
+
+===== err.h:65 err_data_flags =====
+63|    /** Allocated size in bytes of each @c err_data slot. */
+64|    size_t err_data_size[ERR_NUM_ERRORS];
+65|    int err_data_flags[ERR_NUM_ERRORS];
+
+===== err.h:61 err_buffer =====
+59|    int err_flags[ERR_NUM_ERRORS];
+60|    int err_marks[ERR_NUM_ERRORS];
+61|    unsigned long err_buffer[ERR_NUM_ERRORS];
+
+===== err.h:60 err_marks =====
+58|struct err_state_st {
+59|    int err_flags[ERR_NUM_ERRORS];
+60|    int err_marks[ERR_NUM_ERRORS];
+
+===== err.h:59 err_flags =====
+57|#define ERR_NUM_ERRORS 16
+58|struct err_state_st {
+59|    int err_flags[ERR_NUM_ERRORS];
+
+===== evp.h:5556 EVP_PKEY_derive_set_peer =====
+5554|int EVP_PKEY_derive_set_peer_ex(EVP_PKEY_CTX *ctx, EVP_PKEY *peer,
+5555|    int validate_peer);
+5556|int EVP_PKEY_derive_set_peer(EVP_PKEY_CTX *ctx, EVP_PKEY *peer);
+
+===== evp.h:5116 EVP_PKEY_new_raw_public_key =====
+5114|    const char *keytype, const char *propq,
+5115|    const unsigned char *pub, size_t len);
+5116|EVP_PKEY *EVP_PKEY_new_raw_public_key(int type, ENGINE *e,
+5117|    const unsigned char *pub,
+5118|    size_t len);
+
+===== evp.h:4759 EVP_PKEY_CTX_set_mac_key =====
+4757|    (EVP_PKEY_OP_PARAMGEN | EVP_PKEY_OP_KEYGEN)
+4758|
+4759|int EVP_PKEY_CTX_set_mac_key(EVP_PKEY_CTX *ctx, const unsigned char *key,
+4760|    int keylen);
+
+===== evp.h:4468 EVP_PKEY_asn1_get0_info =====
+4466| */
+4467|int EVP_PKEY_asn1_add_alias(int to, int from);
+4468|int EVP_PKEY_asn1_get0_info(int *ppkey_id, int *pkey_base_id,
+4469|    int *ppkey_flags, const char **pinfo,
+4470|    const char **ppem_str,
+4471|    const EVP_PKEY_ASN1_METHOD *ameth);
+
+===== evp.h:2394 EVP_rc4_hmac_md5 =====
+2392|const EVP_CIPHER *EVP_rc4_40(void);
+2393|#ifndef OPENSSL_NO_MD5
+2394|const EVP_CIPHER *EVP_rc4_hmac_md5(void);
+
+===== evp.h:2206 EVP_sha512_224 =====
+2204| */
+2205|const EVP_MD *EVP_sha512(void);
+2206|const EVP_MD *EVP_sha512_224(void);
+
+===== http.h:258 OSSL_HTTP_REQ_CTX_set_max_response_hdr_lines =====
+256|    const char *server, int use_ssl);
+257|
+258|void OSSL_HTTP_REQ_CTX_set_max_response_hdr_lines(OSSL_HTTP_REQ_CTX *rctx,
+259|    size_t count);
+
+===== http.h:179 OSSL_HTTP_get =====
+177|    size_t max_resp_len, int timeout, int keep_alive);
+178|BIO *OSSL_HTTP_exchange(OSSL_HTTP_REQ_CTX *rctx, char **redirection_url);
+179|BIO *OSSL_HTTP_get(const char *url, const char *proxy, const char *no_proxy,
+180|    BIO *bio, BIO *rbio,
+181|    OSSL_HTTP_bio_cb_t bio_update_fn, void *arg,
+182|    int buf_size, const STACK_OF(CONF_VALUE) *headers,
+183|    const char *expected_content_type, int expect_asn1,
+184|    size_t max_resp_len, int timeout);
+
+===== kdf.h:129 EVP_PKEY_CTX_set_tls1_prf_md =====
+127|    EVP_KDF_HKDF_MODE_EXPAND_ONLY
+128|
+129|int EVP_PKEY_CTX_set_tls1_prf_md(EVP_PKEY_CTX *ctx, const EVP_MD *md);
+
+===== kdf.h:76 EVP_KDF_CTX_gettable_params =====
+74|const OSSL_PARAM *EVP_KDF_gettable_ctx_params(const EVP_KDF *kdf);
+75|const OSSL_PARAM *EVP_KDF_settable_ctx_params(const EVP_KDF *kdf);
+76|const OSSL_PARAM *EVP_KDF_CTX_gettable_params(EVP_KDF_CTX *ctx);
+
+===== lhash.h:149 OPENSSL_LH_node_stats_bio =====
+147| */
+148|OSSL_DEPRECATEDIN_3_1 void OPENSSL_LH_stats_bio(const OPENSSL_LHASH *lh, BIO *out);
+149|OSSL_DEPRECATEDIN_3_1 void OPENSSL_LH_node_stats_bio(const OPENSSL_LHASH *lh, BIO *out);
+
+===== objects.h:328 OBJ_length =====
+326|int OBJ_create_objects(BIO *in);
+327|
+328|size_t OBJ_length(const ASN1_OBJECT *obj);
+
+===== params.h:271 OSSL_PARAM_dup =====
+269|void OSSL_PARAM_set_all_unmodified(OSSL_PARAM *p);
+270|
+271|OSSL_PARAM *OSSL_PARAM_dup(const OSSL_PARAM *p);
+
+===== params.h:269 OSSL_PARAM_set_all_unmodified =====
+267|
+268|int OSSL_PARAM_modified(const OSSL_PARAM *p);
+269|void OSSL_PARAM_set_all_unmodified(OSSL_PARAM *p);
+
+===== params.h:268 OSSL_PARAM_modified =====
+266|    size_t *used_len);
+267|
+268|int OSSL_PARAM_modified(const OSSL_PARAM *p);
+
+===== params.h:265 OSSL_PARAM_get_octet_string_ptr =====
+263|
+264|int OSSL_PARAM_get_utf8_string_ptr(const OSSL_PARAM *p, const char **val);
+265|int OSSL_PARAM_get_octet_string_ptr(const OSSL_PARAM *p, const void **val,
+266|    size_t *used_len);
+
+===== params.h:264 OSSL_PARAM_get_utf8_string_ptr =====
+262|    size_t used_len);
+263|
+264|int OSSL_PARAM_get_utf8_string_ptr(const OSSL_PARAM *p, const char **val);
+
+===== params.h:252 OSSL_PARAM_get_octet_ptr =====
+250|int OSSL_PARAM_set_utf8_ptr(OSSL_PARAM *p, const char *val);
+251|
+252|int OSSL_PARAM_get_octet_ptr(const OSSL_PARAM *p, const void **val,
+253|    size_t *used_len);
+
+===== params.h:228 OSSL_PARAM_get_utf8_string =====
+226|int OSSL_PARAM_set_BN(OSSL_PARAM *p, const BIGNUM *val);
+227|
+228|int OSSL_PARAM_get_utf8_string(const OSSL_PARAM *p, char **val, size_t max_len);
+
+===== params.h:219 OSSL_PARAM_get_BN =====
+217|int OSSL_PARAM_set_double(OSSL_PARAM *p, double val);
+218|
+219|int OSSL_PARAM_get_BN(const OSSL_PARAM *p, BIGNUM **val);
+
+===== params.h:208 OSSL_PARAM_set_time_t =====
+206| */
+207|int OSSL_PARAM_set_size_t(OSSL_PARAM *p, size_t val);
+208|int OSSL_PARAM_set_time_t(OSSL_PARAM *p, time_t val);
+
+===== params.h:200 OSSL_PARAM_set_uint64 =====
+198|int OSSL_PARAM_set_uint32(OSSL_PARAM *p, uint32_t val);
+199|int OSSL_PARAM_set_int64(OSSL_PARAM *p, int64_t val);
+200|int OSSL_PARAM_set_uint64(OSSL_PARAM *p, uint64_t val);
+
+===== params.h:199 OSSL_PARAM_set_int64 =====
+197|int OSSL_PARAM_set_int32(OSSL_PARAM *p, int32_t val);
+198|int OSSL_PARAM_set_uint32(OSSL_PARAM *p, uint32_t val);
+199|int OSSL_PARAM_set_int64(OSSL_PARAM *p, int64_t val);
+
+===== params.h:198 OSSL_PARAM_set_uint32 =====
+196| */
+197|int OSSL_PARAM_set_int32(OSSL_PARAM *p, int32_t val);
+198|int OSSL_PARAM_set_uint32(OSSL_PARAM *p, uint32_t val);
+
+===== params.h:181 OSSL_PARAM_set_int =====
+179|int OSSL_PARAM_get_time_t(const OSSL_PARAM *p, time_t *val);
+180|
+181|int OSSL_PARAM_set_int(OSSL_PARAM *p, int val);
+
+===== params.h:179 OSSL_PARAM_get_time_t =====
+177| */
+178|int OSSL_PARAM_get_size_t(const OSSL_PARAM *p, size_t *val);
+179|int OSSL_PARAM_get_time_t(const OSSL_PARAM *p, time_t *val);
+
+===== params.h:164 OSSL_PARAM_get_int64 =====
+162|int OSSL_PARAM_get_int32(const OSSL_PARAM *p, int32_t *val);
+163|int OSSL_PARAM_get_uint32(const OSSL_PARAM *p, uint32_t *val);
+164|int OSSL_PARAM_get_int64(const OSSL_PARAM *p, int64_t *val);
+
+===== params.h:163 OSSL_PARAM_get_uint32 =====
+161|int OSSL_PARAM_get_ulong(const OSSL_PARAM *p, unsigned long int *val);
+162|int OSSL_PARAM_get_int32(const OSSL_PARAM *p, int32_t *val);
+163|int OSSL_PARAM_get_uint32(const OSSL_PARAM *p, uint32_t *val);
+
+===== params.h:162 OSSL_PARAM_get_int32 =====
+160|int OSSL_PARAM_get_long(const OSSL_PARAM *p, long int *val);
+161|int OSSL_PARAM_get_ulong(const OSSL_PARAM *p, unsigned long int *val);
+162|int OSSL_PARAM_get_int32(const OSSL_PARAM *p, int32_t *val);
+
+===== params.h:161 OSSL_PARAM_get_ulong =====
+159|int OSSL_PARAM_get_uint(const OSSL_PARAM *p, unsigned int *val);
+160|int OSSL_PARAM_get_long(const OSSL_PARAM *p, long int *val);
+161|int OSSL_PARAM_get_ulong(const OSSL_PARAM *p, unsigned long int *val);
+
+===== params.h:153 OSSL_PARAM_allocate_from_text =====
+151|OSSL_PARAM OSSL_PARAM_construct_end(void);
+152|
+153|int OSSL_PARAM_allocate_from_text(OSSL_PARAM *to,
+154|    const OSSL_PARAM *paramdefs,
+155|    const char *key, const char *value,
+156|    size_t value_n, int *found);
+
+===== params.h:145 OSSL_PARAM_construct_octet_ptr =====
+143|OSSL_PARAM OSSL_PARAM_construct_octet_string(const char *key, void *buf,
+144|    size_t bsize);
+145|OSSL_PARAM OSSL_PARAM_construct_octet_ptr(const char *key, void **buf,
+146|    size_t bsize);
+
+===== params.h:93 OSSL_PARAM_construct_int64 =====
+91|OSSL_PARAM OSSL_PARAM_construct_int32(const char *key, int32_t *buf);
+92|OSSL_PARAM OSSL_PARAM_construct_uint32(const char *key, uint32_t *buf);
+93|OSSL_PARAM OSSL_PARAM_construct_int64(const char *key, int64_t *buf);
+
+===== params.h:92 OSSL_PARAM_construct_uint32 =====
+90| */
+91|OSSL_PARAM OSSL_PARAM_construct_int32(const char *key, int32_t *buf);
+92|OSSL_PARAM OSSL_PARAM_construct_uint32(const char *key, uint32_t *buf);
+
+===== params.h:83 OSSL_PARAM_construct_long =====
+81| */
+82|OSSL_PARAM OSSL_PARAM_construct_uint(const char *key, unsigned int *buf);
+83|OSSL_PARAM OSSL_PARAM_construct_long(const char *key, long int *buf);
+
+===== params.h:75 OSSL_PARAM_construct_int =====
+73|
+74|/* Basic parameter type run-time construction */
+75|OSSL_PARAM OSSL_PARAM_construct_int(const char *key, int *buf);
+
+===== params.h:71 OSSL_PARAM_locate =====
+69|
+70|/* Search an OSSL_PARAM array for a matching name */
+71|OSSL_PARAM *OSSL_PARAM_locate(OSSL_PARAM *p, const char *key);
+
+===== pkcs7.h:912 PKCS7_dataFinal =====
+910|
+911|BIO *PKCS7_dataInit(PKCS7 *p7, BIO *bio);
+912|int PKCS7_dataFinal(PKCS7 *p7, BIO *bio);
+
+===== rand.h:231 RAND_write_file =====
+229| */
+230|int RAND_load_file(const char *file, long max_bytes);
+231|int RAND_write_file(const char *file);
+
+===== rsa.h:1333 RSA_meth_get_pub_enc =====
+1331|OSSL_DEPRECATEDIN_3_0 int RSA_meth_set0_app_data(RSA_METHOD *meth,
+1332|    void *app_data);
+1333|OSSL_DEPRECATEDIN_3_0
+1334|int (*RSA_meth_get_pub_enc(const RSA_METHOD *meth))(int flen,
+1335|    const unsigned char *from,
+1336|    unsigned char *to,
+1337|    RSA *rsa, int padding);
+
+===== rsa.h:855 maskGenFunc =====
+853|    /** AlgorithmIdentifier for the OAEP hash function (for example SHA-256). */
+854|    X509_ALGOR *hashFunc;
+855|    X509_ALGOR *maskGenFunc;
+
+===== sha.h:261 SHA512_Transform =====
+259|    const void *data, size_t len);
+260|OSSL_DEPRECATEDIN_3_0 int SHA512_Final(unsigned char *md, SHA512_CTX *c);
+261|OSSL_DEPRECATEDIN_3_0 void SHA512_Transform(SHA512_CTX *c,
+262|    const unsigned char *data);
+
+===== ssl.h:5230 SSL_inject_net_dgram =====
+5228|
+5229|#ifndef OPENSSL_NO_QUIC
+5230|__owur int SSL_inject_net_dgram(SSL *s, const unsigned char *buf,
+5231|    size_t buf_len,
+5232|    const BIO_ADDR *peer,
+5233|    const BIO_ADDR *local);
+
+===== ssl.h:5038 SSL_set_record_padding_callback =====
+5036|int SSL_CTX_set_block_padding(SSL_CTX *ctx, size_t block_size);
+5037|
+5038|int SSL_set_record_padding_callback(SSL *ssl,
+5039|    size_t (*cb)(SSL *ssl, int type,
+5040|        size_t len, void *arg));
+
+===== ssl.h:4675 SSL_get_state =====
+4673|void (*SSL_get_info_callback(const SSL *ssl))(const SSL *ssl, int type,
+4674|    int val);
+4675|__owur OSSL_HANDSHAKE_STATE SSL_get_state(const SSL *ssl);
+
+===== ssl.h:4452 SSL_get_client_CA_list =====
+4450| */
+4451|void SSL_CTX_set_client_CA_list(SSL_CTX *ctx, STACK_OF(X509_NAME) *name_list);
+4452|__owur STACK_OF(X509_NAME) *SSL_get_client_CA_list(const SSL *s);
+
+===== ssl.h:3098 SSL_SESSION_get_id =====
+3096| */
+3097|__owur SSL_SESSION *SSL_SESSION_dup(const SSL_SESSION *src);
+3098|const unsigned char *SSL_SESSION_get_id(const SSL_SESSION *s,
+3099|    unsigned int *len);
+
+===== ssl.h:2967 SSL_SESSION_set_time_ex =====
+2965| */
+2966|__owur time_t SSL_SESSION_get_time_ex(const SSL_SESSION *s);
+2967|__owur time_t SSL_SESSION_set_time_ex(SSL_SESSION *s, time_t t);
+
+===== ssl.h:2785 SSL_use_RSAPrivateKey_file =====
+2783|
+2784|#ifndef OPENSSL_NO_DEPRECATED_3_0
+2785|OSSL_DEPRECATEDIN_3_0
+2786|__owur int SSL_use_RSAPrivateKey_file(SSL *ssl, const char *file, int type);
+
+===== ssl.h:2456 SSL_CIPHER_get_version =====
+2454| */
+2455|__owur int SSL_CIPHER_get_bits(const SSL_CIPHER *c, int *alg_bits);
+2456|__owur const char *SSL_CIPHER_get_version(const SSL_CIPHER *c);
+
+===== stack.h:25 OPENSSL_sk_compfunc =====
+23|typedef struct stack_st OPENSSL_STACK; /* Use STACK_OF(...) instead */
+24|
+25|typedef int (*OPENSSL_sk_compfunc)(const void *, const void *);
+
+===== types.h:327 pem_password_cb =====
+325|typedef struct ossl_param_bld_st OSSL_PARAM_BLD;
+326|
+327|typedef int pem_password_cb(char *buf, int size, int rwflag, void *userdata);
+
+===== types.h:305 ct_policy_eval_ctx_st =====
+303|typedef struct ctlog_st CTLOG;
+304|typedef struct ctlog_store_st CTLOG_STORE;
+305|typedef struct ct_policy_eval_ctx_st CT_POLICY_EVAL_CTX;
+
+===== types.h:261 SSL =====
+259|
+260|typedef struct engine_st ENGINE;
+261|typedef struct ssl_st SSL;
+
+===== types.h:221 ssl_dane_st =====
+219|typedef struct rand_drbg_st RAND_DRBG;
+220|
+221|typedef struct ssl_dane_st SSL_DANE;
+
+===== types.h:219 RAND_DRBG =====
+217| */
+218|typedef struct rand_meth_st RAND_METHOD;
+219|typedef struct rand_drbg_st RAND_DRBG;
+
+===== types.h:124 bn_recp_ctx_st =====
+122|typedef struct bn_blinding_st BN_BLINDING;
+123|typedef struct bn_mont_ctx_st BN_MONT_CTX;
+124|typedef struct bn_recp_ctx_st BN_RECP_CTX;
+
+===== types.h:121 bignum_ctx =====
+119| */
+120|typedef struct bignum_st BIGNUM;
+121|typedef struct bignum_ctx BN_CTX;
+
+===== types.h:69 ASN1_IA5STRING =====
+67|typedef struct asn1_string_st ASN1_PRINTABLESTRING;
+68|typedef struct asn1_string_st ASN1_T61STRING;
+69|typedef struct asn1_string_st ASN1_IA5STRING;
+
+===== x509.h:4395 PKCS5_pbkdf2_set_ex =====
+4393|X509_ALGOR *PKCS5_pbkdf2_set(int iter, unsigned char *salt, int saltlen,
+4394|    int prf_nid, int keylen);
+4395|X509_ALGOR *PKCS5_pbkdf2_set_ex(int iter, unsigned char *salt, int saltlen,
+4396|    int prf_nid, int keylen,
+4397|    OSSL_LIB_CTX *libctx);
+
+===== x509.h:3710 X509_add1_ext_i2d =====
+3708|int X509_add_ext(X509 *x, X509_EXTENSION *ex, int loc);
+3709|void *X509_get_ext_d2i(const X509 *x, int nid, int *crit, int *idx);
+3710|int X509_add1_ext_i2d(X509 *x, int nid, void *value, int crit,
+3711|    unsigned long flags);
+
+===== x509.h:3700 X509_get_ext =====
+3698| */
+3699|int X509_get_ext_by_critical(const X509 *x, int crit, int lastpos);
+3700|X509_EXTENSION *X509_get_ext(const X509 *x, int loc);
+
+===== x509.h:3075 X509_CRL_get0_lastUpdate =====
+3073| */
+3074|long X509_CRL_get_version(const X509_CRL *crl);
+3075|const ASN1_TIME *X509_CRL_get0_lastUpdate(const X509_CRL *crl);
+
+===== x509.h:2738 X509_set1_notBefore =====
+2736| */
+2737|ASN1_TIME *X509_getm_notBefore(const X509 *x);
+2738|int X509_set1_notBefore(X509 *x, const ASN1_TIME *tm);
+
+===== x509_vfy.h:1825 X509_STORE_CTX_set_time =====
+1823| */
+1824|void X509_STORE_CTX_set_flags(X509_STORE_CTX *ctx, unsigned long flags);
+1825|void X509_STORE_CTX_set_time(X509_STORE_CTX *ctx, unsigned long flags,
+1826|    time_t t);
+
+===== x509_vfy.h:1794 X509_STORE_CTX_set0_crls =====
+1792|void X509_STORE_CTX_set0_rpk(X509_STORE_CTX *ctx, EVP_PKEY *target);
+1793|void X509_STORE_CTX_set0_verified_chain(X509_STORE_CTX *c, STACK_OF(X509) *sk);
+1794|void X509_STORE_CTX_set0_crls(X509_STORE_CTX *ctx, STACK_OF(X509_CRL) *sk);
+
+===== x509_vfy.h:1131 X509_STORE_CTX_get_check_revocation =====
+1129| */
+1130|X509_STORE_CTX_check_issued_fn X509_STORE_CTX_get_check_issued(const X509_STORE_CTX *ctx);
+1131|X509_STORE_CTX_check_revocation_fn X509_STORE_CTX_get_check_revocation(const X509_STORE_CTX *ctx);
+
+===== x509_vfy.h:1104 X509_STORE_CTX_set0_untrusted =====
+1102| */
+1103|STACK_OF(X509) *X509_STORE_CTX_get0_untrusted(const X509_STORE_CTX *ctx);
+1104|void X509_STORE_CTX_set0_untrusted(X509_STORE_CTX *ctx, STACK_OF(X509) *sk);
+
+===== x509_vfy.h:1078 X509_STORE_CTX_cleanup =====
+1076| */
+1077|void X509_STORE_CTX_set0_trusted_stack(X509_STORE_CTX *ctx, STACK_OF(X509) *sk);
+1078|void X509_STORE_CTX_cleanup(X509_STORE_CTX *ctx);
+
+===== x509_vfy.h:182 arg2 =====
+180|    /** @brief Integer argument associated with this trust entry. */
+181|    int arg1;
+182|    void *arg2;
+
+===== x509v3.h:3839 PROFESSION_INFO_set0_addProfessionInfo =====
+3837|const ASN1_OCTET_STRING *PROFESSION_INFO_get0_addProfessionInfo(
+3838|    const PROFESSION_INFO *pi);
+3839|void PROFESSION_INFO_set0_addProfessionInfo(
+3840|    PROFESSION_INFO *pi, ASN1_OCTET_STRING *aos);
+
+===== x509v3.h:1891 i2d_DIST_POINT =====
+1889| */
+1890|DIST_POINT *d2i_DIST_POINT(DIST_POINT **a, const unsigned char **in, long len);
+1891|int i2d_DIST_POINT(const DIST_POINT *a, unsigned char **out);
+
+===== x509v3.h:1713 d2i_CERTIFICATEPOLICIES =====
+1711| */
+1712|void CERTIFICATEPOLICIES_free(CERTIFICATEPOLICIES *a);
+1713|CERTIFICATEPOLICIES *d2i_CERTIFICATEPOLICIES(CERTIFICATEPOLICIES **a, const unsigned char **in, long len);

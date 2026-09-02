@@ -1,0 +1,48 @@
+=== batch 18d: hmac/http/kdf/lhash/params/pkcs7/rsa/sha ===
+  OK: hmac.h :: HMAC_Init_ex
+  OK: http.h :: OSSL_HTTP_REQ_CTX_free
+  OK: http.h :: OSSL_HTTP_REQ_CTX_nbio
+  OK: http.h :: OSSL_HTTP_bio_cb_t
+  OK: http.h :: OSSL_HTTP_open
+  OK: http.h :: OSSL_HTTP_exchange
+  OK: http.h :: OSSL_parse_url
+  OK: kdf.h :: EVP_KDF_get0_description
+  OK: kdf.h :: EVP_KDF_get0_name
+  OK: kdf.h :: EVP_KDF_CTX_get_kdf_size
+  OK: kdf.h :: EVP_PKEY_CTX_set1_pbe_pass
+  OK: lhash.h :: LH hash/doall typedefs
+  OK: lhash.h.in :: LH hash/doall typedefs
+  OK: lhash.h :: LH doall_arg_thunk + OPENSSL_LHASH
+  OK: lhash.h.in :: LH doall_arg_thunk + OPENSSL_LHASH
+  OK: lhash.h :: struct lhash_st forward
+  OK: lhash.h.in :: struct lhash_st forward
+  OK: lhash.h :: OPENSSL_LH_flush
+  OK: lhash.h.in :: OPENSSL_LH_flush
+  OK: lhash.h :: OPENSSL_LH_delete
+  OK: lhash.h.in :: OPENSSL_LH_delete
+  OK: lhash.h :: OPENSSL_LH_strhash
+  OK: lhash.h.in :: OPENSSL_LH_strhash
+  OK: lhash.h :: OPENSSL_LH_node_stats
+  OK: lhash.h.in :: OPENSSL_LH_node_stats
+  OK: params.h :: OSSL_PARAM_construct_ulong
+  OK: params.h :: OSSL_PARAM_construct_size_t
+  OK: params.h :: OSSL_PARAM_get_int
+  OK: params.h :: OSSL_PARAM_get_long
+  OK: params.h :: OSSL_PARAM_set_uint
+  OK: params.h :: OSSL_PARAM_set_double
+  OK: params.h :: OSSL_PARAM_set_utf8_ptr
+  OK: pkcs7.h :: PKCS7_dup
+  OK: pkcs7.h.in :: PKCS7_dup
+  OK: pkcs7.h :: PKCS7_digest_from_attributes
+  OK: pkcs7.h.in :: PKCS7_digest_from_attributes
+  OK: pkcs7.h :: PKCS7_set_signed_attributes
+  OK: pkcs7.h.in :: PKCS7_set_signed_attributes
+  OK: rsa.h :: RSA_check_key
+  OK: rsa.h :: RSA_print_fp
+  OK: rsa.h :: RSA_print
+  OK: sha.h :: SHA_CTX.data
+  OK: sha.h :: SHA512 u.d/u.p
+  OK: sha.h :: SHA512_Init
+  OK: sha.h :: SHA512_Final
+
+OK=45 MISS=0

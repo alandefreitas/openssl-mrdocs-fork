@@ -1,0 +1,31 @@
+=== batch 14c ===
+  OK: evp.h :: EVP_MD_do_all_sorted
+  OK: evp.h :: EVP_MAC_up_ref
+  OK: evp.h :: EVP_MAC_settable_ctx_params
+  OK: evp.h :: EVP_RAND_get0_name
+  OK: evp.h :: EVP_RAND_CTX_get0_rand
+  OK: evp.h :: EVP_RAND_reseed
+  OK: evp.h :: EVP_RAND_nonce
+  OK: evp.h :: EVP_PKEY_set_type
+  OK: evp.h :: EVP_PKEY_set_type_by_keymgmt
+  OK: evp.h :: EVP_PKEY_get0_RSA
+  OK: evp.h :: EVP_PKEY_print_private
+  OK: evp.h :: EVP_PKEY_asn1_add_alias
+  OK: evp.h :: EVP_PKEY_asn1_set_free
+  OK: evp.h :: EVP_PKEY_asn1_set_security_bits
+  OK: evp.h :: EVP_PKEY_CTX_get1_id
+  OK: evp.h :: EVP_PKEY_CTX_settable_params
+  OK: evp.h :: EVP_ASYM_CIPHER_settable_ctx_params
+  OK: evp.h :: EVP_PKEY_meth_set_init
+  OK: evp.h :: EVP_PKEY_meth_set_verify_recover
+  OK: http.h :: OSSL_HTTP_REQ_CTX_set_max_response_length
+  OK: kdf.h :: EVP_KDF_CTX_reset
+  OK: kdf.h :: EVP_KDF_CTX_set_params
+  OK: kdf.h :: EVP_KDF_names_do_all
+  OK: objects.h :: OBJ_NAME_add
+  OK: objects.h :: OBJ_add_object
+  OK: params.h :: OSSL_PARAM_construct_uint64
+  OK: params.h :: OSSL_PARAM_set_long
+  OK: params.h :: OSSL_PARAM_get_utf8_ptr
+
+OK=28 MISS=0
