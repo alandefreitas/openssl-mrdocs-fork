@@ -9,12 +9,6 @@
 # OpenSSL is a C library: every public header wraps its declarations in
 # `extern "C"`. MrDocs treats linkage specs as transparent DeclContexts so
 # those symbols are extracted into the global namespace.
-#
-# Unlike the Folly/Bitcoin demos, this config keeps the host stdlib/libc: the
-# isolated clang-23 + SDK C-header pairing conflicts with OpenSSL's e_os2.h
-# stdint dance (the SDK stdint.h then fails to see the underlying intN_t
-# typedefs). The host toolchain is enough here because OpenSSL's public
-# headers are C and do not need C++23 library features.
 source-root: ..
 input:
   - ../include/openssl
@@ -71,22 +65,26 @@ exclude-symbols:
   - 'sk_*_compfunc'
   - 'sk_*_copyfunc'
   - 'sk_*_freefunc'
-  - 'lh_*_compfunc'
-  - 'lh_*_hashfunc'
-  - 'lh_*_doallfunc'
   - 'lh_*_dummy::**'
   - '**::dummy'
   - '**::d1'
   - '**::d2'
   - '**::d3'
+  # STACK_OF(T) and LHASH_OF(T) families: DEFINE_STACK_OF / DEFINE_LHASH_OF_EX
+  # stamp out an opaque struct, callback typedefs, and ~25 functions per type
+  # (95 stack and 13 lhash families). OpenSSL documents them once, generically,
+  # in DEFINE_STACK_OF(3) and DEFINE_LHASH_OF_EX(3); the instances are excluded.
+  - 'lh_*_compfunc'
+  - 'lh_*_hashfunc'
+  - 'lh_*_doallfunc'
   - 'stack_st_*'
   - 'stack_st_*::**'
   - 'sk_*'
+  - 'lhash_st_*'
+  - 'lhash_st_*::**'
   # POSIX gethostbyname(3) result type; not part of the OpenSSL API surface.
   - 'hostent'
   - 'hostent::**'
-  - 'lhash_st_*'
-  - 'lhash_st_*::**'
 
 implementation-defined:
   - 'ossl_check_*'
@@ -109,18 +107,4 @@ exclude-macros:
 extract-all: true
 multipage: true
 generator: adoc
-auto-function-metadata: false
 non-standard-attributes: false
-
-warnings: true
-warn-if-undocumented: true
-warn-no-paramdoc: true
-warn-unnamed-param: true
-warn-if-undoc-enum-val: true
-warn-if-doc-error: true
-warn-broken-ref: true
-warn-if-undocumented-namespace: true
-warn-no-brief: true
-
-#warn-as-error: true
-#max-errors: 40
